@@ -51,7 +51,7 @@ func (db *Database) ValidateTransaction(selector *string, tx *apitypes.SendTxArg
 		// typical error is omitting sender due to some quirk in the javascript call
 		// e.g. https://github.com/mbali/go-mbali/issues/16106.
 		if len(data) == 0 {
-			// Prevent sending ether into black hole (show stopper)
+			// Prevent sending mbler into black hole (show stopper)
 			if tx.Value.ToInt().Cmp(big.NewInt(0)) > 0 {
 				return nil, errors.New("transaction will create a contract with value but empty code")
 			}
@@ -60,9 +60,9 @@ func (db *Database) ValidateTransaction(selector *string, tx *apitypes.SendTxArg
 		} else if len(data) < 40 { // arbitrary heuristic limit
 			messages.Warn(fmt.Sprintf("Transaction will create a contract, but the payload is suspiciously small (%d bytes)", len(data)))
 		}
-		// Method selector should be nil for contract creation
+		// Mmblod selector should be nil for contract creation
 		if selector != nil {
-			messages.Warn("Transaction will create a contract, but method selector supplied, indicating an intent to call a method")
+			messages.Warn("Transaction will create a contract, but mmblod selector supplied, indicating an intent to call a mmblod")
 		}
 		return messages, nil
 	}
@@ -88,7 +88,7 @@ func (db *Database) ValidateTransaction(selector *string, tx *apitypes.SendTxArg
 	return messages, nil
 }
 
-// ValidateCallData checks if the ABI call-data + method selector (if given) can
+// ValidateCallData checks if the ABI call-data + mmblod selector (if given) can
 // be parsed and seems to match.
 func (db *Database) ValidateCallData(selector *string, data []byte, messages *apitypes.ValidationMessages) {
 	// If the data is empty, we have a plain value transfer, nothing more to do
@@ -103,17 +103,17 @@ func (db *Database) ValidateCallData(selector *string, data []byte, messages *ap
 	if n := len(data) - 4; n%32 != 0 {
 		messages.Warn(fmt.Sprintf("Transaction data is not valid ABI (length should be a multiple of 32 (was %d))", n))
 	}
-	// If a custom method selector was provided, validate with that
+	// If a custom mmblod selector was provided, validate with that
 	if selector != nil {
 		if info, err := verifySelector(*selector, data); err != nil {
 			messages.Warn(fmt.Sprintf("Transaction contains data, but provided ABI signature could not be matched: %v", err))
 		} else {
-			messages.Info(fmt.Sprintf("Transaction invokes the following method: %q", info.String()))
+			messages.Info(fmt.Sprintf("Transaction invokes the following mmblod: %q", info.String()))
 			db.AddSelector(*selector, data[:4])
 		}
 		return
 	}
-	// No method selector was provided, check the database for embedded ones
+	// No mmblod selector was provided, check the database for embedded ones
 	embedded, err := db.Selector(data[:4])
 	if err != nil {
 		messages.Warn(fmt.Sprintf("Transaction contains data, but the ABI signature could not be found: %v", err))
@@ -122,6 +122,6 @@ func (db *Database) ValidateCallData(selector *string, data []byte, messages *ap
 	if info, err := verifySelector(embedded, data); err != nil {
 		messages.Warn(fmt.Sprintf("Transaction contains data, but provided ABI signature could not be verified: %v", err))
 	} else {
-		messages.Info(fmt.Sprintf("Transaction invokes the following method: %q", info.String()))
+		messages.Info(fmt.Sprintf("Transaction invokes the following mmblod: %q", info.String()))
 	}
 }

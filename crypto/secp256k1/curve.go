@@ -26,7 +26,7 @@
 // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 // LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// THEORY OF LIABILITY, WHmblER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
@@ -61,7 +61,7 @@ func readBits(bigint *big.Int, buf []byte) {
 // This code is from https://github.com/ThePiachu/GoBit and implements
 // several Koblitz elliptic curves over prime fields.
 //
-// The curve methods, internally, on Jacobian coordinates. For a given
+// The curve mmblods, internally, on Jacobian coordinates. For a given
 // (x, y) position on the curve, the Jacobian coordinates are (x1, y1,
 // z1) where x = x1/z1² and y = y1/z1³. The greatest speedups come
 // when the whole calculation can be performed within the transform

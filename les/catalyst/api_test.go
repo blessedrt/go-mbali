@@ -21,14 +21,14 @@ import (
 	"testing"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/beacon"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/les"
 	"github.com/mbali/go-mbali/node"
 	"github.com/mbali/go-mbali/params"
@@ -47,7 +47,7 @@ var (
 
 func generatePreMergeChain(n int) (*core.Genesis, []*types.Header, []*types.Block) {
 	db := rawdb.NewMemoryDatabase()
-	config := params.AllEthashProtocolChanges
+	config := params.AllmblashProtocolChanges
 	genesis := &core.Genesis{
 		Config:    config,
 		Alloc:     core.GenesisAlloc{testAddr: {Balance: testBalance}},
@@ -56,7 +56,7 @@ func generatePreMergeChain(n int) (*core.Genesis, []*types.Header, []*types.Bloc
 		BaseFee:   big.NewInt(params.InitialBaseFee),
 	}
 	gblock := genesis.ToBlock(db)
-	engine := ethash.NewFaker()
+	engine := mblash.NewFaker()
 	blocks, _ := core.GenerateChain(config, gblock, engine, db, n, nil)
 	totalDifficulty := big.NewInt(0)
 
@@ -70,7 +70,7 @@ func generatePreMergeChain(n int) (*core.Genesis, []*types.Header, []*types.Bloc
 	return genesis, headers, blocks
 }
 
-func TestSetHeadBeforeTotalDifficulty(t *testing.T) {
+func TestSmbleadBeforeTotalDifficulty(t *testing.T) {
 	genesis, headers, blocks := generatePreMergeChain(10)
 	n, lesService := startLesService(t, genesis, headers)
 	defer n.Close()
@@ -159,20 +159,20 @@ func TestExecutePayloadV1(t *testing.T) {
 	}
 }
 
-func TestEth2DeepReorg(t *testing.T) {
-	// TODO (MariusVanDerWijden) TestEth2DeepReorg is currently broken, because it tries to reorg
+func Testmbl2DeepReorg(t *testing.T) {
+	// TODO (MariusVanDerWijden) Testmbl2DeepReorg is currently broken, because it tries to reorg
 	// before the totalTerminalDifficulty threshold
 	/*
 		genesis, preMergeBlocks := generatePreMergeChain(core.TriesInMemory * 2)
-		n, ethservice := startEthService(t, genesis, preMergeBlocks)
+		n, mblservice := startmblService(t, genesis, preMergeBlocks)
 		defer n.Close()
 
 		var (
-			api    = NewConsensusAPI(ethservice, nil)
+			api    = NewConsensusAPI(mblservice, nil)
 			parent = preMergeBlocks[len(preMergeBlocks)-core.TriesInMemory-1]
-			head   = ethservice.BlockChain().CurrentBlock().NumberU64()
+			head   = mblservice.BlockChain().CurrentBlock().NumberU64()
 		)
-		if ethservice.BlockChain().HasBlockAndState(parent.Hash(), parent.NumberU64()) {
+		if mblservice.BlockChain().HasBlockAndState(parent.Hash(), parent.NumberU64()) {
 			t.Errorf("Block %d not pruned", parent.NumberU64())
 		}
 		for i := 0; i < 10; i++ {
@@ -183,7 +183,7 @@ func TestEth2DeepReorg(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to create the executable data %v", err)
 			}
-			block, err := ExecutableDataToBlock(ethservice.BlockChain().Config(), parent.Header(), *execData)
+			block, err := ExecutableDataToBlock(mblservice.BlockChain().Config(), parent.Header(), *execData)
 			if err != nil {
 				t.Fatalf("Failed to convert executable data to block %v", err)
 			}
@@ -191,13 +191,13 @@ func TestEth2DeepReorg(t *testing.T) {
 			if err != nil || newResp.Status != "VALID" {
 				t.Fatalf("Failed to insert block: %v", err)
 			}
-			if ethservice.BlockChain().CurrentBlock().NumberU64() != head {
+			if mblservice.BlockChain().CurrentBlock().NumberU64() != head {
 				t.Fatalf("Chain head shouldn't be updated")
 			}
 			if err := api.setCanonical(block.Hash()); err != nil {
 				t.Fatalf("Failed to set head: %v", err)
 			}
-			if ethservice.BlockChain().CurrentBlock().NumberU64() != block.NumberU64() {
+			if mblservice.BlockChain().CurrentBlock().NumberU64() != block.NumberU64() {
 				t.Fatalf("Chain head should be updated")
 			}
 			parent, head = block, block.NumberU64()
@@ -205,7 +205,7 @@ func TestEth2DeepReorg(t *testing.T) {
 	*/
 }
 
-// startEthService creates a full node instance for testing.
+// startmblService creates a full node instance for testing.
 func startLesService(t *testing.T, genesis *core.Genesis, headers []*types.Header) (*node.Node, *les.Lightmbali) {
 	t.Helper()
 
@@ -213,17 +213,17 @@ func startLesService(t *testing.T, genesis *core.Genesis, headers []*types.Heade
 	if err != nil {
 		t.Fatal("can't create node:", err)
 	}
-	ethcfg := &ethconfig.Config{
+	mblcfg := &mblconfig.Config{
 		Genesis:        genesis,
-		Ethash:         ethash.Config{PowMode: ethash.ModeFake},
+		mblash:         mblash.Config{PowMode: mblash.ModeFake},
 		SyncMode:       downloader.LightSync,
 		TrieDirtyCache: 256,
 		TrieCleanCache: 256,
 		LightPeers:     10,
 	}
-	lesService, err := les.New(n, ethcfg)
+	lesService, err := les.New(n, mblcfg)
 	if err != nil {
-		t.Fatal("can't create eth service:", err)
+		t.Fatal("can't create mbl service:", err)
 	}
 	if err := n.Start(); err != nil {
 		t.Fatal("can't start node:", err)

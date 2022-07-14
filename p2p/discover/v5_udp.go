@@ -749,7 +749,7 @@ func (t *UDPv5) handleWhoareyou(p *v5wire.Whoareyou, fromID enode.ID, fromAddr *
 	t.sendCall(c)
 }
 
-// matchWithCall checks whether a handshake attempt matches the active call.
+// matchWithCall checks whmbler a handshake attempt matches the active call.
 func (t *UDPv5) matchWithCall(fromID enode.ID, nonce v5wire.Nonce) (*callV5, error) {
 	c := t.activeCallByAuth[nonce]
 	if c == nil {

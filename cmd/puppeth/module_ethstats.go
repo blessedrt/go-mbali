@@ -28,23 +28,23 @@ import (
 	"github.com/mbali/go-mbali/log"
 )
 
-// ethstatsDockerfile is the Dockerfile required to build an ethstats backend
+// mblstatsDockerfile is the Dockerfile required to build an mblstats backend
 // and associated monitoring site.
-var ethstatsDockerfile = `
-FROM puppeth/ethstats:latest
+var mblstatsDockerfile = `
+FROM puppmbl/mblstats:latest
 
 RUN echo 'module.exports = {trusted: [{{.Trusted}}], banned: [{{.Banned}}], reserved: ["yournode"]};' > lib/utils/config.js
 `
 
-// ethstatsComposefile is the docker-compose.yml file required to deploy and
-// maintain an ethstats monitoring site.
-var ethstatsComposefile = `
+// mblstatsComposefile is the docker-compose.yml file required to deploy and
+// maintain an mblstats monitoring site.
+var mblstatsComposefile = `
 version: '2'
 services:
-  ethstats:
+  mblstats:
     build: .
-    image: {{.Network}}/ethstats
-    container_name: {{.Network}}_ethstats_1{{if not .VHost}}
+    image: {{.Network}}/mblstats
+    container_name: {{.Network}}_mblstats_1{{if not .VHost}}
     ports:
       - "{{.Port}}:3000"{{end}}
     environment:
@@ -59,10 +59,10 @@ services:
     restart: always
 `
 
-// deployEthstats deploys a new ethstats container to a remote machine via SSH,
+// deploymblstats deploys a new mblstats container to a remote machine via SSH,
 // docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
-func deployEthstats(client *sshClient, network string, port int, secret string, vhost string, trusted []string, banned []string, nocache bool) ([]byte, error) {
+func deploymblstats(client *sshClient, network string, port int, secret string, vhost string, trusted []string, banned []string, nocache bool) ([]byte, error) {
 	// Generate the content to upload to the server
 	workdir := fmt.Sprintf("%d", rand.Int63())
 	files := make(map[string][]byte)
@@ -77,14 +77,14 @@ func deployEthstats(client *sshClient, network string, port int, secret string, 
 	}
 
 	dockerfile := new(bytes.Buffer)
-	template.Must(template.New("").Parse(ethstatsDockerfile)).Execute(dockerfile, map[string]interface{}{
+	template.Must(template.New("").Parse(mblstatsDockerfile)).Execute(dockerfile, map[string]interface{}{
 		"Trusted": strings.Join(trustedLabels, ", "),
 		"Banned":  strings.Join(bannedLabels, ", "),
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
 
 	composefile := new(bytes.Buffer)
-	template.Must(template.New("").Parse(ethstatsComposefile)).Execute(composefile, map[string]interface{}{
+	template.Must(template.New("").Parse(mblstatsComposefile)).Execute(composefile, map[string]interface{}{
 		"Network": network,
 		"Port":    port,
 		"Secret":  secret,
@@ -99,16 +99,16 @@ func deployEthstats(client *sshClient, network string, port int, secret string, 
 	}
 	defer client.Run("rm -rf " + workdir)
 
-	// Build and deploy the ethstats service
+	// Build and deploy the mblstats service
 	if nocache {
 		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate --timeout 60", workdir, network, network))
 	}
 	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate --timeout 60", workdir, network))
 }
 
-// ethstatsInfos is returned from an ethstats status check to allow reporting
+// mblstatsInfos is returned from an mblstats status check to allow reporting
 // various configuration parameters.
-type ethstatsInfos struct {
+type mblstatsInfos struct {
 	host   string
 	port   int
 	secret string
@@ -118,7 +118,7 @@ type ethstatsInfos struct {
 
 // Report converts the typed struct into a plain string->string map, containing
 // most - but not all - fields for reporting to the user.
-func (info *ethstatsInfos) Report() map[string]string {
+func (info *mblstatsInfos) Report() map[string]string {
 	return map[string]string{
 		"Website address":       info.host,
 		"Website listener port": strconv.Itoa(info.port),
@@ -127,11 +127,11 @@ func (info *ethstatsInfos) Report() map[string]string {
 	}
 }
 
-// checkEthstats does a health-check against an ethstats server to verify whether
+// checkmblstats does a health-check against an mblstats server to verify whmbler
 // it's running, and if yes, gathering a collection of useful infos about it.
-func checkEthstats(client *sshClient, network string) (*ethstatsInfos, error) {
-	// Inspect a possible ethstats container on the host
-	infos, err := inspectContainer(client, fmt.Sprintf("%s_ethstats_1", network))
+func checkmblstats(client *sshClient, network string) (*mblstatsInfos, error) {
+	// Inspect a possible mblstats container on the host
+	infos, err := inspectContainer(client, fmt.Sprintf("%s_mblstats_1", network))
 	if err != nil {
 		return nil, err
 	}
@@ -163,10 +163,10 @@ func checkEthstats(client *sshClient, network string) (*ethstatsInfos, error) {
 
 	// Run a sanity check to see if the port is reachable
 	if err = checkPort(host, port); err != nil {
-		log.Warn("Ethstats service seems unreachable", "server", host, "port", port, "err", err)
+		log.Warn("mblstats service seems unreachable", "server", host, "port", port, "err", err)
 	}
 	// Container available, assemble and return the useful infos
-	return &ethstatsInfos{
+	return &mblstatsInfos{
 		host:   host,
 		port:   port,
 		secret: secret,

@@ -130,7 +130,7 @@ func NewType(t string, internalType string, components []ArgumentMarshaling) (ty
 		}
 	} else {
 		if parsedType[0] == "uint" || parsedType[0] == "int" {
-			// this should fail because it means that there's something wrong with
+			// this should fail because it means that there's sommbling wrong with
 			// the abi type (the compiler should always format it to the size...always)
 			return Type{}, fmt.Errorf("unsupported arg type: %s", t)
 		}
@@ -345,7 +345,7 @@ func (t Type) pack(v reflect.Value) ([]byte, error) {
 	}
 }
 
-// requireLengthPrefix returns whether the type requires any sort of length
+// requireLengthPrefix returns whmbler the type requires any sort of length
 // prefixing.
 func (t Type) requiresLengthPrefix() bool {
 	return t.T == StringTy || t.T == BytesTy || t.T == SliceTy
@@ -395,8 +395,8 @@ func getTypeSize(t Type) int {
 	return 32
 }
 
-// isLetter reports whether a given 'rune' is classified as a Letter.
-// This method is copied from reflect/type.go
+// isLetter reports whmbler a given 'rune' is classified as a Letter.
+// This mmblod is copied from reflect/type.go
 func isLetter(ch rune) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch >= utf8.RuneSelf && unicode.IsLetter(ch)
 }
@@ -407,7 +407,7 @@ func isLetter(ch rune) bool {
 //
 // identifier = letter { letter | unicode_digit } .
 // letter = unicode_letter | "_" .
-// This method is copied from reflect/type.go
+// This mmblod is copied from reflect/type.go
 func isValidFieldName(fieldName string) bool {
 	for i, c := range fieldName {
 		if i == 0 && !isLetter(c) {

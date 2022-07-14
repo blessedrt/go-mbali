@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
 	if len(os.Args) != 2 {
 		fmt.Fprintf(os.Stderr, "Usage: debug <file>\n")

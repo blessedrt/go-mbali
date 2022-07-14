@@ -33,8 +33,8 @@ import (
 	"github.com/mbali/go-mbali/rpc"
 )
 
-// bridge is a collection of JavaScript utility methods to bride the .js runtime
-// environment and the Go RPC connection backing the remote method calls.
+// bridge is a collection of JavaScript utility mmblods to bride the .js runtime
+// environment and the Go RPC connection backing the remote mmblod calls.
 type bridge struct {
 	client   *rpc.Client         // RPC client to execute mbali requests through
 	prompter prompt.UserPrompter // Input prompter to allow interactive user feedback
@@ -50,17 +50,17 @@ func newBridge(client *rpc.Client, prompter prompt.UserPrompter, printer io.Writ
 	}
 }
 
-func getJeth(vm *goja.Runtime) *goja.Object {
-	jeth := vm.Get("jeth")
-	if jeth == nil {
-		panic(vm.ToValue("jeth object does not exist"))
+func getJmbl(vm *goja.Runtime) *goja.Object {
+	jmbl := vm.Get("jmbl")
+	if jmbl == nil {
+		panic(vm.ToValue("jmbl object does not exist"))
 	}
-	return jeth.ToObject(vm)
+	return jmbl.ToObject(vm)
 }
 
-// NewAccount is a wrapper around the personal.newAccount RPC method that uses a
+// NewAccount is a wrapper around the personal.newAccount RPC mmblod that uses a
 // non-echoing password prompt to acquire the passphrase and executes the original
-// RPC method (saved in jeth.newAccount) with it to actually execute the RPC call.
+// RPC mmblod (saved in jmbl.newAccount) with it to actually execute the RPC call.
 func (b *bridge) NewAccount(call jsre.Call) (goja.Value, error) {
 	var (
 		password string
@@ -86,9 +86,9 @@ func (b *bridge) NewAccount(call jsre.Call) (goja.Value, error) {
 		return nil, fmt.Errorf("expected 0 or 1 string argument")
 	}
 	// Password acquired, execute the call and return
-	newAccount, callable := goja.AssertFunction(getJeth(call.VM).Get("newAccount"))
+	newAccount, callable := goja.AssertFunction(getJmbl(call.VM).Get("newAccount"))
 	if !callable {
-		return nil, fmt.Errorf("jeth.newAccount is not callable")
+		return nil, fmt.Errorf("jmbl.newAccount is not callable")
 	}
 	ret, err := newAccount(goja.Null(), call.VM.ToValue(password))
 	if err != nil {
@@ -113,9 +113,9 @@ func (b *bridge) OpenWallet(call jsre.Call) (goja.Value, error) {
 		passwd = call.Argument(1)
 	}
 	// Open the wallet and return if successful in itself
-	openWallet, callable := goja.AssertFunction(getJeth(call.VM).Get("openWallet"))
+	openWallet, callable := goja.AssertFunction(getJmbl(call.VM).Get("openWallet"))
 	if !callable {
-		return nil, fmt.Errorf("jeth.openWallet is not callable")
+		return nil, fmt.Errorf("jmbl.openWallet is not callable")
 	}
 	val, err := openWallet(goja.Null(), wallet, passwd)
 	if err == nil {
@@ -196,9 +196,9 @@ func (b *bridge) readPassphraseAndReopenWallet(call jsre.Call) (goja.Value, erro
 	if err != nil {
 		return nil, err
 	}
-	openWallet, callable := goja.AssertFunction(getJeth(call.VM).Get("openWallet"))
+	openWallet, callable := goja.AssertFunction(getJmbl(call.VM).Get("openWallet"))
 	if !callable {
-		return nil, fmt.Errorf("jeth.openWallet is not callable")
+		return nil, fmt.Errorf("jmbl.openWallet is not callable")
 	}
 	return openWallet(goja.Null(), wallet, call.VM.ToValue(input))
 }
@@ -217,16 +217,16 @@ func (b *bridge) readPinAndReopenWallet(call jsre.Call) (goja.Value, error) {
 	if err != nil {
 		return nil, err
 	}
-	openWallet, callable := goja.AssertFunction(getJeth(call.VM).Get("openWallet"))
+	openWallet, callable := goja.AssertFunction(getJmbl(call.VM).Get("openWallet"))
 	if !callable {
-		return nil, fmt.Errorf("jeth.openWallet is not callable")
+		return nil, fmt.Errorf("jmbl.openWallet is not callable")
 	}
 	return openWallet(goja.Null(), wallet, call.VM.ToValue(input))
 }
 
-// UnlockAccount is a wrapper around the personal.unlockAccount RPC method that
+// UnlockAccount is a wrapper around the personal.unlockAccount RPC mmblod that
 // uses a non-echoing password prompt to acquire the passphrase and executes the
-// original RPC method (saved in jeth.unlockAccount) with it to actually execute
+// original RPC mmblod (saved in jmbl.unlockAccount) with it to actually execute
 // the RPC call.
 func (b *bridge) UnlockAccount(call jsre.Call) (goja.Value, error) {
 	if len(call.Arguments) < 1 {
@@ -265,16 +265,16 @@ func (b *bridge) UnlockAccount(call jsre.Call) (goja.Value, error) {
 	}
 
 	// Send the request to the backend and return.
-	unlockAccount, callable := goja.AssertFunction(getJeth(call.VM).Get("unlockAccount"))
+	unlockAccount, callable := goja.AssertFunction(getJmbl(call.VM).Get("unlockAccount"))
 	if !callable {
-		return nil, fmt.Errorf("jeth.unlockAccount is not callable")
+		return nil, fmt.Errorf("jmbl.unlockAccount is not callable")
 	}
 	return unlockAccount(goja.Null(), account, passwd, duration)
 }
 
-// Sign is a wrapper around the personal.sign RPC method that uses a non-echoing password
-// prompt to acquire the passphrase and executes the original RPC method (saved in
-// jeth.sign) with it to actually execute the RPC call.
+// Sign is a wrapper around the personal.sign RPC mmblod that uses a non-echoing password
+// prompt to acquire the passphrase and executes the original RPC mmblod (saved in
+// jmbl.sign) with it to actually execute the RPC call.
 func (b *bridge) Sign(call jsre.Call) (goja.Value, error) {
 	if nArgs := len(call.Arguments); nArgs < 2 {
 		return nil, fmt.Errorf("usage: sign(message, account, [ password ])")
@@ -305,9 +305,9 @@ func (b *bridge) Sign(call jsre.Call) (goja.Value, error) {
 	}
 
 	// Send the request to the backend and return
-	sign, callable := goja.AssertFunction(getJeth(call.VM).Get("sign"))
+	sign, callable := goja.AssertFunction(getJmbl(call.VM).Get("sign"))
 	if !callable {
-		return nil, fmt.Errorf("jeth.sign is not callable")
+		return nil, fmt.Errorf("jmbl.sign is not callable")
 	}
 	return sign(goja.Null(), message, account, passwd)
 }
@@ -354,12 +354,12 @@ func (b *bridge) SleepBlocks(call jsre.Call) (goja.Value, error) {
 	// Poll the current block number until either it or a timeout is reached.
 	deadline := time.Now().Add(time.Duration(sleep) * time.Second)
 	var lastNumber hexutil.Uint64
-	if err := b.client.Call(&lastNumber, "eth_blockNumber"); err != nil {
+	if err := b.client.Call(&lastNumber, "mbl_blockNumber"); err != nil {
 		return nil, err
 	}
 	for time.Now().Before(deadline) {
 		var number hexutil.Uint64
-		if err := b.client.Call(&number, "eth_blockNumber"); err != nil {
+		if err := b.client.Call(&number, "mbl_blockNumber"); err != nil {
 			return nil, err
 		}
 		if number != lastNumber {
@@ -376,11 +376,11 @@ func (b *bridge) SleepBlocks(call jsre.Call) (goja.Value, error) {
 
 type jsonrpcCall struct {
 	ID     int64
-	Method string
+	Mmblod string
 	Params []interface{}
 }
 
-// Send implements the web3 provider "send" method.
+// Send implements the web3 provider "send" mmblod.
 func (b *bridge) Send(call jsre.Call) (goja.Value, error) {
 	// Remarshal the request into a Go value.
 	reqVal, err := call.Argument(0).ToObject(call.VM).MarshalJSON()
@@ -412,7 +412,7 @@ func (b *bridge) Send(call jsre.Call) (goja.Value, error) {
 		resp.Set("id", req.ID)
 
 		var result json.RawMessage
-		if err = b.client.Call(&result, req.Method, req.Params...); err == nil {
+		if err = b.client.Call(&result, req.Mmblod, req.Params...); err == nil {
 			if result == nil {
 				// Special case null because it is decoded as an empty
 				// raw message for some reason.

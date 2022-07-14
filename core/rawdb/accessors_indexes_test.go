@@ -24,7 +24,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
 	"golang.org/x/crypto/sha3"
@@ -58,17 +58,17 @@ func (h *testHasher) Hash() common.Hash {
 func TestLookupStorage(t *testing.T) {
 	tests := []struct {
 		name                        string
-		writeTxLookupEntriesByBlock func(ethdb.Writer, *types.Block)
+		writeTxLookupEntriesByBlock func(mbldb.Writer, *types.Block)
 	}{
 		{
 			"DatabaseV6",
-			func(db ethdb.Writer, block *types.Block) {
+			func(db mbldb.Writer, block *types.Block) {
 				WriteTxLookupEntriesByBlock(db, block)
 			},
 		},
 		{
 			"DatabaseV4-V5",
-			func(db ethdb.Writer, block *types.Block) {
+			func(db mbldb.Writer, block *types.Block) {
 				for _, tx := range block.Transactions() {
 					db.Put(txLookupKey(tx.Hash()), block.Hash().Bytes())
 				}
@@ -76,7 +76,7 @@ func TestLookupStorage(t *testing.T) {
 		},
 		{
 			"DatabaseV3",
-			func(db ethdb.Writer, block *types.Block) {
+			func(db mbldb.Writer, block *types.Block) {
 				for index, tx := range block.Transactions() {
 					entry := LegacyTxLookupEntry{
 						BlockHash:  block.Hash(),

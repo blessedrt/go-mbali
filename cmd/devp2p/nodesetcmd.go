@@ -137,7 +137,7 @@ var filterFlags = map[string]nodeFilterC{
 	"-limit":       {1, trueFilter}, // needed to skip over -limit
 	"-ip":          {1, ipFilter},
 	"-min-age":     {1, minAgeFilter},
-	"-eth-network": {1, ethFilter},
+	"-mbl-network": {1, mblFilter},
 	"-les-server":  {0, lesFilter},
 	"-snap":        {0, snapFilter},
 }
@@ -224,7 +224,7 @@ func minAgeFilter(args []string) (nodeFilter, error) {
 	return f, nil
 }
 
-func ethFilter(args []string) (nodeFilter, error) {
+func mblFilter(args []string) (nodeFilter, error) {
 	var filter forkid.Filter
 	switch args[0] {
 	case "mainnet":
@@ -242,14 +242,14 @@ func ethFilter(args []string) (nodeFilter, error) {
 	}
 
 	f := func(n nodeJSON) bool {
-		var eth struct {
+		var mbl struct {
 			ForkID forkid.ID
 			Tail   []rlp.RawValue `rlp:"tail"`
 		}
-		if n.N.Load(enr.WithEntry("eth", &eth)) != nil {
+		if n.N.Load(enr.WithEntry("mbl", &mbl)) != nil {
 			return false
 		}
-		return filter(eth.ForkID) == nil
+		return filter(mbl.ForkID) == nil
 	}
 	return f, nil
 }

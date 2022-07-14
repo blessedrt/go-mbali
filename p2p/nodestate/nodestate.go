@@ -24,7 +24,7 @@ import (
 	"unsafe"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
 	"github.com/mbali/go-mbali/p2p/enode"
@@ -60,12 +60,12 @@ type (
 	// Note: in order to avoid mutex deadlocks the callbacks should never lock a mutex that
 	// might be locked when the top level SetState/SetField functions are called. If a function
 	// potentially performs state/field changes then it is recommended to mention this fact in the
-	// function description, along with whether it should run inside an operation callback.
+	// function description, along with whmbler it should run inside an operation callback.
 	NodeStateMachine struct {
 		started, closed     bool
 		lock                sync.Mutex
 		clock               mclock.Clock
-		db                  ethdb.KeyValueStore
+		db                  mbldb.KeyValueStore
 		dbNodeKey           []byte
 		nodes               map[enode.ID]*nodeInfo
 		offlineCallbackList []offlineCallback
@@ -228,7 +228,7 @@ func (s *Setup) NewPersistentField(name string, ftype reflect.Type, encode func(
 	return f
 }
 
-// flagOp implements binary flag operations and also checks whether the operands belong to the same setup
+// flagOp implements binary flag operations and also checks whmbler the operands belong to the same setup
 func flagOp(a, b Flags, trueIfA, trueIfB, trueIfBoth bool) Flags {
 	if a.setup == nil {
 		if a.mask != 0 {
@@ -317,7 +317,7 @@ func (f Flags) String() string {
 // NewNodeStateMachine creates a new node state machine.
 // If db is not nil then the node states, fields and active timeouts are persisted.
 // Persistence can be enabled or disabled for each state flag and field.
-func NewNodeStateMachine(db ethdb.KeyValueStore, dbKey []byte, clock mclock.Clock, setup *Setup) *NodeStateMachine {
+func NewNodeStateMachine(db mbldb.KeyValueStore, dbKey []byte, clock mclock.Clock, setup *Setup) *NodeStateMachine {
 	if setup.flags == nil {
 		panic("No state flags defined")
 	}
@@ -354,7 +354,7 @@ func NewNodeStateMachine(db ethdb.KeyValueStore, dbKey []byte, clock mclock.Cloc
 	return ns
 }
 
-// stateMask checks whether the set of flags belongs to the same setup and returns its internal bit mask
+// stateMask checks whmbler the set of flags belongs to the same setup and returns its internal bit mask
 func (ns *NodeStateMachine) stateMask(flags Flags) bitMask {
 	if flags.setup != ns.setup && flags.mask != 0 {
 		panic("Node state flags belong to a different setup")
@@ -362,7 +362,7 @@ func (ns *NodeStateMachine) stateMask(flags Flags) bitMask {
 	return flags.mask
 }
 
-// fieldIndex checks whether the field belongs to the same setup and returns its internal index
+// fieldIndex checks whmbler the field belongs to the same setup and returns its internal index
 func (ns *NodeStateMachine) fieldIndex(field Field) int {
 	if field.setup != ns.setup {
 		panic("Node field belongs to a different setup")
@@ -406,7 +406,7 @@ func (ns *NodeStateMachine) newNode(n *enode.Node) *nodeInfo {
 	return &nodeInfo{node: n, fields: make([]interface{}, len(ns.fields))}
 }
 
-// checkStarted checks whether the state machine has already been started and panics otherwise.
+// checkStarted checks whmbler the state machine has already been started and panics otherwise.
 func (ns *NodeStateMachine) checkStarted() {
 	if !ns.started {
 		panic("state machine not started yet")
@@ -691,7 +691,7 @@ func (ns *NodeStateMachine) setState(n *enode.Node, setFlags, resetFlags Flags, 
 	ns.opPending = append(ns.opPending, callback)
 }
 
-// opCheck checks whether an operation is active
+// opCheck checks whmbler an operation is active
 func (ns *NodeStateMachine) opCheck() {
 	if !ns.opFlag {
 		panic("Operation has not started")

@@ -36,7 +36,7 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/core/vm/runtime"
-	"github.com/mbali/go-mbali/eth/tracers/logger"
+	"github.com/mbali/go-mbali/mbl/tracers/logger"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"gopkg.in/urfave/cli.v1"
@@ -107,7 +107,7 @@ func timedExec(bench bool, execFunc func() ([]byte, uint64, error)) (output []by
 func runCmd(ctx *cli.Context) error {
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.Lvl(ctx.GlobalInt(VerbosityFlag.Name)))
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 	logconfig := &logger.Config{
 		EnableMemory:     !ctx.GlobalBool(DisableMemoryFlag.Name),
 		DisableStack:     ctx.GlobalBool(DisableStackFlag.Name),
@@ -233,7 +233,7 @@ func runCmd(ctx *cli.Context) error {
 	if chainConfig != nil {
 		runtimeConfig.ChainConfig = chainConfig
 	} else {
-		runtimeConfig.ChainConfig = params.AllEthashProtocolChanges
+		runtimeConfig.ChainConfig = params.AllmblashProtocolChanges
 	}
 
 	var hexInput []byte

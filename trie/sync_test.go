@@ -22,7 +22,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 )
 
 // makeTestTrie create a sample test trie to test node-wise reconstruction.

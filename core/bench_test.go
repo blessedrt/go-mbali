@@ -23,12 +23,12 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/math"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/params"
 )
 
@@ -115,7 +115,7 @@ func init() {
 	}
 }
 
-// genTxRing returns a block generator that sends ether in a ring
+// genTxRing returns a block generator that sends mbler in a ring
 // among n accounts. This is creates n entries in the state database
 // and fills the blocks with many small transactions.
 func genTxRing(naccounts int) func(int, *BlockGen) {
@@ -172,7 +172,7 @@ func genUncles(i int, gen *BlockGen) {
 
 func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 	// Create the database in memory or in a temporary directory.
-	var db ethdb.Database
+	var db mbldb.Database
 	var err error
 	if !disk {
 		db = rawdb.NewMemoryDatabase()
@@ -192,11 +192,11 @@ func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 		Alloc:  GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
 	}
 	genesis := gspec.MustCommit(db)
-	chain, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, b.N, gen)
+	chain, _ := GenerateChain(gspec.Config, genesis, mblash.NewFaker(), db, b.N, gen)
 
 	// Time the insertion of the new chain.
 	// State and blocks are stored in the same DB.
-	chainman, _ := NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
+	chainman, _ := NewBlockChain(db, nil, gspec.Config, mblash.NewFaker(), vm.Config{}, nil, nil)
 	defer chainman.Stop()
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -244,7 +244,7 @@ func BenchmarkChainWrite_full_500k(b *testing.B) {
 
 // makeChainForBench writes a given number of headers or empty blocks/receipts
 // into a database.
-func makeChainForBench(db ethdb.Database, full bool, count uint64) {
+func makeChainForBench(db mbldb.Database, full bool, count uint64) {
 	var hash common.Hash
 	for n := uint64(0); n < count; n++ {
 		header := &types.Header{
@@ -303,7 +303,7 @@ func benchReadChain(b *testing.B, full bool, count uint64) {
 		if err != nil {
 			b.Fatalf("error opening database at %v: %v", dir, err)
 		}
-		chain, err := NewBlockChain(db, &cacheConfig, params.TestChainConfig, ethash.NewFaker(), vm.Config{}, nil, nil)
+		chain, err := NewBlockChain(db, &cacheConfig, params.TestChainConfig, mblash.NewFaker(), vm.Config{}, nil, nil)
 		if err != nil {
 			b.Fatalf("error creating chain: %v", err)
 		}

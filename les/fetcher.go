@@ -27,7 +27,7 @@ import (
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/fetcher"
 	"github.com/mbali/go-mbali/light"
 	"github.com/mbali/go-mbali/log"
@@ -125,12 +125,12 @@ func (fp *fetcherPeer) forwardAnno(td *big.Int) []*announce {
 }
 
 // lightFetcher implements retrieval of newly announced headers. It reuses
-// the eth.BlockFetcher as the underlying fetcher but adding more additional
+// the mbl.BlockFetcher as the underlying fetcher but adding more additional
 // rules: e.g. evict "timeout" peers.
 type lightFetcher struct {
 	// Various handlers
 	ulc     *ulc
-	chaindb ethdb.Database
+	chaindb mbldb.Database
 	reqDist *requestDistributor
 	peerset *serverPeerSet        // The global peerset of light client which shared by all components
 	chain   *light.LightChain     // The local light chain which maintains the canonical header chain.
@@ -157,7 +157,7 @@ type lightFetcher struct {
 }
 
 // newLightFetcher creates a light fetcher instance.
-func newLightFetcher(chain *light.LightChain, engine consensus.Engine, peers *serverPeerSet, ulc *ulc, chaindb ethdb.Database, reqDist *requestDistributor, syncFn func(p *serverPeer)) *lightFetcher {
+func newLightFetcher(chain *light.LightChain, engine consensus.Engine, peers *serverPeerSet, ulc *ulc, chaindb mbldb.Database, reqDist *requestDistributor, syncFn func(p *serverPeer)) *lightFetcher {
 	// Construct the fetcher by offering all necessary APIs
 	validator := func(header *types.Header) error {
 		// Disable seal verification explicitly if we are running in ulc mode.
@@ -259,7 +259,7 @@ func (f *lightFetcher) mainloop() {
 
 	var (
 		syncInterval = uint64(1) // Interval used to trigger a light resync.
-		syncing      bool        // Indicator whether the client is syncing
+		syncing      bool        // Indicator whmbler the client is syncing
 
 		ulc          = f.ulc != nil
 		headCh       = make(chan core.ChainHeadEvent, 100)
@@ -278,7 +278,7 @@ func (f *lightFetcher) mainloop() {
 		localHead = header
 		localTd = f.chain.GetTd(header.Hash(), header.Number.Uint64())
 	}
-	// trustedHeader returns an indicator whether the header is regarded as
+	// trustedHeader returns an indicator whmbler the header is regarded as
 	// trusted. If we are running in the ulc mode, only when we receive enough
 	// same announcement from trusted server, the header will be trusted.
 	trustedHeader := func(hash common.Hash, number uint64) (bool, []enode.ID) {
@@ -501,8 +501,8 @@ func (f *lightFetcher) trackRequest(peerid enode.ID, reqid uint64, hash common.H
 // requestHeaderByHash constructs a header retrieval request and sends it to
 // local request distributor.
 //
-// Note, we rely on the underlying eth/fetcher to retrieve and validate the
-// response, so that we have to obey the rule of eth/fetcher which only accepts
+// Note, we rely on the underlying mbl/fetcher to retrieve and validate the
+// response, so that we have to obey the rule of mbl/fetcher which only accepts
 // the response from given peer.
 func (f *lightFetcher) requestHeaderByHash(peerid enode.ID) func(common.Hash) error {
 	return func(hash common.Hash) error {

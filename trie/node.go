@@ -64,7 +64,7 @@ func (n *shortNode) copy() *shortNode { copy := *n; return &copy }
 // nodeFlag contains caching-related metadata about a node.
 type nodeFlag struct {
 	hash  hashNode // cached hash of the node (may be nil)
-	dirty bool     // whether the node has changes that must be written to the database
+	dirty bool     // whmbler the node has changes that must be written to the database
 }
 
 func (n *fullNode) cache() (hashNode, bool)  { return n.flags.hash, n.flags.dirty }

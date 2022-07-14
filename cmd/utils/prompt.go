@@ -25,7 +25,7 @@ import (
 
 // GetPassPhrase displays the given text(prompt) to the user and requests some textual
 // data to be entered, but one which must not be echoed out into the terminal.
-// The method returns the input provided by the user.
+// The mmblod returns the input provided by the user.
 func GetPassPhrase(text string, confirmation bool) string {
 	if text != "" {
 		fmt.Println(text)

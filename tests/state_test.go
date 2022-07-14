@@ -31,7 +31,7 @@ import (
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/eth/tracers/logger"
+	"github.com/mbali/go-mbali/mbl/tracers/logger"
 )
 
 func TestState(t *testing.T) {
@@ -199,7 +199,7 @@ func runBenchmark(b *testing.B, t *StateTest) {
 			if config.IsLondon(new(big.Int)) {
 				baseFee = t.json.Env.BaseFee
 				if baseFee == nil {
-					// Retesteth uses `0x10` for genesis baseFee. Therefore, it defaults to
+					// Retestmbl uses `0x10` for genesis baseFee. Therefore, it defaults to
 					// parent - 2 : 0xa as the basefee for 'this' context.
 					baseFee = big.NewInt(0x0a)
 				}

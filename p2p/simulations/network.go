@@ -302,7 +302,7 @@ func (net *Network) Stop(id enode.ID) error {
 }
 
 // Connect connects two nodes togombler by calling the "admin_addPeer" RPC
-// method on the "one" node so that it connects to the "other" node
+// mmblod on the "one" node so that it connects to the "other" node
 func (net *Network) Connect(oneID, otherID enode.ID) error {
 	net.lock.Lock()
 	defer net.lock.Unlock()
@@ -324,7 +324,7 @@ func (net *Network) connect(oneID, otherID enode.ID) error {
 }
 
 // Disconnect disconnects two nodes by calling the "admin_removePeer" RPC
-// method on the "one" node so that it disconnects from the "other" node
+// mmblod on the "one" node so that it disconnects from the "other" node
 func (net *Network) Disconnect(oneID, otherID enode.ID) error {
 	conn := net.GetConn(oneID, otherID)
 	if conn == nil {
@@ -567,7 +567,7 @@ func (net *Network) getDownNodeIDs() (ids []enode.ID) {
 	return ids
 }
 
-// GetRandomNode returns a random node on the network, regardless of whether it is running or not
+// GetRandomNode returns a random node on the network, regardless of whmbler it is running or not
 func (net *Network) GetRandomNode(excludeIDs ...enode.ID) *Node {
 	net.lock.RLock()
 	defer net.lock.RUnlock()
@@ -653,7 +653,7 @@ func (net *Network) getConn(oneID, otherID enode.ID) *Conn {
 // the order of nodes does not matter, i.e., Conn(i,j) == Conn(j, i)
 // it checks if the connection is already up, and if the nodes are running
 // NOTE:
-// it also checks whether there has been recent attempt to connect the peers
+// it also checks whmbler there has been recent attempt to connect the peers
 // this is cheating as the simulation is used as an oracle and know about
 // remote peers attempt to connect to a node which will then not initiate the connection
 func (net *Network) InitConn(oneID, otherID enode.ID) (*Conn, error) {
@@ -721,7 +721,7 @@ type Node struct {
 	// Config if the config used to created the node
 	Config *adapters.NodeConfig `json:"config"`
 
-	// up tracks whether or not the node is running
+	// up tracks whmbler or not the node is running
 	up   bool
 	upMu *sync.RWMutex
 }
@@ -735,7 +735,7 @@ func (n *Node) copy() *Node {
 	return newNode(n.Node, &configCpy, n.Up())
 }
 
-// Up returns whether the node is currently up (online)
+// Up returns whmbler the node is currently up (online)
 func (n *Node) Up() bool {
 	n.upMu.RLock()
 	defer n.upMu.RUnlock()
@@ -788,7 +788,7 @@ func (n *Node) MarshalJSON() ([]byte, error) {
 // status. IMPORTANT: The implementation is incomplete; we lose p2p.NodeInfo.
 func (n *Node) UnmarshalJSON(raw []byte) error {
 	// TODO: How should we turn back NodeInfo into n.Node?
-	// Ticket: https://github.com/ethersphere/go-mbali/issues/1177
+	// Ticket: https://github.com/mblersphere/go-mbali/issues/1177
 	var node struct {
 		Config *adapters.NodeConfig `json:"config,omitempty"`
 		Up     bool                 `json:"up"`
@@ -808,7 +808,7 @@ type Conn struct {
 	// Other is the node which the connection was made to
 	Other enode.ID `json:"other"`
 
-	// Up tracks whether or not the connection is active
+	// Up tracks whmbler or not the connection is active
 	Up bool `json:"up"`
 	// Registers when the connection was grabbed to dial
 	initiated time.Time
@@ -817,7 +817,7 @@ type Conn struct {
 	other *Node
 }
 
-// nodesUp returns whether both nodes are currently up
+// nodesUp returns whmbler both nodes are currently up
 func (c *Conn) nodesUp() error {
 	if !c.one.Up() {
 		return fmt.Errorf("one %v is not up", c.One)

@@ -28,7 +28,7 @@ type item struct {
 type SetIndexCallback func(data interface{}, index int)
 
 // Internal sortable stack data structure. Implements the Push and Pop ops for
-// the stack (heap) functionality and the Len, Less and Swap methods for the
+// the stack (heap) functionality and the Len, Less and Swap mmblods for the
 // sortability requirements of the heaps.
 type sstack struct {
 	setIndex   SetIndexCallback

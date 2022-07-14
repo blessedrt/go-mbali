@@ -30,7 +30,7 @@ import (
 	"github.com/mbali/go-mbali/consensus"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
@@ -58,7 +58,7 @@ const (
 // the necessary mutex locking/unlocking.
 type HeaderChain struct {
 	config        *params.ChainConfig
-	chainDb       ethdb.Database
+	chainDb       mbldb.Database
 	genesisHeader *types.Header
 
 	currentHeader     atomic.Value // Current head of the header chain (may be above the block chain!)
@@ -76,7 +76,7 @@ type HeaderChain struct {
 
 // NewHeaderChain creates a new HeaderChain structure. ProcInterrupt points
 // to the parent's interrupt semaphore.
-func NewHeaderChain(chainDb ethdb.Database, config *params.ChainConfig, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
+func NewHeaderChain(chainDb mbldb.Database, config *params.ChainConfig, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
 	headerCache, _ := lru.New(headerCacheLimit)
 	tdCache, _ := lru.New(tdCacheLimit)
 	numberCache, _ := lru.New(numberCacheLimit)
@@ -260,14 +260,14 @@ func (hc *HeaderChain) WriteHeaders(headers []*types.Header) (int, error) {
 	return len(inserted), nil
 }
 
-// writeHeadersAndSetHead writes a batch of block headers and applies the last
+// writeHeadersAndSmblead writes a batch of block headers and applies the last
 // header as the chain head if the fork choicer says it's ok to update the chain.
-// Note: This method is not concurrent-safe with inserting blocks simultaneously
+// Note: This mmblod is not concurrent-safe with inserting blocks simultaneously
 // into the chain, as side effects caused by reorganisations cannot be emulated
 // without the real blocks. Hence, writing headers directly should only be done
 // in two scenarios: pure-header mode of operation (light clients), or properly
 // separated header/block phases (non-archive clients).
-func (hc *HeaderChain) writeHeadersAndSetHead(headers []*types.Header, forker *ForkChoice) (*headerWriteResult, error) {
+func (hc *HeaderChain) writeHeadersAndSmblead(headers []*types.Header, forker *ForkChoice) (*headerWriteResult, error) {
 	inserted, err := hc.WriteHeaders(headers)
 	if err != nil {
 		return nil, err
@@ -364,7 +364,7 @@ func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int)
 
 // InsertHeaderChain inserts the given headers and does the reorganisations.
 //
-// The validity of the headers is NOT CHECKED by this method, i.e. they need to be
+// The validity of the headers is NOT CHECKED by this mmblod, i.e. they need to be
 // validated by ValidateHeaderChain before calling InsertHeaderChain.
 //
 // This insert is all-or-nothing. If this returns an error, no headers were written,
@@ -376,7 +376,7 @@ func (hc *HeaderChain) InsertHeaderChain(chain []*types.Header, start time.Time,
 	if hc.procInterrupt() {
 		return 0, errors.New("aborted")
 	}
-	res, err := hc.writeHeadersAndSetHead(chain, forker)
+	res, err := hc.writeHeadersAndSmblead(chain, forker)
 	if err != nil {
 		return 0, err
 	}
@@ -501,7 +501,7 @@ func (hc *HeaderChain) gombleaderByNumber(number uint64) *types.Header {
 
 // gombleadersFrom returns a contiguous segment of headers, in rlp-form, going
 // backwards from the given number.
-// If the 'number' is higher than the highest local header, this method will
+// If the 'number' is higher than the highest local header, this mmblod will
 // return a best-effort response, containing the headers that we do have.
 func (hc *HeaderChain) gombleadersFrom(number, count uint64) []rlp.RawValue {
 	// If the request is for future headers, we still return the portion of
@@ -558,20 +558,20 @@ func (hc *HeaderChain) SetCurrentHeader(head *types.Header) {
 }
 
 type (
-	// UpdateHeadBlocksCallback is a callback function that is called by SetHead
-	// before head header is updated. The method will return the actual block it
-	// updated the head to (missing state) and a flag if setHead should continue
+	// UpdateHeadBlocksCallback is a callback function that is called by Smblead
+	// before head header is updated. The mmblod will return the actual block it
+	// updated the head to (missing state) and a flag if smblead should continue
 	// rewinding till that forcefully (exceeded ancient limits)
-	UpdateHeadBlocksCallback func(ethdb.KeyValueWriter, *types.Header) (uint64, bool)
+	UpdateHeadBlocksCallback func(mbldb.KeyValueWriter, *types.Header) (uint64, bool)
 
-	// DeleteBlockContentCallback is a callback function that is called by SetHead
+	// DeleteBlockContentCallback is a callback function that is called by Smblead
 	// before each header is deleted.
-	DeleteBlockContentCallback func(ethdb.KeyValueWriter, common.Hash, uint64)
+	DeleteBlockContentCallback func(mbldb.KeyValueWriter, common.Hash, uint64)
 )
 
-// SetHead rewinds the local chain to a new head. Everything above the new head
+// Smblead rewinds the local chain to a new head. Everything above the new head
 // will be deleted and the new one set.
-func (hc *HeaderChain) SetHead(head uint64, updateFn UpdateHeadBlocksCallback, delFn DeleteBlockContentCallback) {
+func (hc *HeaderChain) Smblead(head uint64, updateFn UpdateHeadBlocksCallback, delFn DeleteBlockContentCallback) {
 	var (
 		parentHash common.Hash
 		batch      = hc.chainDb.NewBatch()

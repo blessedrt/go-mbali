@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
@@ -140,7 +140,7 @@ func testGappedAnnouncements(t *testing.T, protocol int) {
 
 	// Send a reorged announcement
 	blocks, _ := core.GenerateChain(rawdb.ReadChainConfig(s.db, s.backend.Blockchain().Genesis().Hash()), s.backend.Blockchain().GetBlockByNumber(3),
-		ethash.NewFaker(), s.db, 2, func(i int, gen *core.BlockGen) {
+		mblash.NewFaker(), s.db, 2, func(i int, gen *core.BlockGen) {
 			gen.OffsetTime(-9) // higher block difficulty
 		})
 	s.backend.Blockchain().InsertChain(blocks)
@@ -153,7 +153,7 @@ func TestTrustedAnnouncementsLes2(t *testing.T) { testTrustedAnnouncement(t, 2) 
 func TestTrustedAnnouncementsLes3(t *testing.T) { testTrustedAnnouncement(t, 3) }
 
 func testTrustedAnnouncement(t *testing.T, protocol int) {
-	//log.Root().SetHandler(log.LvlFilterHandler(log.LvlDebug, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	//log.Root().Smblandler(log.LvlFilterHandler(log.LvlDebug, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	var (
 		servers   []*testServer
 		teardowns []func()

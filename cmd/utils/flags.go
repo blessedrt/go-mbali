@@ -37,22 +37,22 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/fdlimit"
 	"github.com/mbali/go-mbali/consensus"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth"
-	ethcatalyst "github.com/mbali/go-mbali/eth/catalyst"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/eth/gasprice"
-	"github.com/mbali/go-mbali/eth/tracers"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/remotedb"
-	"github.com/mbali/go-mbali/ethstats"
+	"github.com/mbali/go-mbali/mbl"
+	mblcatalyst "github.com/mbali/go-mbali/mbl/catalyst"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mbl/gasprice"
+	"github.com/mbali/go-mbali/mbl/tracers"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/remotedb"
+	"github.com/mbali/go-mbali/mblstats"
 	"github.com/mbali/go-mbali/graphql"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/internal/flags"
 	"github.com/mbali/go-mbali/les"
 	lescatalyst "github.com/mbali/go-mbali/les/catalyst"
@@ -142,7 +142,7 @@ var (
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
 		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli instead)",
-		Value: ethconfig.Defaults.NetworkId,
+		Value: mblconfig.Defaults.NetworkId,
 	}
 	MainnetFlag = cli.BoolFlag{
 		Name:  "mainnet",
@@ -220,7 +220,7 @@ var (
 		Usage: "Max number of elements (0 = no limit)",
 		Value: 0,
 	}
-	defaultSyncMode = ethconfig.Defaults.SyncMode
+	defaultSyncMode = mblconfig.Defaults.SyncMode
 	SyncModeFlag    = TextMarshalerFlag{
 		Name:  "syncmode",
 		Usage: `Blockchain sync mode ("snap", "full" or "light")`,
@@ -238,19 +238,19 @@ var (
 	TxLookupLimitFlag = cli.Uint64Flag{
 		Name:  "txlookuplimit",
 		Usage: "Number of recent blocks to maintain transactions index for (default = about one year, 0 = entire chain)",
-		Value: ethconfig.Defaults.TxLookupLimit,
+		Value: mblconfig.Defaults.TxLookupLimit,
 	}
 	LightKDFFlag = cli.BoolFlag{
 		Name:  "lightkdf",
 		Usage: "Reduce key-derivation RAM & CPU usage at some expense of KDF strength",
 	}
-	EthRequiredBlocksFlag = cli.StringFlag{
-		Name:  "eth.requiredblocks",
+	mblRequiredBlocksFlag = cli.StringFlag{
+		Name:  "mbl.requiredblocks",
 		Usage: "Comma separated block number-to-hash mappings to require for peering (<number>=<hash>)",
 	}
 	LegacyWhitelistFlag = cli.StringFlag{
 		Name:  "whitelist",
-		Usage: "Comma separated block number-to-hash mappings to enforce (<number>=<hash>) (deprecated in favor of --eth.requiredblocks)",
+		Usage: "Comma separated block number-to-hash mappings to enforce (<number>=<hash>) (deprecated in favor of --mbl.requiredblocks)",
 	}
 	BloomFilterSizeFlag = cli.Uint64Flag{
 		Name:  "bloomfilter.size",
@@ -269,32 +269,32 @@ var (
 	LightServeFlag = cli.IntFlag{
 		Name:  "light.serve",
 		Usage: "Maximum percentage of time allowed for serving LES requests (multi-threaded processing allows values over 100)",
-		Value: ethconfig.Defaults.LightServ,
+		Value: mblconfig.Defaults.LightServ,
 	}
 	LightIngressFlag = cli.IntFlag{
 		Name:  "light.ingress",
 		Usage: "Incoming bandwidth limit for serving light clients (kilobytes/sec, 0 = unlimited)",
-		Value: ethconfig.Defaults.LightIngress,
+		Value: mblconfig.Defaults.LightIngress,
 	}
 	LightEgressFlag = cli.IntFlag{
 		Name:  "light.egress",
 		Usage: "Outgoing bandwidth limit for serving light clients (kilobytes/sec, 0 = unlimited)",
-		Value: ethconfig.Defaults.LightEgress,
+		Value: mblconfig.Defaults.LightEgress,
 	}
 	LightMaxPeersFlag = cli.IntFlag{
 		Name:  "light.maxpeers",
 		Usage: "Maximum number of light clients to serve, or light servers to attach to",
-		Value: ethconfig.Defaults.LightPeers,
+		Value: mblconfig.Defaults.LightPeers,
 	}
 	UltraLightServersFlag = cli.StringFlag{
 		Name:  "ulc.servers",
 		Usage: "List of trusted ultra-light servers",
-		Value: strings.Join(ethconfig.Defaults.UltraLightServers, ","),
+		Value: strings.Join(mblconfig.Defaults.UltraLightServers, ","),
 	}
 	UltraLightFractionFlag = cli.IntFlag{
 		Name:  "ulc.fraction",
 		Usage: "Minimum % of trusted ultra-light servers required to announce a new head",
-		Value: ethconfig.Defaults.UltraLightFraction,
+		Value: mblconfig.Defaults.UltraLightFraction,
 	}
 	UltraLightOnlyAnnounceFlag = cli.BoolFlag{
 		Name:  "ulc.onlyannounce",
@@ -308,43 +308,43 @@ var (
 		Name:  "light.nosyncserve",
 		Usage: "Enables serving light clients before syncing",
 	}
-	// Ethash settings
-	EthashCacheDirFlag = DirectoryFlag{
-		Name:  "ethash.cachedir",
-		Usage: "Directory to store the ethash verification caches (default = inside the datadir)",
+	// mblash settings
+	mblashCacheDirFlag = DirectoryFlag{
+		Name:  "mblash.cachedir",
+		Usage: "Directory to store the mblash verification caches (default = inside the datadir)",
 	}
-	EthashCachesInMemoryFlag = cli.IntFlag{
-		Name:  "ethash.cachesinmem",
-		Usage: "Number of recent ethash caches to keep in memory (16MB each)",
-		Value: ethconfig.Defaults.Ethash.CachesInMem,
+	mblashCachesInMemoryFlag = cli.IntFlag{
+		Name:  "mblash.cachesinmem",
+		Usage: "Number of recent mblash caches to keep in memory (16MB each)",
+		Value: mblconfig.Defaults.mblash.CachesInMem,
 	}
-	EthashCachesOnDiskFlag = cli.IntFlag{
-		Name:  "ethash.cachesondisk",
-		Usage: "Number of recent ethash caches to keep on disk (16MB each)",
-		Value: ethconfig.Defaults.Ethash.CachesOnDisk,
+	mblashCachesOnDiskFlag = cli.IntFlag{
+		Name:  "mblash.cachesondisk",
+		Usage: "Number of recent mblash caches to keep on disk (16MB each)",
+		Value: mblconfig.Defaults.mblash.CachesOnDisk,
 	}
-	EthashCachesLockMmapFlag = cli.BoolFlag{
-		Name:  "ethash.cacheslockmmap",
-		Usage: "Lock memory maps of recent ethash caches",
+	mblashCachesLockMmapFlag = cli.BoolFlag{
+		Name:  "mblash.cacheslockmmap",
+		Usage: "Lock memory maps of recent mblash caches",
 	}
-	EthashDatasetDirFlag = DirectoryFlag{
-		Name:  "ethash.dagdir",
-		Usage: "Directory to store the ethash mining DAGs",
-		Value: DirectoryString(ethconfig.Defaults.Ethash.DatasetDir),
+	mblashDatasetDirFlag = DirectoryFlag{
+		Name:  "mblash.dagdir",
+		Usage: "Directory to store the mblash mining DAGs",
+		Value: DirectoryString(mblconfig.Defaults.mblash.DatasetDir),
 	}
-	EthashDatasetsInMemoryFlag = cli.IntFlag{
-		Name:  "ethash.dagsinmem",
-		Usage: "Number of recent ethash mining DAGs to keep in memory (1+GB each)",
-		Value: ethconfig.Defaults.Ethash.DatasetsInMem,
+	mblashDatasetsInMemoryFlag = cli.IntFlag{
+		Name:  "mblash.dagsinmem",
+		Usage: "Number of recent mblash mining DAGs to keep in memory (1+GB each)",
+		Value: mblconfig.Defaults.mblash.DatasetsInMem,
 	}
-	EthashDatasetsOnDiskFlag = cli.IntFlag{
-		Name:  "ethash.dagsondisk",
-		Usage: "Number of recent ethash mining DAGs to keep on disk (1+GB each)",
-		Value: ethconfig.Defaults.Ethash.DatasetsOnDisk,
+	mblashDatasetsOnDiskFlag = cli.IntFlag{
+		Name:  "mblash.dagsondisk",
+		Usage: "Number of recent mblash mining DAGs to keep on disk (1+GB each)",
+		Value: mblconfig.Defaults.mblash.DatasetsOnDisk,
 	}
-	EthashDatasetsLockMmapFlag = cli.BoolFlag{
-		Name:  "ethash.dagslockmmap",
-		Usage: "Lock memory maps for recent ethash mining DAGs",
+	mblashDatasetsLockMmapFlag = cli.BoolFlag{
+		Name:  "mblash.dagslockmmap",
+		Usage: "Lock memory maps for recent mblash mining DAGs",
 	}
 	// Transaction pool settings
 	TxPoolLocalsFlag = cli.StringFlag{
@@ -368,37 +368,37 @@ var (
 	TxPoolPriceLimitFlag = cli.Uint64Flag{
 		Name:  "txpool.pricelimit",
 		Usage: "Minimum gas price limit to enforce for acceptance into the pool",
-		Value: ethconfig.Defaults.TxPool.PriceLimit,
+		Value: mblconfig.Defaults.TxPool.PriceLimit,
 	}
 	TxPoolPriceBumpFlag = cli.Uint64Flag{
 		Name:  "txpool.pricebump",
 		Usage: "Price bump percentage to replace an already existing transaction",
-		Value: ethconfig.Defaults.TxPool.PriceBump,
+		Value: mblconfig.Defaults.TxPool.PriceBump,
 	}
 	TxPoolAccountSlotsFlag = cli.Uint64Flag{
 		Name:  "txpool.accountslots",
 		Usage: "Minimum number of executable transaction slots guaranteed per account",
-		Value: ethconfig.Defaults.TxPool.AccountSlots,
+		Value: mblconfig.Defaults.TxPool.AccountSlots,
 	}
 	TxPoolGlobalSlotsFlag = cli.Uint64Flag{
 		Name:  "txpool.globalslots",
 		Usage: "Maximum number of executable transaction slots for all accounts",
-		Value: ethconfig.Defaults.TxPool.GlobalSlots,
+		Value: mblconfig.Defaults.TxPool.GlobalSlots,
 	}
 	TxPoolAccountQueueFlag = cli.Uint64Flag{
 		Name:  "txpool.accountqueue",
 		Usage: "Maximum number of non-executable transaction slots permitted per account",
-		Value: ethconfig.Defaults.TxPool.AccountQueue,
+		Value: mblconfig.Defaults.TxPool.AccountQueue,
 	}
 	TxPoolGlobalQueueFlag = cli.Uint64Flag{
 		Name:  "txpool.globalqueue",
 		Usage: "Maximum number of non-executable transaction slots for all accounts",
-		Value: ethconfig.Defaults.TxPool.GlobalQueue,
+		Value: mblconfig.Defaults.TxPool.GlobalQueue,
 	}
 	TxPoolLifetimeFlag = cli.DurationFlag{
 		Name:  "txpool.lifetime",
 		Usage: "Maximum amount of time non-executable transaction are queued",
-		Value: ethconfig.Defaults.TxPool.Lifetime,
+		Value: mblconfig.Defaults.TxPool.Lifetime,
 	}
 	// Performance tuning settings
 	CacheFlag = cli.IntFlag{
@@ -419,12 +419,12 @@ var (
 	CacheTrieJournalFlag = cli.StringFlag{
 		Name:  "cache.trie.journal",
 		Usage: "Disk journal directory for trie cache to survive node restarts",
-		Value: ethconfig.Defaults.TrieCleanCacheJournal,
+		Value: mblconfig.Defaults.TrieCleanCacheJournal,
 	}
 	CacheTrieRejournalFlag = cli.DurationFlag{
 		Name:  "cache.trie.rejournal",
 		Usage: "Time interval to regenerate the trie cache journal",
-		Value: ethconfig.Defaults.TrieCleanCacheRejournal,
+		Value: mblconfig.Defaults.TrieCleanCacheRejournal,
 	}
 	CacheGCFlag = cli.IntFlag{
 		Name:  "cache.gc",
@@ -469,15 +469,15 @@ var (
 	MinerGasLimitFlag = cli.Uint64Flag{
 		Name:  "miner.gaslimit",
 		Usage: "Target gas ceiling for mined blocks",
-		Value: ethconfig.Defaults.Miner.GasCeil,
+		Value: mblconfig.Defaults.Miner.GasCeil,
 	}
 	MinerGasPriceFlag = BigFlag{
 		Name:  "miner.gasprice",
 		Usage: "Minimum gas price for mining a transaction",
-		Value: ethconfig.Defaults.Miner.GasPrice,
+		Value: mblconfig.Defaults.Miner.GasPrice,
 	}
-	MinerEtherbaseFlag = cli.StringFlag{
-		Name:  "miner.etherbase",
+	MinermblerbaseFlag = cli.StringFlag{
+		Name:  "miner.mblerbase",
 		Usage: "Public address for block mining rewards (default = first account)",
 		Value: "0",
 	}
@@ -488,7 +488,7 @@ var (
 	MinerRecommitIntervalFlag = cli.DurationFlag{
 		Name:  "miner.recommit",
 		Usage: "Time interval to recreate the block being mined",
-		Value: ethconfig.Defaults.Miner.Recommit,
+		Value: mblconfig.Defaults.Miner.Recommit,
 	}
 	MinerNoVerifyFlag = cli.BoolFlag{
 		Name:  "miner.noverify",
@@ -520,18 +520,18 @@ var (
 	}
 	RPCGlobalGasCapFlag = cli.Uint64Flag{
 		Name:  "rpc.gascap",
-		Usage: "Sets a cap on gas that can be used in eth_call/estimateGas (0=infinite)",
-		Value: ethconfig.Defaults.RPCGasCap,
+		Usage: "Sets a cap on gas that can be used in mbl_call/estimateGas (0=infinite)",
+		Value: mblconfig.Defaults.RPCGasCap,
 	}
 	RPCGlobalEVMTimeoutFlag = cli.DurationFlag{
 		Name:  "rpc.evmtimeout",
-		Usage: "Sets a timeout used for eth_call (0=infinite)",
-		Value: ethconfig.Defaults.RPCEVMTimeout,
+		Usage: "Sets a timeout used for mbl_call (0=infinite)",
+		Value: mblconfig.Defaults.RPCEVMTimeout,
 	}
 	RPCGlobalTxFeeCapFlag = cli.Float64Flag{
 		Name:  "rpc.txfeecap",
-		Usage: "Sets a cap on transaction fee (in ether) that can be sent via the RPC APIs (0 = no cap)",
-		Value: ethconfig.Defaults.RPCTxFeeCap,
+		Usage: "Sets a cap on transaction fee (in mbler) that can be sent via the RPC APIs (0 = no cap)",
+		Value: mblconfig.Defaults.RPCTxFeeCap,
 	}
 	// Authenticated RPC HTTP settings
 	AuthListenFlag = cli.StringFlag{
@@ -554,9 +554,9 @@ var (
 		Usage: "Path to a JWT secret to use for authenticated RPC endpoints",
 	}
 	// Logging and debug settings
-	EthStatsURLFlag = cli.StringFlag{
-		Name:  "ethstats",
-		Usage: "Reporting URL of a ethstats service (nodename:secret@host:port)",
+	mblStatsURLFlag = cli.StringFlag{
+		Name:  "mblstats",
+		Usage: "Reporting URL of a mblstats service (nodename:secret@host:port)",
 	}
 	FakePoWFlag = cli.BoolFlag{
 		Name:  "fakepow",
@@ -731,22 +731,22 @@ var (
 	GpoBlocksFlag = cli.IntFlag{
 		Name:  "gpo.blocks",
 		Usage: "Number of recent blocks to check for gas prices",
-		Value: ethconfig.Defaults.GPO.Blocks,
+		Value: mblconfig.Defaults.GPO.Blocks,
 	}
 	GpoPercentileFlag = cli.IntFlag{
 		Name:  "gpo.percentile",
 		Usage: "Suggested gas price is the given percentile of a set of recent transaction gas prices",
-		Value: ethconfig.Defaults.GPO.Percentile,
+		Value: mblconfig.Defaults.GPO.Percentile,
 	}
 	GpoMaxGasPriceFlag = cli.Int64Flag{
 		Name:  "gpo.maxprice",
 		Usage: "Maximum transaction priority fee (or gasprice before London fork) to be recommended by gpo",
-		Value: ethconfig.Defaults.GPO.MaxPrice.Int64(),
+		Value: mblconfig.Defaults.GPO.MaxPrice.Int64(),
 	}
 	GpoIgnoreGasPriceFlag = cli.Int64Flag{
 		Name:  "gpo.ignoreprice",
 		Usage: "Gas price below which gpo will ignore transactions",
-		Value: ethconfig.Defaults.GPO.IgnorePrice.Int64(),
+		Value: mblconfig.Defaults.GPO.IgnorePrice.Int64(),
 	}
 
 	// Metrics flags
@@ -892,7 +892,7 @@ func MakeDataDir(ctx *cli.Context) string {
 
 // setNodeKey creates a node key from set command line flags, either loading it
 // from a file or as a specified hex value. If neither flags were provided, this
-// method returns nil and an emphemeral key is to be generated.
+// mmblod returns nil and an emphemeral key is to be generated.
 func setNodeKey(ctx *cli.Context, cfg *p2p.Config) {
 	var (
 		hex  = ctx.GlobalString(NodeKeyHexFlag.Name)
@@ -1012,9 +1012,9 @@ func SplitAndTrim(input string) (ret []string) {
 	return ret
 }
 
-// setHTTP creates the HTTP RPC listener interface string from the set
+// smblTTP creates the HTTP RPC listener interface string from the set
 // command line flags, returning empty if the HTTP endpoint is disabled.
-func setHTTP(ctx *cli.Context, cfg *node.Config) {
+func smblTTP(ctx *cli.Context, cfg *node.Config) {
 	if ctx.GlobalBool(HTTPEnabledFlag.Name) && cfg.HTTPHost == "" {
 		cfg.HTTPHost = "127.0.0.1"
 		if ctx.GlobalIsSet(HTTPListenAddrFlag.Name) {
@@ -1108,7 +1108,7 @@ func setIPC(ctx *cli.Context, cfg *node.Config) {
 }
 
 // setLes configures the les server and ultra light client settings from the command line flags.
-func setLes(ctx *cli.Context, cfg *ethconfig.Config) {
+func setLes(ctx *cli.Context, cfg *mblconfig.Config) {
 	if ctx.GlobalIsSet(LightServeFlag.Name) {
 		cfg.LightServ = ctx.GlobalInt(LightServeFlag.Name)
 	}
@@ -1128,8 +1128,8 @@ func setLes(ctx *cli.Context, cfg *ethconfig.Config) {
 		cfg.UltraLightFraction = ctx.GlobalInt(UltraLightFractionFlag.Name)
 	}
 	if cfg.UltraLightFraction <= 0 && cfg.UltraLightFraction > 100 {
-		log.Error("Ultra light fraction is invalid", "had", cfg.UltraLightFraction, "updated", ethconfig.Defaults.UltraLightFraction)
-		cfg.UltraLightFraction = ethconfig.Defaults.UltraLightFraction
+		log.Error("Ultra light fraction is invalid", "had", cfg.UltraLightFraction, "updated", mblconfig.Defaults.UltraLightFraction)
+		cfg.UltraLightFraction = mblconfig.Defaults.UltraLightFraction
 	}
 	if ctx.GlobalIsSet(UltraLightOnlyAnnounceFlag.Name) {
 		cfg.UltraLightOnlyAnnounce = ctx.GlobalBool(UltraLightOnlyAnnounceFlag.Name)
@@ -1153,7 +1153,7 @@ func MakeDatabaseHandles(max int) int {
 	case max == 0:
 		// User didn't specify a meaningful value, use system limits
 	case max < 128:
-		// User specified something unhealthy, just use system defaults
+		// User specified sommbling unhealthy, just use system defaults
 		log.Error("File descriptor limit invalid (<128)", "had", max, "updated", limit)
 	case max > limit:
 		// User requested more than the OS allows, notify that we can't allocate it
@@ -1194,24 +1194,24 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	return accs[index], nil
 }
 
-// setEtherbase retrieves the etherbase either from the directly specified
+// setmblerbase retrieves the mblerbase either from the directly specified
 // command line flags or from the keystore if CLI indexed.
-func setEtherbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *ethconfig.Config) {
-	// Extract the current etherbase
-	var etherbase string
-	if ctx.GlobalIsSet(MinerEtherbaseFlag.Name) {
-		etherbase = ctx.GlobalString(MinerEtherbaseFlag.Name)
+func setmblerbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *mblconfig.Config) {
+	// Extract the current mblerbase
+	var mblerbase string
+	if ctx.GlobalIsSet(MinermblerbaseFlag.Name) {
+		mblerbase = ctx.GlobalString(MinermblerbaseFlag.Name)
 	}
-	// Convert the etherbase into an address and configure it
-	if etherbase != "" {
+	// Convert the mblerbase into an address and configure it
+	if mblerbase != "" {
 		if ks != nil {
-			account, err := MakeAddress(ks, etherbase)
+			account, err := MakeAddress(ks, mblerbase)
 			if err != nil {
-				Fatalf("Invalid miner etherbase: %v", err)
+				Fatalf("Invalid miner mblerbase: %v", err)
 			}
-			cfg.Miner.Etherbase = account.Address
+			cfg.Miner.mblerbase = account.Address
 		} else {
-			Fatalf("No etherbase configured")
+			Fatalf("No mblerbase configured")
 		}
 	}
 }
@@ -1266,11 +1266,11 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 	if !(lightClient || lightServer) {
 		lightPeers = 0
 	}
-	ethPeers := cfg.MaxPeers - lightPeers
+	mblPeers := cfg.MaxPeers - lightPeers
 	if lightClient {
-		ethPeers = 0
+		mblPeers = 0
 	}
-	log.Info("Maximum peer count", "ETH", ethPeers, "LES", lightPeers, "total", cfg.MaxPeers)
+	log.Info("Maximum peer count", "mbl", mblPeers, "LES", lightPeers, "total", cfg.MaxPeers)
 
 	if ctx.GlobalIsSet(MaxPendingPeersFlag.Name) {
 		cfg.MaxPendingPeers = ctx.GlobalInt(MaxPendingPeersFlag.Name)
@@ -1311,7 +1311,7 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	SetP2PConfig(ctx, &cfg.P2P)
 	setIPC(ctx, cfg)
-	setHTTP(ctx, cfg)
+	smblTTP(ctx, cfg)
 	setGraphQL(ctx, cfg)
 	setWS(ctx, cfg)
 	setNodeUserIdent(ctx, cfg)
@@ -1399,7 +1399,7 @@ func setGPO(ctx *cli.Context, cfg *gasprice.Config, light bool) {
 	// If we are running the light client, apply another group
 	// settings for gas oracle.
 	if light {
-		*cfg = ethconfig.LightClientGPO
+		*cfg = mblconfig.LightClientGPO
 	}
 	if ctx.GlobalIsSet(GpoBlocksFlag.Name) {
 		cfg.Blocks = ctx.GlobalInt(GpoBlocksFlag.Name)
@@ -1458,30 +1458,30 @@ func setTxPool(ctx *cli.Context, cfg *core.TxPoolConfig) {
 	}
 }
 
-func setEthash(ctx *cli.Context, cfg *ethconfig.Config) {
-	if ctx.GlobalIsSet(EthashCacheDirFlag.Name) {
-		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
+func setmblash(ctx *cli.Context, cfg *mblconfig.Config) {
+	if ctx.GlobalIsSet(mblashCacheDirFlag.Name) {
+		cfg.mblash.CacheDir = ctx.GlobalString(mblashCacheDirFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetDirFlag.Name) {
-		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
+	if ctx.GlobalIsSet(mblashDatasetDirFlag.Name) {
+		cfg.mblash.DatasetDir = ctx.GlobalString(mblashDatasetDirFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
-		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
+	if ctx.GlobalIsSet(mblashCachesInMemoryFlag.Name) {
+		cfg.mblash.CachesInMem = ctx.GlobalInt(mblashCachesInMemoryFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashCachesOnDiskFlag.Name) {
-		cfg.Ethash.CachesOnDisk = ctx.GlobalInt(EthashCachesOnDiskFlag.Name)
+	if ctx.GlobalIsSet(mblashCachesOnDiskFlag.Name) {
+		cfg.mblash.CachesOnDisk = ctx.GlobalInt(mblashCachesOnDiskFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashCachesLockMmapFlag.Name) {
-		cfg.Ethash.CachesLockMmap = ctx.GlobalBool(EthashCachesLockMmapFlag.Name)
+	if ctx.GlobalIsSet(mblashCachesLockMmapFlag.Name) {
+		cfg.mblash.CachesLockMmap = ctx.GlobalBool(mblashCachesLockMmapFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetsInMemoryFlag.Name) {
-		cfg.Ethash.DatasetsInMem = ctx.GlobalInt(EthashDatasetsInMemoryFlag.Name)
+	if ctx.GlobalIsSet(mblashDatasetsInMemoryFlag.Name) {
+		cfg.mblash.DatasetsInMem = ctx.GlobalInt(mblashDatasetsInMemoryFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetsOnDiskFlag.Name) {
-		cfg.Ethash.DatasetsOnDisk = ctx.GlobalInt(EthashDatasetsOnDiskFlag.Name)
+	if ctx.GlobalIsSet(mblashDatasetsOnDiskFlag.Name) {
+		cfg.mblash.DatasetsOnDisk = ctx.GlobalInt(mblashDatasetsOnDiskFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetsLockMmapFlag.Name) {
-		cfg.Ethash.DatasetsLockMmap = ctx.GlobalBool(EthashDatasetsLockMmapFlag.Name)
+	if ctx.GlobalIsSet(mblashDatasetsLockMmapFlag.Name) {
+		cfg.mblash.DatasetsLockMmap = ctx.GlobalBool(mblashDatasetsLockMmapFlag.Name)
 	}
 }
 
@@ -1510,11 +1510,11 @@ func setMiner(ctx *cli.Context, cfg *miner.Config) {
 	}
 }
 
-func setRequiredBlocks(ctx *cli.Context, cfg *ethconfig.Config) {
-	requiredBlocks := ctx.GlobalString(EthRequiredBlocksFlag.Name)
+func setRequiredBlocks(ctx *cli.Context, cfg *mblconfig.Config) {
+	requiredBlocks := ctx.GlobalString(mblRequiredBlocksFlag.Name)
 	if requiredBlocks == "" {
 		if ctx.GlobalIsSet(LegacyWhitelistFlag.Name) {
-			log.Warn("The flag --whitelist is deprecated and will be removed, please use --eth.requiredblocks")
+			log.Warn("The flag --whitelist is deprecated and will be removed, please use --mbl.requiredblocks")
 			requiredBlocks = ctx.GlobalString(LegacyWhitelistFlag.Name)
 		} else {
 			return
@@ -1579,8 +1579,8 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 	}
 }
 
-// SetEthConfig applies eth-related command line flags to the config.
-func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
+// SetmblConfig applies mbl-related command line flags to the config.
+func SetmblConfig(ctx *cli.Context, stack *node.Node, cfg *mblconfig.Config) {
 	// Avoid conflicting network flags
 	CheckExclusive(ctx, MainnetFlag, DeveloperFlag, RopstenFlag, RinkebyFlag, GoerliFlag, SepoliaFlag, KilnFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
@@ -1596,10 +1596,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
 		ks = keystores[0].(*keystore.KeyStore)
 	}
-	setEtherbase(ctx, ks, cfg)
+	setmblerbase(ctx, ks, cfg)
 	setGPO(ctx, &cfg.GPO, ctx.GlobalString(SyncModeFlag.Name) == "light")
 	setTxPool(ctx, &cfg.TxPool)
-	setEthash(ctx, cfg)
+	setmblash(ctx, cfg)
 	setMiner(ctx, &cfg.Miner)
 	setRequiredBlocks(ctx, cfg)
 	setLes(ctx, cfg)
@@ -1703,13 +1703,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.RPCTxFeeCap = ctx.GlobalFloat64(RPCGlobalTxFeeCapFlag.Name)
 	}
 	if ctx.GlobalIsSet(NoDiscoverFlag.Name) {
-		cfg.EthDiscoveryURLs, cfg.SnapDiscoveryURLs = []string{}, []string{}
+		cfg.mblDiscoveryURLs, cfg.SnapDiscoveryURLs = []string{}, []string{}
 	} else if ctx.GlobalIsSet(DNSDiscoveryFlag.Name) {
 		urls := ctx.GlobalString(DNSDiscoveryFlag.Name)
 		if urls == "" {
-			cfg.EthDiscoveryURLs = []string{}
+			cfg.mblDiscoveryURLs = []string{}
 		} else {
-			cfg.EthDiscoveryURLs = SplitAndTrim(urls)
+			cfg.mblDiscoveryURLs = SplitAndTrim(urls)
 		}
 	}
 	// Override any default configs for hard coded networks.
@@ -1777,9 +1777,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			// when we're definitely concerned with only one account.
 			passphrase = list[0]
 		}
-		// setEtherbase has been called above, configuring the miner address from command line flags.
-		if cfg.Miner.Etherbase != (common.Address{}) {
-			developer = accounts.Account{Address: cfg.Miner.Etherbase}
+		// setmblerbase has been called above, configuring the miner address from command line flags.
+		if cfg.Miner.mblerbase != (common.Address{}) {
+			developer = accounts.Account{Address: cfg.Miner.mblerbase}
 		} else if accs := ks.Accounts(); len(accs) > 0 {
 			developer = ks.Accounts()[0]
 		} else {
@@ -1822,8 +1822,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 
 // SetDNSDiscoveryDefaults configures DNS discovery with the given URL if
 // no URLs are set.
-func SetDNSDiscoveryDefaults(cfg *ethconfig.Config, genesis common.Hash) {
-	if cfg.EthDiscoveryURLs != nil {
+func SetDNSDiscoveryDefaults(cfg *mblconfig.Config, genesis common.Hash) {
+	if cfg.mblDiscoveryURLs != nil {
 		return // already set through flags/config
 	}
 	protocol := "all"
@@ -1831,15 +1831,15 @@ func SetDNSDiscoveryDefaults(cfg *ethconfig.Config, genesis common.Hash) {
 		protocol = "les"
 	}
 	if url := params.KnownDNSNetwork(genesis, protocol); url != "" {
-		cfg.EthDiscoveryURLs = []string{url}
-		cfg.SnapDiscoveryURLs = cfg.EthDiscoveryURLs
+		cfg.mblDiscoveryURLs = []string{url}
+		cfg.SnapDiscoveryURLs = cfg.mblDiscoveryURLs
 	}
 }
 
-// RegisterEthService adds an mbali client to the stack.
+// RegistermblService adds an mbali client to the stack.
 // The second return value is the full node instance, which may be nil if the
 // node is running as a light client.
-func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend, *eth.mbali) {
+func RegistermblService(stack *node.Node, cfg *mblconfig.Config) (mblapi.Backend, *mbl.mbali) {
 	if cfg.SyncMode == downloader.LightSync {
 		backend, err := les.New(stack, cfg)
 		if err != nil {
@@ -1853,7 +1853,7 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 		}
 		return backend.ApiBackend, nil
 	}
-	backend, err := eth.New(stack, cfg)
+	backend, err := mbl.New(stack, cfg)
 	if err != nil {
 		Fatalf("Failed to register the mbali service: %v", err)
 	}
@@ -1864,7 +1864,7 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 		}
 	}
 	if backend.BlockChain().Config().TerminalTotalDifficulty != nil {
-		if err := ethcatalyst.Register(stack, backend); err != nil {
+		if err := mblcatalyst.Register(stack, backend); err != nil {
 			Fatalf("Failed to register the catalyst service: %v", err)
 		}
 	}
@@ -1872,16 +1872,16 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 	return backend.APIBackend, backend
 }
 
-// RegisterEthStatsService configures the mbali Stats daemon and adds it to
+// RegistermblStatsService configures the mbali Stats daemon and adds it to
 // the given node.
-func RegisterEthStatsService(stack *node.Node, backend ethapi.Backend, url string) {
-	if err := ethstats.New(stack, backend, backend.Engine(), url); err != nil {
+func RegistermblStatsService(stack *node.Node, backend mblapi.Backend, url string) {
+	if err := mblstats.New(stack, backend, backend.Engine(), url); err != nil {
 		Fatalf("Failed to register the mbali Stats service: %v", err)
 	}
 }
 
 // RegisterGraphQLService is a utility function to construct a new service and register it against a node.
-func RegisterGraphQLService(stack *node.Node, backend ethapi.Backend, cfg node.Config) {
+func RegisterGraphQLService(stack *node.Node, backend mblapi.Backend, cfg node.Config) {
 	if err := graphql.New(stack, backend, cfg.GraphQLCors, cfg.GraphQLVirtualHosts); err != nil {
 		Fatalf("Failed to register the GraphQL service: %v", err)
 	}
@@ -1964,13 +1964,13 @@ func SplitTagsFlag(tagsFlag string) map[string]string {
 }
 
 // MakeChainDatabase open an LevelDB using the flags passed to the client and will hard crash if it fails.
-func MakeChainDatabase(ctx *cli.Context, stack *node.Node, readonly bool) ethdb.Database {
+func MakeChainDatabase(ctx *cli.Context, stack *node.Node, readonly bool) mbldb.Database {
 	var (
 		cache   = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
 		handles = MakeDatabaseHandles(ctx.GlobalInt(FDLimitFlag.Name))
 
 		err     error
-		chainDb ethdb.Database
+		chainDb mbldb.Database
 	)
 	switch {
 	case ctx.GlobalIsSet(RemoteDBFlag.Name):
@@ -2009,7 +2009,7 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 }
 
 // MakeChain creates a chain manager from set command line flags.
-func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb ethdb.Database) {
+func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb mbldb.Database) {
 	var err error
 	chainDb = MakeChainDatabase(ctx, stack, false) // TODO(rjl493456442) support read-only database
 	config, _, err := core.SetupGenesisBlock(chainDb, MakeGenesis(ctx))
@@ -2018,21 +2018,21 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	}
 
 	var engine consensus.Engine
-	ethashConf := ethconfig.Defaults.Ethash
+	mblashConf := mblconfig.Defaults.mblash
 	if ctx.GlobalBool(FakePoWFlag.Name) {
-		ethashConf.PowMode = ethash.ModeFake
+		mblashConf.PowMode = mblash.ModeFake
 	}
-	engine = ethconfig.CreateConsensusEngine(stack, config, &ethashConf, nil, false, chainDb)
+	engine = mblconfig.CreateConsensusEngine(stack, config, &mblashConf, nil, false, chainDb)
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
 		Fatalf("--%s must be either 'full' or 'archive'", GCModeFlag.Name)
 	}
 	cache := &core.CacheConfig{
-		TrieCleanLimit:      ethconfig.Defaults.TrieCleanCache,
+		TrieCleanLimit:      mblconfig.Defaults.TrieCleanCache,
 		TrieCleanNoPrefetch: ctx.GlobalBool(CacheNoPrefetchFlag.Name),
-		TrieDirtyLimit:      ethconfig.Defaults.TrieDirtyCache,
+		TrieDirtyLimit:      mblconfig.Defaults.TrieDirtyCache,
 		TrieDirtyDisabled:   ctx.GlobalString(GCModeFlag.Name) == "archive",
-		TrieTimeLimit:       ethconfig.Defaults.TrieTimeout,
-		SnapshotLimit:       ethconfig.Defaults.SnapshotCache,
+		TrieTimeLimit:       mblconfig.Defaults.TrieTimeout,
+		SnapshotLimit:       mblconfig.Defaults.SnapshotCache,
 		Preimages:           ctx.GlobalBool(CachePreimagesFlag.Name),
 	}
 	if cache.TrieDirtyDisabled && !cache.Preimages {
@@ -2081,7 +2081,7 @@ func MakeConsolePreloads(ctx *cli.Context) []string {
 //
 // e.g. gombl account new --keystore /tmp/mykeystore --lightkdf
 //
-// is equivalent after calling this method with:
+// is equivalent after calling this mmblod with:
 //
 // gombl --keystore /tmp/mykeystore --lightkdf account new
 //

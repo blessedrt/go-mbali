@@ -212,7 +212,7 @@ func (sn *SimNode) ServeRPC(conn *websocket.Conn) error {
 }
 
 // Snapshots creates snapshots of the services by calling the
-// simulation_snapshot RPC method
+// simulation_snapshot RPC mmblod
 func (sn *SimNode) Snapshots() (map[string][]byte, error) {
 	sn.lock.RLock()
 	services := make(map[string]node.Lifecycle, len(sn.running))

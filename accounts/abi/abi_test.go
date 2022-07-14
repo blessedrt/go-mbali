@@ -89,39 +89,39 @@ var (
 		{Name: "f", Type: "uint256"}})
 )
 
-var methods = map[string]Method{
-	"":                    NewMethod("", "", Function, "", false, false, nil, nil),
-	"balance":             NewMethod("balance", "balance", Function, "view", false, false, nil, nil),
-	"send":                NewMethod("send", "send", Function, "", false, false, []Argument{{"amount", Uint256, false}}, nil),
-	"test":                NewMethod("test", "test", Function, "", false, false, []Argument{{"number", Uint32, false}}, nil),
-	"string":              NewMethod("string", "string", Function, "", false, false, []Argument{{"inputs", String, false}}, nil),
-	"bool":                NewMethod("bool", "bool", Function, "", false, false, []Argument{{"inputs", Bool, false}}, nil),
-	"address":             NewMethod("address", "address", Function, "", false, false, []Argument{{"inputs", Address, false}}, nil),
-	"uint64[]":            NewMethod("uint64[]", "uint64[]", Function, "", false, false, []Argument{{"inputs", Uint64Arr, false}}, nil),
-	"uint64[2]":           NewMethod("uint64[2]", "uint64[2]", Function, "", false, false, []Argument{{"inputs", Uint64Arr2, false}}, nil),
-	"int8":                NewMethod("int8", "int8", Function, "", false, false, []Argument{{"inputs", Int8, false}}, nil),
-	"bytes32":             NewMethod("bytes32", "bytes32", Function, "", false, false, []Argument{{"inputs", Bytes32, false}}, nil),
-	"foo":                 NewMethod("foo", "foo", Function, "", false, false, []Argument{{"inputs", Uint32, false}}, nil),
-	"bar":                 NewMethod("bar", "bar", Function, "", false, false, []Argument{{"inputs", Uint32, false}, {"string", Uint16, false}}, nil),
-	"slice":               NewMethod("slice", "slice", Function, "", false, false, []Argument{{"inputs", Uint32Arr2, false}}, nil),
-	"slice256":            NewMethod("slice256", "slice256", Function, "", false, false, []Argument{{"inputs", Uint256Arr2, false}}, nil),
-	"sliceAddress":        NewMethod("sliceAddress", "sliceAddress", Function, "", false, false, []Argument{{"inputs", AddressArr, false}}, nil),
-	"sliceMultiAddress":   NewMethod("sliceMultiAddress", "sliceMultiAddress", Function, "", false, false, []Argument{{"a", AddressArr, false}, {"b", AddressArr, false}}, nil),
-	"nestedArray":         NewMethod("nestedArray", "nestedArray", Function, "", false, false, []Argument{{"a", Uint256ArrNested, false}, {"b", AddressArr, false}}, nil),
-	"nestedArray2":        NewMethod("nestedArray2", "nestedArray2", Function, "", false, false, []Argument{{"a", Uint8ArrNested, false}}, nil),
-	"nestedSlice":         NewMethod("nestedSlice", "nestedSlice", Function, "", false, false, []Argument{{"a", Uint8SliceNested, false}}, nil),
-	"receive":             NewMethod("receive", "receive", Function, "payable", false, true, []Argument{{"memo", Bytes, false}}, []Argument{}),
-	"fixedArrStr":         NewMethod("fixedArrStr", "fixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr", Uint256Arr2, false}}, nil),
-	"fixedArrBytes":       NewMethod("fixedArrBytes", "fixedArrBytes", Function, "view", false, false, []Argument{{"bytes", Bytes, false}, {"fixedArr", Uint256Arr2, false}}, nil),
-	"mixedArrStr":         NewMethod("mixedArrStr", "mixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr", Uint256Arr2, false}, {"dynArr", Uint256Arr, false}}, nil),
-	"doubleFixedArrStr":   NewMethod("doubleFixedArrStr", "doubleFixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr1", Uint256Arr2, false}, {"fixedArr2", Uint256Arr3, false}}, nil),
-	"multipleMixedArrStr": NewMethod("multipleMixedArrStr", "multipleMixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr1", Uint256Arr2, false}, {"dynArr", Uint256Arr, false}, {"fixedArr2", Uint256Arr3, false}}, nil),
-	"overloadedNames":     NewMethod("overloadedNames", "overloadedNames", Function, "view", false, false, []Argument{{"f", TupleF, false}}, nil),
+var mmblods = map[string]Mmblod{
+	"":                    NewMmblod("", "", Function, "", false, false, nil, nil),
+	"balance":             NewMmblod("balance", "balance", Function, "view", false, false, nil, nil),
+	"send":                NewMmblod("send", "send", Function, "", false, false, []Argument{{"amount", Uint256, false}}, nil),
+	"test":                NewMmblod("test", "test", Function, "", false, false, []Argument{{"number", Uint32, false}}, nil),
+	"string":              NewMmblod("string", "string", Function, "", false, false, []Argument{{"inputs", String, false}}, nil),
+	"bool":                NewMmblod("bool", "bool", Function, "", false, false, []Argument{{"inputs", Bool, false}}, nil),
+	"address":             NewMmblod("address", "address", Function, "", false, false, []Argument{{"inputs", Address, false}}, nil),
+	"uint64[]":            NewMmblod("uint64[]", "uint64[]", Function, "", false, false, []Argument{{"inputs", Uint64Arr, false}}, nil),
+	"uint64[2]":           NewMmblod("uint64[2]", "uint64[2]", Function, "", false, false, []Argument{{"inputs", Uint64Arr2, false}}, nil),
+	"int8":                NewMmblod("int8", "int8", Function, "", false, false, []Argument{{"inputs", Int8, false}}, nil),
+	"bytes32":             NewMmblod("bytes32", "bytes32", Function, "", false, false, []Argument{{"inputs", Bytes32, false}}, nil),
+	"foo":                 NewMmblod("foo", "foo", Function, "", false, false, []Argument{{"inputs", Uint32, false}}, nil),
+	"bar":                 NewMmblod("bar", "bar", Function, "", false, false, []Argument{{"inputs", Uint32, false}, {"string", Uint16, false}}, nil),
+	"slice":               NewMmblod("slice", "slice", Function, "", false, false, []Argument{{"inputs", Uint32Arr2, false}}, nil),
+	"slice256":            NewMmblod("slice256", "slice256", Function, "", false, false, []Argument{{"inputs", Uint256Arr2, false}}, nil),
+	"sliceAddress":        NewMmblod("sliceAddress", "sliceAddress", Function, "", false, false, []Argument{{"inputs", AddressArr, false}}, nil),
+	"sliceMultiAddress":   NewMmblod("sliceMultiAddress", "sliceMultiAddress", Function, "", false, false, []Argument{{"a", AddressArr, false}, {"b", AddressArr, false}}, nil),
+	"nestedArray":         NewMmblod("nestedArray", "nestedArray", Function, "", false, false, []Argument{{"a", Uint256ArrNested, false}, {"b", AddressArr, false}}, nil),
+	"nestedArray2":        NewMmblod("nestedArray2", "nestedArray2", Function, "", false, false, []Argument{{"a", Uint8ArrNested, false}}, nil),
+	"nestedSlice":         NewMmblod("nestedSlice", "nestedSlice", Function, "", false, false, []Argument{{"a", Uint8SliceNested, false}}, nil),
+	"receive":             NewMmblod("receive", "receive", Function, "payable", false, true, []Argument{{"memo", Bytes, false}}, []Argument{}),
+	"fixedArrStr":         NewMmblod("fixedArrStr", "fixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr", Uint256Arr2, false}}, nil),
+	"fixedArrBytes":       NewMmblod("fixedArrBytes", "fixedArrBytes", Function, "view", false, false, []Argument{{"bytes", Bytes, false}, {"fixedArr", Uint256Arr2, false}}, nil),
+	"mixedArrStr":         NewMmblod("mixedArrStr", "mixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr", Uint256Arr2, false}, {"dynArr", Uint256Arr, false}}, nil),
+	"doubleFixedArrStr":   NewMmblod("doubleFixedArrStr", "doubleFixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr1", Uint256Arr2, false}, {"fixedArr2", Uint256Arr3, false}}, nil),
+	"multipleMixedArrStr": NewMmblod("multipleMixedArrStr", "multipleMixedArrStr", Function, "view", false, false, []Argument{{"str", String, false}, {"fixedArr1", Uint256Arr2, false}, {"dynArr", Uint256Arr, false}, {"fixedArr2", Uint256Arr3, false}}, nil),
+	"overloadedNames":     NewMmblod("overloadedNames", "overloadedNames", Function, "view", false, false, []Argument{{"f", TupleF, false}}, nil),
 }
 
 func TestReader(t *testing.T) {
 	abi := ABI{
-		Methods: methods,
+		Mmblods: mmblods,
 	}
 
 	exp, err := JSON(strings.NewReader(jsondata))
@@ -129,23 +129,23 @@ func TestReader(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for name, expM := range exp.Methods {
-		gotM, exist := abi.Methods[name]
+	for name, expM := range exp.Mmblods {
+		gotM, exist := abi.Mmblods[name]
 		if !exist {
-			t.Errorf("Missing expected method %v", name)
+			t.Errorf("Missing expected mmblod %v", name)
 		}
 		if !reflect.DeepEqual(gotM, expM) {
-			t.Errorf("\nGot abi method: \n%v\ndoes not match expected method\n%v", gotM, expM)
+			t.Errorf("\nGot abi mmblod: \n%v\ndoes not match expected mmblod\n%v", gotM, expM)
 		}
 	}
 
-	for name, gotM := range abi.Methods {
-		expM, exist := exp.Methods[name]
+	for name, gotM := range abi.Mmblods {
+		expM, exist := exp.Mmblods[name]
 		if !exist {
-			t.Errorf("Found extra method %v", name)
+			t.Errorf("Found extra mmblod %v", name)
 		}
 		if !reflect.DeepEqual(gotM, expM) {
-			t.Errorf("\nGot abi method: \n%v\ndoes not match expected method\n%v", gotM, expM)
+			t.Errorf("\nGot abi mmblod: \n%v\ndoes not match expected mmblod\n%v", gotM, expM)
 		}
 	}
 }
@@ -170,13 +170,13 @@ func TestInvalidABI(t *testing.T) {
 //	}
 func TestConstructor(t *testing.T) {
 	json := `[{	"inputs": [{"internalType": "uint256","name": "a","type": "uint256"	},{	"internalType": "uint256","name": "b","type": "uint256"}],"stateMutability": "nonpayable","type": "constructor"}]`
-	method := NewMethod("", "", Constructor, "nonpayable", false, false, []Argument{{"a", Uint256, false}, {"b", Uint256, false}}, nil)
+	mmblod := NewMmblod("", "", Constructor, "nonpayable", false, false, []Argument{{"a", Uint256, false}, {"b", Uint256, false}}, nil)
 	// Test from JSON
 	abi, err := JSON(strings.NewReader(json))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(abi.Constructor, method) {
+	if !reflect.DeepEqual(abi.Constructor, mmblod) {
 		t.Error("Missing expected constructor")
 	}
 	// Test pack/unpack
@@ -234,8 +234,8 @@ func TestTestNumbers(t *testing.T) {
 	}
 }
 
-func TestMethodSignature(t *testing.T) {
-	m := NewMethod("foo", "foo", Function, "", false, false, []Argument{{"bar", String, false}, {"baz", String, false}}, nil)
+func TestMmblodSignature(t *testing.T) {
+	m := NewMmblod("foo", "foo", Function, "", false, false, []Argument{{"bar", String, false}, {"baz", String, false}}, nil)
 	exp := "foo(string,string)"
 	if m.Sig != exp {
 		t.Error("signature mismatch", exp, "!=", m.Sig)
@@ -246,13 +246,13 @@ func TestMethodSignature(t *testing.T) {
 		t.Errorf("expected ids to match %x != %x", m.ID, idexp)
 	}
 
-	m = NewMethod("foo", "foo", Function, "", false, false, []Argument{{"bar", Uint256, false}}, nil)
+	m = NewMmblod("foo", "foo", Function, "", false, false, []Argument{{"bar", Uint256, false}}, nil)
 	exp = "foo(uint256)"
 	if m.Sig != exp {
 		t.Error("signature mismatch", exp, "!=", m.Sig)
 	}
 
-	// Method with tuple arguments
+	// Mmblod with tuple arguments
 	s, _ := NewType("tuple", "", []ArgumentMarshaling{
 		{Name: "a", Type: "int256"},
 		{Name: "b", Type: "int256[]"},
@@ -265,23 +265,23 @@ func TestMethodSignature(t *testing.T) {
 			{Name: "y", Type: "int256"},
 		}},
 	})
-	m = NewMethod("foo", "foo", Function, "", false, false, []Argument{{"s", s, false}, {"bar", String, false}}, nil)
+	m = NewMmblod("foo", "foo", Function, "", false, false, []Argument{{"s", s, false}, {"bar", String, false}}, nil)
 	exp = "foo((int256,int256[],(int256,int256)[],(int256,int256)[2]),string)"
 	if m.Sig != exp {
 		t.Error("signature mismatch", exp, "!=", m.Sig)
 	}
 }
 
-func TestOverloadedMethodSignature(t *testing.T) {
+func TestOverloadedMmblodSignature(t *testing.T) {
 	json := `[{"constant":true,"inputs":[{"name":"i","type":"uint256"},{"name":"j","type":"uint256"}],"name":"foo","outputs":[],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"foo","outputs":[],"payable":false,"stateMutability":"pure","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"i","type":"uint256"}],"name":"bar","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"i","type":"uint256"},{"indexed":false,"name":"j","type":"uint256"}],"name":"bar","type":"event"}]`
 	abi, err := JSON(strings.NewReader(json))
 	if err != nil {
 		t.Fatal(err)
 	}
-	check := func(name string, expect string, method bool) {
-		if method {
-			if abi.Methods[name].Sig != expect {
-				t.Fatalf("The signature of overloaded method mismatch, want %s, have %s", expect, abi.Methods[name].Sig)
+	check := func(name string, expect string, mmblod bool) {
+		if mmblod {
+			if abi.Mmblods[name].Sig != expect {
+				t.Fatalf("The signature of overloaded mmblod mismatch, want %s, have %s", expect, abi.Mmblods[name].Sig)
 			}
 		} else {
 			if abi.Events[name].Sig != expect {
@@ -303,7 +303,7 @@ func TestCustomErrors(t *testing.T) {
 	}
 	check := func(name string, expect string) {
 		if abi.Errors[name].Sig != expect {
-			t.Fatalf("The signature of overloaded method mismatch, want %s, have %s", expect, abi.Methods[name].Sig)
+			t.Fatalf("The signature of overloaded mmblod mismatch, want %s, have %s", expect, abi.Mmblods[name].Sig)
 		}
 	}
 	check("MyError", "MyError(uint256)")
@@ -656,7 +656,7 @@ func TestDefaultFunctionParsing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, ok := abi.Methods["balance"]; !ok {
+	if _, ok := abi.Mmblods["balance"]; !ok {
 		t.Error("expected 'balance' to be present")
 	}
 }
@@ -822,7 +822,7 @@ func TestUnpackEventIntoMap(t *testing.T) {
 	}
 }
 
-func TestUnpackMethodIntoMap(t *testing.T) {
+func TestUnpackMmblodIntoMap(t *testing.T) {
 	const abiJSON = `[{"constant":false,"inputs":[{"name":"memo","type":"bytes"}],"name":"receive","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"send","outputs":[{"name":"amount","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"get","outputs":[{"name":"hash","type":"bytes"}],"payable":true,"stateMutability":"payable","type":"function"}]`
 	abi, err := JSON(strings.NewReader(abiJSON))
 	if err != nil {
@@ -837,7 +837,7 @@ func TestUnpackMethodIntoMap(t *testing.T) {
 		t.Errorf("len(data) is %d, want a multiple of 32", len(data))
 	}
 
-	// Tests a method with no outputs
+	// Tests a mmblod with no outputs
 	receiveMap := map[string]interface{}{}
 	if err = abi.UnpackIntoMap(receiveMap, "receive", data); err != nil {
 		t.Error(err)
@@ -846,7 +846,7 @@ func TestUnpackMethodIntoMap(t *testing.T) {
 		t.Error("unpacked `receive` map expected to have length 0")
 	}
 
-	// Tests a method with only outputs
+	// Tests a mmblod with only outputs
 	sendMap := map[string]interface{}{}
 	if err = abi.UnpackIntoMap(sendMap, "send", data); err != nil {
 		t.Error(err)
@@ -858,7 +858,7 @@ func TestUnpackMethodIntoMap(t *testing.T) {
 		t.Error("unpacked `send` map expected `amount` value of 1")
 	}
 
-	// Tests a method with outputs and inputs
+	// Tests a mmblod with outputs and inputs
 	getMap := map[string]interface{}{}
 	if err = abi.UnpackIntoMap(getMap, "get", data); err != nil {
 		t.Error(err)
@@ -873,7 +873,7 @@ func TestUnpackMethodIntoMap(t *testing.T) {
 }
 
 func TestUnpackIntoMapNamingConflict(t *testing.T) {
-	// Two methods have the same name
+	// Two mmblods have the same name
 	var abiJSON = `[{"constant":false,"inputs":[{"name":"memo","type":"bytes"}],"name":"get","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"send","outputs":[{"name":"amount","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"get","outputs":[{"name":"hash","type":"bytes"}],"payable":true,"stateMutability":"payable","type":"function"}]`
 	abi, err := JSON(strings.NewReader(abiJSON))
 	if err != nil {
@@ -889,7 +889,7 @@ func TestUnpackIntoMapNamingConflict(t *testing.T) {
 	}
 	getMap := map[string]interface{}{}
 	if err = abi.UnpackIntoMap(getMap, "get", data); err == nil {
-		t.Error("naming conflict between two methods; error expected")
+		t.Error("naming conflict between two mmblods; error expected")
 	}
 
 	// Two events have the same name
@@ -911,7 +911,7 @@ func TestUnpackIntoMapNamingConflict(t *testing.T) {
 		t.Error("naming conflict between two events; no error expected")
 	}
 
-	// Method and event have the same name
+	// Mmblod and event have the same name
 	abiJSON = `[{"constant":false,"inputs":[{"name":"memo","type":"bytes"}],"name":"received","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"memo","type":"bytes"}],"name":"received","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"}],"name":"receivedAddr","type":"event"}]`
 	abi, err = JSON(strings.NewReader(abiJSON))
 	if err != nil {
@@ -921,7 +921,7 @@ func TestUnpackIntoMapNamingConflict(t *testing.T) {
 		t.Errorf("len(data) is %d, want a non-multiple of 32", len(data))
 	}
 	if err = abi.UnpackIntoMap(receivedMap, "received", data); err == nil {
-		t.Error("naming conflict between an event and a method; error expected")
+		t.Error("naming conflict between an event and a mmblod; error expected")
 	}
 
 	// Conflict is case sensitive
@@ -955,34 +955,34 @@ func TestUnpackIntoMapNamingConflict(t *testing.T) {
 	}
 }
 
-func TestABI_MethodById(t *testing.T) {
+func TestABI_MmblodById(t *testing.T) {
 	abi, err := JSON(strings.NewReader(jsondata))
 	if err != nil {
 		t.Fatal(err)
 	}
-	for name, m := range abi.Methods {
+	for name, m := range abi.Mmblods {
 		a := fmt.Sprintf("%v", m)
-		m2, err := abi.MethodById(m.ID)
+		m2, err := abi.MmblodById(m.ID)
 		if err != nil {
-			t.Fatalf("Failed to look up ABI method: %v", err)
+			t.Fatalf("Failed to look up ABI mmblod: %v", err)
 		}
 		b := fmt.Sprintf("%v", m2)
 		if a != b {
-			t.Errorf("Method %v (id %x) not 'findable' by id in ABI", name, m.ID)
+			t.Errorf("Mmblod %v (id %x) not 'findable' by id in ABI", name, m.ID)
 		}
 	}
 	// test unsuccessful lookups
-	if _, err = abi.MethodById(crypto.Keccak256()); err == nil {
-		t.Error("Expected error: no method with this id")
+	if _, err = abi.MmblodById(crypto.Keccak256()); err == nil {
+		t.Error("Expected error: no mmblod with this id")
 	}
 	// Also test empty
-	if _, err := abi.MethodById([]byte{0x00}); err == nil {
+	if _, err := abi.MmblodById([]byte{0x00}); err == nil {
 		t.Errorf("Expected error, too short to decode data")
 	}
-	if _, err := abi.MethodById([]byte{}); err == nil {
+	if _, err := abi.MmblodById([]byte{}); err == nil {
 		t.Errorf("Expected error, too short to decode data")
 	}
-	if _, err := abi.MethodById(nil); err == nil {
+	if _, err := abi.MmblodById(nil); err == nil {
 		t.Errorf("Expected error, nil is short to decode data")
 	}
 }
@@ -1034,7 +1034,7 @@ func TestABI_EventById(t *testing.T) {
 
 		event, err := abi.EventByID(topicID)
 		if err != nil {
-			t.Fatalf("Failed to look up ABI method: %v, test #%d", err, testnum)
+			t.Fatalf("Failed to look up ABI mmblod: %v, test #%d", err, testnum)
 		}
 		if event == nil {
 			t.Errorf("We should find a event for topic %s, test #%d", topicID.Hex(), testnum)
@@ -1055,25 +1055,25 @@ func TestABI_EventById(t *testing.T) {
 	}
 }
 
-// TestDoubleDuplicateMethodNames checks that if transfer0 already exists, there won't be a name
-// conflict and that the second transfer method will be renamed transfer1.
-func TestDoubleDuplicateMethodNames(t *testing.T) {
+// TestDoubleDuplicateMmblodNames checks that if transfer0 already exists, there won't be a name
+// conflict and that the second transfer mmblod will be renamed transfer1.
+func TestDoubleDuplicateMmblodNames(t *testing.T) {
 	abiJSON := `[{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transfer","outputs":[{"name":"ok","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"value","type":"uint256"},{"name":"data","type":"bytes"}],"name":"transfer0","outputs":[{"name":"ok","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"value","type":"uint256"},{"name":"data","type":"bytes"},{"name":"customFallback","type":"string"}],"name":"transfer","outputs":[{"name":"ok","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]`
 	contractAbi, err := JSON(strings.NewReader(abiJSON))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := contractAbi.Methods["transfer"]; !ok {
-		t.Fatalf("Could not find original method")
+	if _, ok := contractAbi.Mmblods["transfer"]; !ok {
+		t.Fatalf("Could not find original mmblod")
 	}
-	if _, ok := contractAbi.Methods["transfer0"]; !ok {
-		t.Fatalf("Could not find duplicate method")
+	if _, ok := contractAbi.Mmblods["transfer0"]; !ok {
+		t.Fatalf("Could not find duplicate mmblod")
 	}
-	if _, ok := contractAbi.Methods["transfer1"]; !ok {
-		t.Fatalf("Could not find duplicate method")
+	if _, ok := contractAbi.Mmblods["transfer1"]; !ok {
+		t.Fatalf("Could not find duplicate mmblod")
 	}
-	if _, ok := contractAbi.Methods["transfer2"]; ok {
-		t.Fatalf("Should not have found extra method")
+	if _, ok := contractAbi.Mmblods["transfer2"]; ok {
+		t.Fatalf("Should not have found extra mmblod")
 	}
 }
 

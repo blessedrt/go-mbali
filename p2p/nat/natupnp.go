@@ -202,7 +202,7 @@ func discover(out chan<- *upnp, target string, matcher func(goupnp.ServiceClient
 			}
 			upnp.dev = devs[i].Root
 
-			// check whether port mapping is enabled
+			// check whmbler port mapping is enabled
 			if upnp.natEnabled() {
 				out <- upnp
 				found = true

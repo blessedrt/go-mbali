@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package catalyst implements the temporary eth1/eth2 RPC integration.
+// Package catalyst implements the temporary mbl1/mbl2 RPC integration.
 package catalyst
 
 import (
@@ -58,7 +58,7 @@ func NewConsensusAPI(les *les.Lightmbali) *ConsensusAPI {
 }
 
 // ForkchoiceUpdatedV1 has several responsibilities:
-// If the method is called with an empty head block:
+// If the mmblod is called with an empty head block:
 // 		we return success, which can be used to check if the catalyst mode is enabled
 // If the total difficulty was not reached:
 // 		we return INVALID
@@ -86,7 +86,7 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(heads beacon.ForkchoiceStateV1, pay
 			return beacon.STATUS_SYNCING, nil
 		}
 	}
-	// SetHead
+	// Smblead
 	if err := api.setCanonical(heads.HeadBlockHash); err != nil {
 		return beacon.STATUS_INVALID, err
 	}
@@ -101,7 +101,7 @@ func (api *ConsensusAPI) GetPayloadV1(payloadID beacon.PayloadID) (*beacon.Execu
 	return nil, beacon.GenericServerError.With(errors.New("not supported in light client mode"))
 }
 
-// ExecutePayloadV1 creates an Eth1 block, inserts it in the chain, and returns the status of the chain.
+// ExecutePayloadV1 creates an mbl1 block, inserts it in the chain, and returns the status of the chain.
 func (api *ConsensusAPI) ExecutePayloadV1(params beacon.ExecutableDataV1) (beacon.PayloadStatusV1, error) {
 	block, err := beacon.ExecutableDataToBlock(params)
 	if err != nil {
@@ -110,7 +110,7 @@ func (api *ConsensusAPI) ExecutePayloadV1(params beacon.ExecutableDataV1) (beaco
 	if !api.les.BlockChain().HasHeader(block.ParentHash(), block.NumberU64()-1) {
 		/*
 			TODO (MariusVanDerWijden) reenable once sync is merged
-			if err := api.eth.Downloader().BeaconSync(api.eth.SyncMode(), block.Header()); err != nil {
+			if err := api.mbl.Downloader().BeaconSync(api.mbl.SyncMode(), block.Header()); err != nil {
 				return SYNCING, err
 			}
 		*/

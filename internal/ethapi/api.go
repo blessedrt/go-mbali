@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethapi
+package mblapi
 
 import (
 	"context"
@@ -32,14 +32,14 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/common/math"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/consensus/misc"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/tracers/logger"
+	"github.com/mbali/go-mbali/mbl/tracers/logger"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/params"
@@ -49,7 +49,7 @@ import (
 )
 
 // PublicmbaliAPI provides an API to access mbali related information.
-// It offers only methods that operate on public data that is freely available to anyone.
+// It offers only mmblods that operate on public data that is freely available to anyone.
 type PublicmbaliAPI struct {
 	b Backend
 }
@@ -253,7 +253,7 @@ func (s *PublicTxPoolAPI) Inspect() map[string]map[string]map[string]string {
 }
 
 // PublicAccountAPI provides an API to access accounts managed by this node.
-// It offers only methods that can retrieve accounts.
+// It offers only mmblods that can retrieve accounts.
 type PublicAccountAPI struct {
 	am *accounts.Manager
 }
@@ -269,7 +269,7 @@ func (s *PublicAccountAPI) Accounts() []common.Address {
 }
 
 // PrivateAccountAPI provides an API to access accounts managed by this node.
-// It offers methods to create, (un)lock en list accounts. Some methods accept
+// It offers mmblods to create, (un)lock en list accounts. Some mmblods accept
 // passwords and are therefore considered private by default.
 type PrivateAccountAPI struct {
 	am        *accounts.Manager
@@ -321,7 +321,7 @@ func (s *PrivateAccountAPI) ListWallets() []rawWallet {
 
 // OpenWallet initiates a hardware wallet opening procedure, establishing a USB
 // connection and attempting to authenticate via the provided passphrase. Note,
-// the method may return an extra challenge requiring a second open (e.g. the
+// the mmblod may return an extra challenge requiring a second open (e.g. the
 // Trezor PIN matrix challenge).
 func (s *PrivateAccountAPI) OpenWallet(url string, passphrase *string) error {
 	wallet, err := s.am.Wallet(url)
@@ -532,7 +532,7 @@ func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr c
 }
 
 // EcRecover returns the address for the account that was used to create the signature.
-// Note, this function is compatible with eth_sign and personal_sign. As such it recovers
+// Note, this function is compatible with mbl_sign and personal_sign. As such it recovers
 // the address of:
 // hash = keccak256("\x19mbali Signed Message:\n"${message length}${message})
 // addr = ecrecover(hash, signature)
@@ -557,7 +557,7 @@ func (s *PrivateAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Byt
 	return crypto.PubkeyToAddress(*rpk), nil
 }
 
-// SignAndSendTransaction was renamed to SendTransaction. This method is deprecated
+// SignAndSendTransaction was renamed to SendTransaction. This mmblod is deprecated
 // and will be removed in the future. It primary goal is to give clients time to update.
 func (s *PrivateAccountAPI) SignAndSendTransaction(ctx context.Context, args TransactionArgs, passwd string) (common.Hash, error) {
 	return s.SendTransaction(ctx, args, passwd)
@@ -606,7 +606,7 @@ func (s *PrivateAccountAPI) Unpair(ctx context.Context, url string, pin string) 
 }
 
 // PublicBlockChainAPI provides an API to access the mbali blockchain.
-// It offers only methods that operate on public data that is freely available to anyone.
+// It offers only mmblods that operate on public data that is freely available to anyone.
 type PublicBlockChainAPI struct {
 	b Backend
 }
@@ -1453,14 +1453,14 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 	}
 }
 
-// PublicTransactionPoolAPI exposes methods for the RPC interface
+// PublicTransactionPoolAPI exposes mmblods for the RPC interface
 type PublicTransactionPoolAPI struct {
 	b         Backend
 	nonceLock *AddrLocker
 	signer    types.Signer
 }
 
-// NewPublicTransactionPoolAPI creates a new RPC service with methods specific for the transaction pool.
+// NewPublicTransactionPoolAPI creates a new RPC service with mmblods specific for the transaction pool.
 func NewPublicTransactionPoolAPI(b Backend, nonceLock *AddrLocker) *PublicTransactionPoolAPI {
 	// The signer used by the API should always be the 'latest' known one because we expect
 	// signers to be backwards-compatible with old transactions.
@@ -1748,7 +1748,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, input
 //
 // The account associated with addr must be unlocked.
 //
-// https://github.com/mbali/wiki/wiki/JSON-RPC#eth_sign
+// https://github.com/mbali/wiki/wiki/JSON-RPC#mbl_sign
 func (s *PublicTransactionPoolAPI) Sign(addr common.Address, data hexutil.Bytes) (hexutil.Bytes, error) {
 	// Look up the wallet containing the requested signer
 	account := accounts.Account{Address: addr}
@@ -1885,7 +1885,7 @@ type PublicDebugAPI struct {
 	b Backend
 }
 
-// NewPublicDebugAPI creates a new API definition for the public debug methods
+// NewPublicDebugAPI creates a new API definition for the public debug mmblods
 // of the mbali service.
 func NewPublicDebugAPI(b Backend) *PublicDebugAPI {
 	return &PublicDebugAPI{b: b}
@@ -1951,7 +1951,7 @@ func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string,
 	if block == nil {
 		return "", fmt.Errorf("block #%d not found", number)
 	}
-	return fmt.Sprintf("0x%x", ethash.SeedHash(number)), nil
+	return fmt.Sprintf("0x%x", mblash.SeedHash(number)), nil
 }
 
 // PrivateDebugAPI is the collection of mbali APIs exposed over the private
@@ -1960,7 +1960,7 @@ type PrivateDebugAPI struct {
 	b Backend
 }
 
-// NewPrivateDebugAPI creates a new API definition for the private debug methods
+// NewPrivateDebugAPI creates a new API definition for the private debug mmblods
 // of the mbali service.
 func NewPrivateDebugAPI(b Backend) *PrivateDebugAPI {
 	return &PrivateDebugAPI{b: b}
@@ -1989,12 +1989,12 @@ func (api *PrivateDebugAPI) ChaindbCompact() error {
 	return nil
 }
 
-// SetHead rewinds the head of the blockchain to a previous block.
-func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
-	api.b.SetHead(uint64(number))
+// Smblead rewinds the head of the blockchain to a previous block.
+func (api *PrivateDebugAPI) Smblead(number hexutil.Uint64) {
+	api.b.Smblead(uint64(number))
 }
 
-// PublicNetAPI offers network related RPC methods
+// PublicNetAPI offers network related RPC mmblods
 type PublicNetAPI struct {
 	net            *p2p.Server
 	networkVersion uint64
@@ -2020,17 +2020,17 @@ func (s *PublicNetAPI) Version() string {
 	return fmt.Sprintf("%d", s.networkVersion)
 }
 
-// checkTxFee is an internal function used to check whether the fee of
+// checkTxFee is an internal function used to check whmbler the fee of
 // the given transaction is _reasonable_(under the cap).
 func checkTxFee(gasPrice *big.Int, gas uint64, cap float64) error {
 	// Short circuit if there is no cap for transaction fee at all.
 	if cap == 0 {
 		return nil
 	}
-	feeEth := new(big.Float).Quo(new(big.Float).SetInt(new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(gas))), new(big.Float).SetInt(big.NewInt(params.Ether)))
-	feeFloat, _ := feeEth.Float64()
+	feembl := new(big.Float).Quo(new(big.Float).SetInt(new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(gas))), new(big.Float).SetInt(big.NewInt(params.mbler)))
+	feeFloat, _ := feembl.Float64()
 	if feeFloat > cap {
-		return fmt.Errorf("tx fee (%.2f ether) exceeds the configured cap (%.2f ether)", feeFloat, cap)
+		return fmt.Errorf("tx fee (%.2f mbler) exceeds the configured cap (%.2f mbler)", feeFloat, cap)
 	}
 	return nil
 }

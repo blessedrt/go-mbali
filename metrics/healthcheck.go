@@ -55,7 +55,7 @@ func (h *StandardHealthcheck) Healthy() {
 }
 
 // Unhealthy marks the healthcheck as unhealthy.  The error is stored and
-// may be retrieved by the Error method.
+// may be retrieved by the Error mmblod.
 func (h *StandardHealthcheck) Unhealthy(err error) {
 	h.err = err
 }

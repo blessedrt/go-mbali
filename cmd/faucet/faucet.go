@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-// faucet is an Ether faucet backed by a light client.
+// faucet is an mbler faucet backed by a light client.
 package main
 
 import (
@@ -45,10 +45,10 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethclient"
-	"github.com/mbali/go-mbali/ethstats"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mblclient"
+	"github.com/mbali/go-mbali/mblstats"
 	"github.com/mbali/go-mbali/les"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/node"
@@ -62,13 +62,13 @@ import (
 var (
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
-	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
+	mblPortFlag = flag.Int("mblport", 30303, "Listener port for the devp2p connection")
 	bootFlag    = flag.String("bootnodes", "", "Comma separated bootnode enode URLs to seed with")
 	netFlag     = flag.Uint64("network", 0, "Network ID to use for the mbali protocol")
-	statsFlag   = flag.String("ethstats", "", "Ethstats network monitoring auth string")
+	statsFlag   = flag.String("mblstats", "", "mblstats network monitoring auth string")
 
 	netnameFlag = flag.String("faucet.name", "", "Network name to assign to the faucet")
-	payoutFlag  = flag.Int("faucet.amount", 1, "Number of Ethers to pay out per user request")
+	payoutFlag  = flag.Int("faucet.amount", 1, "Number of mblers to pay out per user request")
 	minutesFlag = flag.Int("faucet.minutes", 1440, "Number of minutes to wait between funding rounds")
 	tiersFlag   = flag.Int("faucet.tiers", 3, "Number of funding tiers to enable (x3 time, x2.5 funds)")
 
@@ -89,7 +89,7 @@ var (
 )
 
 var (
-	ether = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
+	mbler = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
 )
 
 var (
@@ -103,7 +103,7 @@ var websiteTmpl string
 func main() {
 	// Parse the flags and set up the logger to print everything requested
 	flag.Parse()
-	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*logFlag), log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.Lvl(*logFlag), log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
 	// Construct the payout tiers
 	amounts := make([]string, *tiersFlag)
@@ -111,7 +111,7 @@ func main() {
 	for i := 0; i < *tiersFlag; i++ {
 		// Calculate the amount for the next tier and format it
 		amount := float64(*payoutFlag) * math.Pow(2.5, float64(i))
-		amounts[i] = fmt.Sprintf("%s Ethers", strconv.FormatFloat(amount, 'f', -1, 64))
+		amounts[i] = fmt.Sprintf("%s mblers", strconv.FormatFloat(amount, 'f', -1, 64))
 		if amount == 1 {
 			amounts[i] = strings.TrimSuffix(amounts[i], "s")
 		}
@@ -175,7 +175,7 @@ func main() {
 		log.Crit("Failed to unlock faucet signer account", "err", err)
 	}
 	// Assemble and start the faucet light service
-	faucet, err := newFaucet(genesis, *ethPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
+	faucet, err := newFaucet(genesis, *mblPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
 	if err != nil {
 		log.Crit("Failed to start faucet", "err", err)
 	}
@@ -198,7 +198,7 @@ type request struct {
 type faucet struct {
 	config *params.ChainConfig // Chain configurations for signing
 	stack  *node.Node          // mbali protocol stack
-	client *ethclient.Client   // Client connection to the mbali chain
+	client *mblclient.Client   // Client connection to the mbali chain
 	index  []byte              // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
@@ -243,7 +243,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*enode.Node, network ui
 	}
 
 	// Assemble the mbali light client protocol
-	cfg := ethconfig.Defaults
+	cfg := mblconfig.Defaults
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
@@ -254,9 +254,9 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*enode.Node, network ui
 		return nil, fmt.Errorf("Failed to register the mbali service: %w", err)
 	}
 
-	// Assemble the ethstats monitoring and reporting service'
+	// Assemble the mblstats monitoring and reporting service'
 	if stats != "" {
-		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), stats); err != nil {
+		if err := mblstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), stats); err != nil {
 			return nil, err
 		}
 	}
@@ -276,7 +276,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*enode.Node, network ui
 		stack.Close()
 		return nil, err
 	}
-	client := ethclient.NewClient(api)
+	client := mblclient.NewClient(api)
 
 	return &faucet{
 		config:   genesis.Config,
@@ -311,7 +311,7 @@ func (f *faucet) webHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(f.index)
 }
 
-// apiHandler handles requests for Ether grants and transaction statuses.
+// apiHandler handles requests for mbler grants and transaction statuses.
 func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 	upgrader := websocket.Upgrader{}
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -370,7 +370,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 	reqs := f.reqs
 	f.lock.RUnlock()
 	if err = send(wsconn, map[string]interface{}{
-		"funds":    new(big.Int).Div(balance, ether),
+		"funds":    new(big.Int).Div(balance, mbler),
 		"funded":   nonce,
 		"peers":    f.stack.Server().PeerCount(),
 		"requests": reqs,
@@ -465,7 +465,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			id = username
 		default:
 			//lint:ignore ST1005 This error is to be displayed in the browser
-			err = errors.New("Something funky happened, please open an issue at https://github.com/mbali/go-mbali/issues")
+			err = errors.New("Sommbling funky happened, please open an issue at https://github.com/mbali/go-mbali/issues")
 		}
 		if err != nil {
 			if err = sendError(wsconn, err); err != nil {
@@ -484,7 +484,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		if timeout = f.timeouts[id]; time.Now().After(timeout) {
 			// User wasn't funded recently, create the funding transaction
-			amount := new(big.Int).Mul(big.NewInt(int64(*payoutFlag)), ether)
+			amount := new(big.Int).Mul(big.NewInt(int64(*payoutFlag)), mbler)
 			amount = new(big.Int).Mul(amount, new(big.Int).Exp(big.NewInt(5), big.NewInt(int64(msg.Tier)), nil))
 			amount = new(big.Int).Div(amount, new(big.Int).Exp(big.NewInt(2), big.NewInt(int64(msg.Tier)), nil))
 
@@ -611,7 +611,7 @@ func (f *faucet) loop() {
 			f.lock.RLock()
 			log.Info("Updated faucet state", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp), "balance", f.balance, "nonce", f.nonce, "price", f.price)
 
-			balance := new(big.Int).Div(f.balance, ether)
+			balance := new(big.Int).Div(f.balance, mbler)
 			peers := f.stack.Server().PeerCount()
 
 			for _, conn := range f.conns {

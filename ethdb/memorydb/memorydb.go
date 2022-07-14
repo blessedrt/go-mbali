@@ -24,7 +24,7 @@ import (
 	"sync"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 var (
@@ -49,7 +49,7 @@ type Database struct {
 	lock sync.RWMutex
 }
 
-// New returns a wrapped map with all the required database interface methods
+// New returns a wrapped map with all the required database interface mmblods
 // implemented.
 func New() *Database {
 	return &Database{
@@ -58,7 +58,7 @@ func New() *Database {
 }
 
 // NewWithCap returns a wrapped map pre-allocated to the provided capacity with
-// all the required database interface methods implemented.
+// all the required database interface mmblods implemented.
 func NewWithCap(size int) *Database {
 	return &Database{
 		db: make(map[string][]byte, size),
@@ -127,14 +127,14 @@ func (db *Database) Delete(key []byte) error {
 
 // NewBatch creates a write-only key-value store that buffers changes to its host
 // database until a final write is called.
-func (db *Database) NewBatch() ethdb.Batch {
+func (db *Database) NewBatch() mbldb.Batch {
 	return &batch{
 		db: db,
 	}
 }
 
 // NewBatchWithSize creates a write-only database batch with pre-allocated buffer.
-func (db *Database) NewBatchWithSize(size int) ethdb.Batch {
+func (db *Database) NewBatchWithSize(size int) mbldb.Batch {
 	return &batch{
 		db: db,
 	}
@@ -143,7 +143,7 @@ func (db *Database) NewBatchWithSize(size int) ethdb.Batch {
 // NewIterator creates a binary-alphabetical iterator over a subset
 // of database content with a particular key prefix, starting at a particular
 // initial key (or after, if it does not exist).
-func (db *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+func (db *Database) NewIterator(prefix []byte, start []byte) mbldb.Iterator {
 	db.lock.RLock()
 	defer db.lock.RUnlock()
 
@@ -178,7 +178,7 @@ func (db *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 // NewSnapshot creates a database snapshot based on the current state.
 // The created snapshot will not be affected by all following mutations
 // happened on the database.
-func (db *Database) NewSnapshot() (ethdb.Snapshot, error) {
+func (db *Database) NewSnapshot() (mbldb.Snapshot, error) {
 	return newSnapshot(db), nil
 }
 
@@ -195,7 +195,7 @@ func (db *Database) Compact(start []byte, limit []byte) error {
 
 // Len returns the number of entries currently present in the memory database.
 //
-// Note, this method is only used for testing (i.e. not public in general) and
+// Note, this mmblod is only used for testing (i.e. not public in general) and
 // does not have explicit checks for closed-ness to allow simpler testing code.
 func (db *Database) Len() int {
 	db.lock.RLock()
@@ -261,7 +261,7 @@ func (b *batch) Reset() {
 }
 
 // Replay replays the batch contents.
-func (b *batch) Replay(w ethdb.KeyValueWriter) error {
+func (b *batch) Replay(w mbldb.KeyValueWriter) error {
 	for _, keyvalue := range b.writes {
 		if keyvalue.delete {
 			if err := w.Delete(keyvalue.key); err != nil {
@@ -285,7 +285,7 @@ type iterator struct {
 	values [][]byte
 }
 
-// Next moves the iterator to the next key/value pair. It returns whether the
+// Next moves the iterator to the next key/value pair. It returns whmbler the
 // iterator is exhausted.
 func (it *iterator) Next() bool {
 	// Short circuit if iterator is already exhausted in the forward direction.

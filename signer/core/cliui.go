@@ -26,7 +26,7 @@ import (
 
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/console/prompt"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/log"
 )
 
@@ -235,7 +235,7 @@ func (ui *CommandlineUI) ShowInfo(message string) {
 	fmt.Printf("## Info \n%s\n", message)
 }
 
-func (ui *CommandlineUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
+func (ui *CommandlineUI) OnApprovedTx(tx mblapi.SignTransactionResult) {
 	fmt.Printf("Transaction signed:\n ")
 	if jsn, err := json.MarshalIndent(tx.Tx, "  ", "  "); err != nil {
 		fmt.Printf("WARN: marshalling error %v\n", err)

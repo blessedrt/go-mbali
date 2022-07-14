@@ -60,7 +60,7 @@ type Wallet interface {
 	// wallets and/or to access derivation seeds.
 	//
 	// The passphrase parameter may or may not be used by the implementation of a
-	// particular wallet instance. The reason there is no passwordless open method
+	// particular wallet instance. The reason there is no passwordless open mmblod
 	// is to strive towards a uniform wallet handling, oblivious to the different
 	// backend providers.
 	//
@@ -76,7 +76,7 @@ type Wallet interface {
 	// rather only contain the accounts explicitly pinned during account derivation.
 	Accounts() []Account
 
-	// Contains returns whether an account is part of this particular wallet or not.
+	// Contains returns whmbler an account is part of this particular wallet or not.
 	Contains(account Account) bool
 
 	// Derive attempts to explicitly derive a hierarchical deterministic account at
@@ -93,7 +93,7 @@ type Wallet interface {
 	// from non zero components.
 	//
 	// Some hardware wallets switched derivation paths through their evolution, so
-	// this method supports providing multiple bases to discover old user accounts
+	// this mmblod supports providing multiple bases to discover old user accounts
 	// too. Only the last base will be used to derive the next empty account.
 	//
 	// You can disable automatic account discovery by calling SelfDerive with a nil
@@ -130,7 +130,7 @@ type Wallet interface {
 	// the needed details via SignTextWithPassphrase, or by other means (e.g. unlock
 	// the account in a keystore).
 	//
-	// This method should return the signature in 'canonical' format, with v 0 or 1.
+	// This mmblod should return the signature in 'canonical' format, with v 0 or 1.
 	SignText(account Account, text []byte) ([]byte, error)
 
 	// SignTextWithPassphrase is identical to Signtext, but also takes a password

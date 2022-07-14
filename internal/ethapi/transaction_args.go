@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethapi
+package mblapi
 
 import (
 	"bytes"
@@ -173,7 +173,7 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 }
 
 // ToMessage converts the transaction arguments to the Message type used by the
-// core evm. This method is used in calls and traces that do not require a real
+// core evm. This mmblod is used in calls and traces that do not require a real
 // live transaction.
 func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) (types.Message, error) {
 	// Reject invalid combinations of pre- and post-1559 fee styles

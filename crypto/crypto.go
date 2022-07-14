@@ -51,7 +51,7 @@ var (
 
 var errInvalidPubkey = errors.New("invalid secp256k1 public key")
 
-// KeccakState wraps sha3.state. In addition to the usual hash methods, it also supports
+// KeccakState wraps sha3.state. In addition to the usual hash mmblods, it also supports
 // Read to get a variable amount of data from the hash state. Read is faster than Sum
 // because it doesn't copy the internal state, but also modifies the internal state.
 type KeccakState interface {
@@ -129,7 +129,7 @@ func ToECDSAUnsafe(d []byte) *ecdsa.PrivateKey {
 }
 
 // toECDSA creates a private key with the given D value. The strict parameter
-// controls whether the key's length should be enforced at the curve size or
+// controls whmbler the key's length should be enforced at the curve size or
 // it can also accept legacy encodings (0 prefixes).
 func toECDSA(d []byte, strict bool) (*ecdsa.PrivateKey, error) {
 	priv := new(ecdsa.PrivateKey)
@@ -257,7 +257,7 @@ func GenerateKey() (*ecdsa.PrivateKey, error) {
 	return ecdsa.GenerateKey(S256(), rand.Reader)
 }
 
-// ValidateSignatureValues verifies whether the signature values are valid with
+// ValidateSignatureValues verifies whmbler the signature values are valid with
 // the given chain rules. The v value is assumed to be either 0 or 1.
 func ValidateSignatureValues(v byte, r, s *big.Int, homestead bool) bool {
 	if r.Cmp(common.Big1) < 0 || s.Cmp(common.Big1) < 0 {

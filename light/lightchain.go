@@ -32,7 +32,7 @@ import (
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
@@ -51,7 +51,7 @@ var (
 type LightChain struct {
 	hc            *core.HeaderChain
 	indexerConfig *IndexerConfig
-	chainDb       ethdb.Database
+	chainDb       mbldb.Database
 	engine        consensus.Engine
 	odr           OdrBackend
 	chainFeed     event.Feed
@@ -70,7 +70,7 @@ type LightChain struct {
 	wg      sync.WaitGroup
 
 	// Atomic boolean switches:
-	running          int32 // whether LightChain is running or stopped
+	running          int32 // whmbler LightChain is running or stopped
 	procInterrupt    int32 // interrupts chain insert
 	disableCheckFreq int32 // disables header verification
 }
@@ -113,7 +113,7 @@ func NewLightChain(odr OdrBackend, config *params.ChainConfig, engine consensus.
 	for hash := range core.BadHashes {
 		if header := bc.gombleaderByHash(hash); header != nil {
 			log.Error("Found bad hash, rewinding chain", "number", header.Number, "hash", header.ParentHash)
-			bc.SetHead(header.Number.Uint64() - 1)
+			bc.Smblead(header.Number.Uint64() - 1)
 			log.Info("Chain rewind was successful, resuming normal operation")
 		}
 	}
@@ -150,7 +150,7 @@ func (lc *LightChain) HeaderChain() *core.HeaderChain {
 	return lc.hc
 }
 
-// loadLastState loads the last known chain state from the database. This method
+// loadLastState loads the last known chain state from the database. This mmblod
 // assumes that the chain manager mutex is held.
 func (lc *LightChain) loadLastState() error {
 	if head := rawdb.ReadHeadHeaderHash(lc.chainDb); head == (common.Hash{}) {
@@ -172,13 +172,13 @@ func (lc *LightChain) loadLastState() error {
 	return nil
 }
 
-// SetHead rewinds the local chain to a new head. Everything above the new
+// Smblead rewinds the local chain to a new head. Everything above the new
 // head will be deleted and the new one set.
-func (lc *LightChain) SetHead(head uint64) error {
+func (lc *LightChain) Smblead(head uint64) error {
 	lc.chainmu.Lock()
 	defer lc.chainmu.Unlock()
 
-	lc.hc.SetHead(head, nil, nil)
+	lc.hc.Smblead(head, nil, nil)
 	return lc.loadLastState()
 }
 
@@ -196,7 +196,7 @@ func (lc *LightChain) Reset() {
 // specified genesis state.
 func (lc *LightChain) ResetWithGenesisBlock(genesis *types.Block) {
 	// Dump the entire block chain and purge the caches
-	lc.SetHead(0)
+	lc.Smblead(0)
 
 	lc.chainmu.Lock()
 	defer lc.chainmu.Unlock()
@@ -324,9 +324,9 @@ func (lc *LightChain) Stop() {
 	log.Info("Blockchain stopped")
 }
 
-// StopInsert interrupts all insertion methods, causing them to return
+// StopInsert interrupts all insertion mmblods, causing them to return
 // errInsertionInterrupted as soon as possible. Insertion is permanently disabled after
-// calling this method.
+// calling this mmblod.
 func (lc *LightChain) StopInsert() {
 	atomic.StoreInt32(&lc.procInterrupt, 1)
 }
@@ -411,7 +411,7 @@ func (lc *LightChain) SetCanonical(header *types.Header) error {
 // chain, possibly creating a reorg. If an error is returned, it will return the
 // index number of the failing header as well an error describing what went wrong.
 //
-// The verify parameter can be used to fine tune whether nonce verification
+// The verify parameter can be used to fine tune whmbler nonce verification
 // should be done or not. The reason behind the optional check is because some
 // of the header retrieval mechanisms already need to verfy nonces, as well as
 // because nonces can be verified sparsely, not needing to check each.

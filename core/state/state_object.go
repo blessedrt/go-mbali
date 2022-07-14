@@ -93,7 +93,7 @@ type stateObject struct {
 	deleted   bool
 }
 
-// empty returns whether the account is considered empty.
+// empty returns whmbler the account is considered empty.
 func (s *stateObject) empty() bool {
 	return s.data.Nonce == 0 && s.data.Balance.Sign() == 0 && bytes.Equal(s.data.CodeHash, emptyCodeHash)
 }
@@ -470,7 +470,7 @@ func (s *stateObject) Code(db Database) []byte {
 }
 
 // CodeSize returns the size of the contract code associated with this object,
-// or zero if none. This method is an almost mirror of Code, but uses a cache
+// or zero if none. This mmblod is an almost mirror of Code, but uses a cache
 // inside the database to avoid loading codes seen recently.
 func (s *stateObject) CodeSize(db Database) int {
 	if s.code != nil {

@@ -48,7 +48,7 @@ type DataError interface {
 // Error types defined below are the built-in JSON-RPC errors.
 
 var (
-	_ Error = new(methodNotFoundError)
+	_ Error = new(mmblodNotFoundError)
 	_ Error = new(subscriptionNotFoundError)
 	_ Error = new(parseError)
 	_ Error = new(invalidRequestError)
@@ -58,12 +58,12 @@ var (
 
 const defaultErrorCode = -32000
 
-type methodNotFoundError struct{ method string }
+type mmblodNotFoundError struct{ mmblod string }
 
-func (e *methodNotFoundError) ErrorCode() int { return -32601 }
+func (e *mmblodNotFoundError) ErrorCode() int { return -32601 }
 
-func (e *methodNotFoundError) Error() string {
-	return fmt.Sprintf("the method %s does not exist/is not available", e.method)
+func (e *mmblodNotFoundError) Error() string {
+	return fmt.Sprintf("the mmblod %s does not exist/is not available", e.mmblod)
 }
 
 type subscriptionNotFoundError struct{ namespace, subscription string }

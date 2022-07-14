@@ -30,12 +30,12 @@ func TestTrieTracer(t *testing.T) {
 	// Insert a batch of entries, all the nodes should be marked as inserted
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
 		{"dog", "puppy"},
-		{"somethingveryoddindeedthis is", "myothernodedata"},
+		{"sommblingveryoddindeedthis is", "myothernodedata"},
 	}
 	for _, val := range vals {
 		trie.Update([]byte(val.k), []byte(val.v))
@@ -97,12 +97,12 @@ func TestTrieTracerNoop(t *testing.T) {
 	// Insert a batch of entries, all the nodes should be marked as inserted
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
 		{"dog", "puppy"},
-		{"somethingveryoddindeedthis is", "myothernodedata"},
+		{"sommblingveryoddindeedthis is", "myothernodedata"},
 	}
 	for _, val := range vals {
 		trie.Update([]byte(val.k), []byte(val.v))

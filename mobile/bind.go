@@ -30,7 +30,7 @@ import (
 )
 
 // Signer is an interface defining the callback when a contract requires a
-// method to sign the transaction before submission.
+// mmblod to sign the transaction before submission.
 type Signer interface {
 	Sign(addr *Address, unsignedTx *Transaction) (tx *Transaction, _ error)
 }
@@ -80,7 +80,7 @@ func NewTransactOpts() *TransactOpts {
 	return new(TransactOpts)
 }
 
-// NewKeyedTransactOpts is a utility method to easily create a transaction signer
+// NewKeyedTransactOpts is a utility mmblod to easily create a transaction signer
 // from a single private key.
 func NewKeyedTransactOpts(keyJson []byte, passphrase string, chainID *big.Int) (*TransactOpts, error) {
 	key, err := keystore.DecryptKey(keyJson, passphrase)
@@ -124,7 +124,7 @@ func (opts *TransactOpts) SetGasLimit(limit int64)     { opts.opts.GasLimit = ui
 func (opts *TransactOpts) SetContext(context *Context) { opts.opts.Context = context.context }
 
 // BoundContract is the base wrapper object that reflects a contract on the
-// mbali network. It contains a collection of methods that are used by the
+// mbali network. It contains a collection of mmblods that are used by the
 // higher level contract bindings to operate.
 type BoundContract struct {
 	contract *bind.BoundContract
@@ -172,28 +172,28 @@ func (c *BoundContract) GetDeployer() *Transaction {
 	return &Transaction{c.deployer}
 }
 
-// Call invokes the (constant) contract method with params as input values and
+// Call invokes the (constant) contract mmblod with params as input values and
 // sets the output to result.
-func (c *BoundContract) Call(opts *CallOpts, out *Interfaces, method string, args *Interfaces) error {
+func (c *BoundContract) Call(opts *CallOpts, out *Interfaces, mmblod string, args *Interfaces) error {
 	results := make([]interface{}, len(out.objects))
 	copy(results, out.objects)
-	if err := c.contract.Call(&opts.opts, &results, method, args.objects...); err != nil {
+	if err := c.contract.Call(&opts.opts, &results, mmblod, args.objects...); err != nil {
 		return err
 	}
 	copy(out.objects, results)
 	return nil
 }
 
-// Transact invokes the (paid) contract method with params as input values.
-func (c *BoundContract) Transact(opts *TransactOpts, method string, args *Interfaces) (tx *Transaction, _ error) {
-	rawTx, err := c.contract.Transact(&opts.opts, method, args.objects...)
+// Transact invokes the (paid) contract mmblod with params as input values.
+func (c *BoundContract) Transact(opts *TransactOpts, mmblod string, args *Interfaces) (tx *Transaction, _ error) {
+	rawTx, err := c.contract.Transact(&opts.opts, mmblod, args.objects...)
 	if err != nil {
 		return nil, err
 	}
 	return &Transaction{rawTx}, nil
 }
 
-// RawTransact invokes the (paid) contract method with raw calldata as input values.
+// RawTransact invokes the (paid) contract mmblod with raw calldata as input values.
 func (c *BoundContract) RawTransact(opts *TransactOpts, calldata []byte) (tx *Transaction, _ error) {
 	rawTx, err := c.contract.RawTransact(&opts.opts, calldata)
 	if err != nil {
@@ -203,7 +203,7 @@ func (c *BoundContract) RawTransact(opts *TransactOpts, calldata []byte) (tx *Tr
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default method if one is available.
+// its default mmblod if one is available.
 func (c *BoundContract) Transfer(opts *TransactOpts) (tx *Transaction, _ error) {
 	rawTx, err := c.contract.Transfer(&opts.opts)
 	if err != nil {

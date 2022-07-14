@@ -99,17 +99,17 @@ type CheckpointOracleTransactorSession struct {
 
 // CheckpointOracleRaw is an auto generated low-level Go binding around an mbali contract.
 type CheckpointOracleRaw struct {
-	Contract *CheckpointOracle // Generic contract binding to access the raw methods on
+	Contract *CheckpointOracle // Generic contract binding to access the raw mmblods on
 }
 
 // CheckpointOracleCallerRaw is an auto generated low-level read-only Go binding around an mbali contract.
 type CheckpointOracleCallerRaw struct {
-	Contract *CheckpointOracleCaller // Generic read-only contract binding to access the raw methods on
+	Contract *CheckpointOracleCaller // Generic read-only contract binding to access the raw mmblods on
 }
 
 // CheckpointOracleTransactorRaw is an auto generated low-level write-only Go binding around an mbali contract.
 type CheckpointOracleTransactorRaw struct {
-	Contract *CheckpointOracleTransactor // Generic write-only contract binding to access the raw methods on
+	Contract *CheckpointOracleTransactor // Generic write-only contract binding to access the raw mmblods on
 }
 
 // NewCheckpointOracle creates a new instance of CheckpointOracle, bound to a specific deployed contract.
@@ -157,45 +157,45 @@ func bindCheckpointOracle(address common.Address, caller bind.ContractCaller, tr
 	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
-// Call invokes the (constant) contract method with params as input values and
+// Call invokes the (constant) contract mmblod with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_CheckpointOracle *CheckpointOracleRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-	return _CheckpointOracle.Contract.CheckpointOracleCaller.contract.Call(opts, result, method, params...)
+func (_CheckpointOracle *CheckpointOracleRaw) Call(opts *bind.CallOpts, result *[]interface{}, mmblod string, params ...interface{}) error {
+	return _CheckpointOracle.Contract.CheckpointOracleCaller.contract.Call(opts, result, mmblod, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default method if one is available.
+// its default mmblod if one is available.
 func (_CheckpointOracle *CheckpointOracleRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 	return _CheckpointOracle.Contract.CheckpointOracleTransactor.contract.Transfer(opts)
 }
 
-// Transact invokes the (paid) contract method with params as input values.
-func (_CheckpointOracle *CheckpointOracleRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _CheckpointOracle.Contract.CheckpointOracleTransactor.contract.Transact(opts, method, params...)
+// Transact invokes the (paid) contract mmblod with params as input values.
+func (_CheckpointOracle *CheckpointOracleRaw) Transact(opts *bind.TransactOpts, mmblod string, params ...interface{}) (*types.Transaction, error) {
+	return _CheckpointOracle.Contract.CheckpointOracleTransactor.contract.Transact(opts, mmblod, params...)
 }
 
-// Call invokes the (constant) contract method with params as input values and
+// Call invokes the (constant) contract mmblod with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_CheckpointOracle *CheckpointOracleCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-	return _CheckpointOracle.Contract.contract.Call(opts, result, method, params...)
+func (_CheckpointOracle *CheckpointOracleCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, mmblod string, params ...interface{}) error {
+	return _CheckpointOracle.Contract.contract.Call(opts, result, mmblod, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default method if one is available.
+// its default mmblod if one is available.
 func (_CheckpointOracle *CheckpointOracleTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 	return _CheckpointOracle.Contract.contract.Transfer(opts)
 }
 
-// Transact invokes the (paid) contract method with params as input values.
-func (_CheckpointOracle *CheckpointOracleTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _CheckpointOracle.Contract.contract.Transact(opts, method, params...)
+// Transact invokes the (paid) contract mmblod with params as input values.
+func (_CheckpointOracle *CheckpointOracleTransactorRaw) Transact(opts *bind.TransactOpts, mmblod string, params ...interface{}) (*types.Transaction, error) {
+	return _CheckpointOracle.Contract.contract.Transact(opts, mmblod, params...)
 }
 
-// GetAllAdmin is a free data retrieval call binding the contract method 0x45848dfc.
+// GetAllAdmin is a free data retrieval call binding the contract mmblod 0x45848dfc.
 //
 // Solidity: function GetAllAdmin() view returns(address[])
 func (_CheckpointOracle *CheckpointOracleCaller) GetAllAdmin(opts *bind.CallOpts) ([]common.Address, error) {
@@ -212,21 +212,21 @@ func (_CheckpointOracle *CheckpointOracleCaller) GetAllAdmin(opts *bind.CallOpts
 
 }
 
-// GetAllAdmin is a free data retrieval call binding the contract method 0x45848dfc.
+// GetAllAdmin is a free data retrieval call binding the contract mmblod 0x45848dfc.
 //
 // Solidity: function GetAllAdmin() view returns(address[])
 func (_CheckpointOracle *CheckpointOracleSession) GetAllAdmin() ([]common.Address, error) {
 	return _CheckpointOracle.Contract.GetAllAdmin(&_CheckpointOracle.CallOpts)
 }
 
-// GetAllAdmin is a free data retrieval call binding the contract method 0x45848dfc.
+// GetAllAdmin is a free data retrieval call binding the contract mmblod 0x45848dfc.
 //
 // Solidity: function GetAllAdmin() view returns(address[])
 func (_CheckpointOracle *CheckpointOracleCallerSession) GetAllAdmin() ([]common.Address, error) {
 	return _CheckpointOracle.Contract.GetAllAdmin(&_CheckpointOracle.CallOpts)
 }
 
-// GetLatestCheckpoint is a free data retrieval call binding the contract method 0x4d6a304c.
+// GetLatestCheckpoint is a free data retrieval call binding the contract mmblod 0x4d6a304c.
 //
 // Solidity: function GetLatestCheckpoint() view returns(uint64, bytes32, uint256)
 func (_CheckpointOracle *CheckpointOracleCaller) GetLatestCheckpoint(opts *bind.CallOpts) (uint64, [32]byte, *big.Int, error) {
@@ -245,35 +245,35 @@ func (_CheckpointOracle *CheckpointOracleCaller) GetLatestCheckpoint(opts *bind.
 
 }
 
-// GetLatestCheckpoint is a free data retrieval call binding the contract method 0x4d6a304c.
+// GetLatestCheckpoint is a free data retrieval call binding the contract mmblod 0x4d6a304c.
 //
 // Solidity: function GetLatestCheckpoint() view returns(uint64, bytes32, uint256)
 func (_CheckpointOracle *CheckpointOracleSession) GetLatestCheckpoint() (uint64, [32]byte, *big.Int, error) {
 	return _CheckpointOracle.Contract.GetLatestCheckpoint(&_CheckpointOracle.CallOpts)
 }
 
-// GetLatestCheckpoint is a free data retrieval call binding the contract method 0x4d6a304c.
+// GetLatestCheckpoint is a free data retrieval call binding the contract mmblod 0x4d6a304c.
 //
 // Solidity: function GetLatestCheckpoint() view returns(uint64, bytes32, uint256)
 func (_CheckpointOracle *CheckpointOracleCallerSession) GetLatestCheckpoint() (uint64, [32]byte, *big.Int, error) {
 	return _CheckpointOracle.Contract.GetLatestCheckpoint(&_CheckpointOracle.CallOpts)
 }
 
-// SetCheckpoint is a paid mutator transaction binding the contract method 0xd459fc46.
+// SetCheckpoint is a paid mutator transaction binding the contract mmblod 0xd459fc46.
 //
 // Solidity: function SetCheckpoint(uint256 _recentNumber, bytes32 _recentHash, bytes32 _hash, uint64 _sectionIndex, uint8[] v, bytes32[] r, bytes32[] s) returns(bool)
 func (_CheckpointOracle *CheckpointOracleTransactor) SetCheckpoint(opts *bind.TransactOpts, _recentNumber *big.Int, _recentHash [32]byte, _hash [32]byte, _sectionIndex uint64, v []uint8, r [][32]byte, s [][32]byte) (*types.Transaction, error) {
 	return _CheckpointOracle.contract.Transact(opts, "SetCheckpoint", _recentNumber, _recentHash, _hash, _sectionIndex, v, r, s)
 }
 
-// SetCheckpoint is a paid mutator transaction binding the contract method 0xd459fc46.
+// SetCheckpoint is a paid mutator transaction binding the contract mmblod 0xd459fc46.
 //
 // Solidity: function SetCheckpoint(uint256 _recentNumber, bytes32 _recentHash, bytes32 _hash, uint64 _sectionIndex, uint8[] v, bytes32[] r, bytes32[] s) returns(bool)
 func (_CheckpointOracle *CheckpointOracleSession) SetCheckpoint(_recentNumber *big.Int, _recentHash [32]byte, _hash [32]byte, _sectionIndex uint64, v []uint8, r [][32]byte, s [][32]byte) (*types.Transaction, error) {
 	return _CheckpointOracle.Contract.SetCheckpoint(&_CheckpointOracle.TransactOpts, _recentNumber, _recentHash, _hash, _sectionIndex, v, r, s)
 }
 
-// SetCheckpoint is a paid mutator transaction binding the contract method 0xd459fc46.
+// SetCheckpoint is a paid mutator transaction binding the contract mmblod 0xd459fc46.
 //
 // Solidity: function SetCheckpoint(uint256 _recentNumber, bytes32 _recentHash, bytes32 _hash, uint64 _sectionIndex, uint8[] v, bytes32[] r, bytes32[] s) returns(bool)
 func (_CheckpointOracle *CheckpointOracleTransactorSession) SetCheckpoint(_recentNumber *big.Int, _recentHash [32]byte, _hash [32]byte, _sectionIndex uint64, v []uint8, r [][32]byte, s [][32]byte) (*types.Transaction, error) {
@@ -289,11 +289,11 @@ type CheckpointOracleNewCheckpointVoteIterator struct {
 
 	logs chan types.Log        // Log channel receiving the found contract events
 	sub  mbali.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
+	done bool                  // Whmbler the subscription completed delivering logs
 	fail error                 // Occurred error to stop iteration
 }
 
-// Next advances the iterator to the subsequent event, returning whether there
+// Next advances the iterator to the subsequent event, returning whmbler there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
 func (it *CheckpointOracleNewCheckpointVoteIterator) Next() bool {

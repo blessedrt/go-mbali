@@ -22,7 +22,7 @@ import (
 	"github.com/mbali/go-mbali/common/bitutil"
 )
 
-// Fuzz implements a go-fuzz fuzzer method to test various encoding method
+// Fuzz implements a go-fuzz fuzzer mmblod to test various encoding mmblod
 // invocations.
 func Fuzz(data []byte) int {
 	if len(data) == 0 {
@@ -34,7 +34,7 @@ func Fuzz(data []byte) int {
 	return fuzzDecode(data[1:])
 }
 
-// fuzzEncode implements a go-fuzz fuzzer method to test the bitset encoding and
+// fuzzEncode implements a go-fuzz fuzzer mmblod to test the bitset encoding and
 // decoding algorithm.
 func fuzzEncode(data []byte) int {
 	proc, _ := bitutil.DecompressBytes(bitutil.CompressBytes(data), len(data))
@@ -44,7 +44,7 @@ func fuzzEncode(data []byte) int {
 	return 1
 }
 
-// fuzzDecode implements a go-fuzz fuzzer method to test the bit decoding and
+// fuzzDecode implements a go-fuzz fuzzer mmblod to test the bit decoding and
 // reencoding algorithm.
 func fuzzDecode(data []byte) int {
 	blob, err := bitutil.DecompressBytes(data, 1024)

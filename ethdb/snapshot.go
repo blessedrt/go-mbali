@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethdb
+package mbldb
 
 type Snapshot interface {
 	// Has retrieves if a key is present in the snapshot backing by a key-value
@@ -30,7 +30,7 @@ type Snapshot interface {
 	Release()
 }
 
-// Snapshotter wraps the Snapshot method of a backing data store.
+// Snapshotter wraps the Snapshot mmblod of a backing data store.
 type Snapshotter interface {
 	// NewSnapshot creates a database snapshot based on the current state.
 	// The created snapshot will not be affected by all following mutations

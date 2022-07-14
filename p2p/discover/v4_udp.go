@@ -53,7 +53,7 @@ const (
 	bondExpiration = 24 * time.Hour
 
 	maxFindnodeFailures = 5                // nodes exceeding this limit are dropped
-	ntpFailureThreshold = 32               // Continuous timeouts after which to check NTP
+	ntpFailurmblreshold = 32               // Continuous timeouts after which to check NTP
 	ntpWarningCooldown  = 10 * time.Minute // Minimum amount of time to pass before repeating NTP warning
 	driftThreshold      = 10 * time.Second // Allowed clock drift before warning user
 
@@ -100,7 +100,7 @@ type replyMatcher struct {
 	deadline time.Time
 
 	// callback is called when a matching reply arrives. If it returns matched == true, the
-	// reply was acceptable. The second return value indicates whether the callback should
+	// reply was acceptable. The second return value indicates whmbler the callback should
 	// be removed from the pending reply queue. If it returns false, the reply is considered
 	// incomplete and the callback will be invoked again for the next matching reply.
 	callback replyMatchFunc
@@ -121,7 +121,7 @@ type reply struct {
 	from enode.ID
 	ip   net.IP
 	data v4wire.Packet
-	// loop indicates whether there was
+	// loop indicates whmbler there was
 	// a matching request by sending on this channel.
 	matched chan<- bool
 }
@@ -390,7 +390,7 @@ func (t *UDPv4) pending(id enode.ID, ip net.IP, ptype byte, callback replyMatchF
 }
 
 // handleReply dispatches a reply packet, invoking reply matchers. It returns
-// whether any matcher considered the packet acceptable.
+// whmbler any matcher considered the packet acceptable.
 func (t *UDPv4) handleReply(from enode.ID, fromIP net.IP, req v4wire.Packet) bool {
 	matched := make(chan bool, 1)
 	select {
@@ -454,7 +454,7 @@ func (t *UDPv4) loop() {
 			plist.PushBack(p)
 
 		case r := <-t.gotreply:
-			var matched bool // whether any replyMatcher considered the reply acceptable.
+			var matched bool // whmbler any replyMatcher considered the reply acceptable.
 			for el := plist.Front(); el != nil; el = el.Next() {
 				p := el.Value.(*replyMatcher)
 				if p.from == r.from && p.ptype == r.data.Kind() && p.ip.Equal(r.ip) {
@@ -485,7 +485,7 @@ func (t *UDPv4) loop() {
 				}
 			}
 			// If we've accumulated too many timeouts, do an NTP time sync check
-			if contTimeouts > ntpFailureThreshold {
+			if contTimeouts > ntpFailurmblreshold {
 				if time.Since(ntpWarnTime) >= ntpWarningCooldown {
 					ntpWarnTime = time.Now()
 					go checkClockDrift()
@@ -604,8 +604,8 @@ func nodeToRPC(n *node) v4wire.Node {
 }
 
 // wrapPacket returns the handler functions applicable to a packet.
-func (t *UDPv4) wrapPacket(p v4wire.Packet) *packetHandlerV4 {
-	var h packetHandlerV4
+func (t *UDPv4) wrapPacket(p v4wire.Packet) *packmblandlerV4 {
+	var h packmblandlerV4
 	h.Packet = p
 	switch p.(type) {
 	case *v4wire.Ping:
@@ -627,20 +627,20 @@ func (t *UDPv4) wrapPacket(p v4wire.Packet) *packetHandlerV4 {
 	return &h
 }
 
-// packetHandlerV4 wraps a packet with handler functions.
-type packetHandlerV4 struct {
+// packmblandlerV4 wraps a packet with handler functions.
+type packmblandlerV4 struct {
 	v4wire.Packet
 	senderKey *ecdsa.PublicKey // used for ping
 
-	// preverify checks whether the packet is valid and should be handled at all.
-	preverify func(p *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error
+	// preverify checks whmbler the packet is valid and should be handled at all.
+	preverify func(p *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error
 	// handle handles the packet.
-	handle func(req *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte)
+	handle func(req *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte)
 }
 
 // PING/v4
 
-func (t *UDPv4) verifyPing(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
+func (t *UDPv4) verifyPing(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
 	req := h.Packet.(*v4wire.Ping)
 
 	senderKey, err := v4wire.DecodePubkey(crypto.S256(), fromKey)
@@ -654,7 +654,7 @@ func (t *UDPv4) verifyPing(h *packetHandlerV4, from *net.UDPAddr, fromID enode.I
 	return nil
 }
 
-func (t *UDPv4) handlePing(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte) {
+func (t *UDPv4) handlePing(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte) {
 	req := h.Packet.(*v4wire.Ping)
 
 	// Reply.
@@ -682,7 +682,7 @@ func (t *UDPv4) handlePing(h *packetHandlerV4, from *net.UDPAddr, fromID enode.I
 
 // PONG/v4
 
-func (t *UDPv4) verifyPong(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
+func (t *UDPv4) verifyPong(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
 	req := h.Packet.(*v4wire.Pong)
 
 	if v4wire.Expired(req.Expiration) {
@@ -698,7 +698,7 @@ func (t *UDPv4) verifyPong(h *packetHandlerV4, from *net.UDPAddr, fromID enode.I
 
 // FINDNODE/v4
 
-func (t *UDPv4) verifyFindnode(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
+func (t *UDPv4) verifyFindnode(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
 	req := h.Packet.(*v4wire.Findnode)
 
 	if v4wire.Expired(req.Expiration) {
@@ -716,7 +716,7 @@ func (t *UDPv4) verifyFindnode(h *packetHandlerV4, from *net.UDPAddr, fromID eno
 	return nil
 }
 
-func (t *UDPv4) handleFindnode(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte) {
+func (t *UDPv4) handleFindnode(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte) {
 	req := h.Packet.(*v4wire.Findnode)
 
 	// Determine closest nodes.
@@ -744,7 +744,7 @@ func (t *UDPv4) handleFindnode(h *packetHandlerV4, from *net.UDPAddr, fromID eno
 
 // NEIGHBORS/v4
 
-func (t *UDPv4) verifyNeighbors(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
+func (t *UDPv4) verifyNeighbors(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
 	req := h.Packet.(*v4wire.Neighbors)
 
 	if v4wire.Expired(req.Expiration) {
@@ -758,7 +758,7 @@ func (t *UDPv4) verifyNeighbors(h *packetHandlerV4, from *net.UDPAddr, fromID en
 
 // ENRREQUEST/v4
 
-func (t *UDPv4) verifyENRRequest(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
+func (t *UDPv4) verifyENRRequest(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
 	req := h.Packet.(*v4wire.ENRRequest)
 
 	if v4wire.Expired(req.Expiration) {
@@ -770,7 +770,7 @@ func (t *UDPv4) verifyENRRequest(h *packetHandlerV4, from *net.UDPAddr, fromID e
 	return nil
 }
 
-func (t *UDPv4) handleENRRequest(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte) {
+func (t *UDPv4) handleENRRequest(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, mac []byte) {
 	t.send(from, fromID, &v4wire.ENRResponse{
 		ReplyTok: mac,
 		Record:   *t.localNode.Node().Record(),
@@ -779,7 +779,7 @@ func (t *UDPv4) handleENRRequest(h *packetHandlerV4, from *net.UDPAddr, fromID e
 
 // ENRRESPONSE/v4
 
-func (t *UDPv4) verifyENRResponse(h *packetHandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
+func (t *UDPv4) verifyENRResponse(h *packmblandlerV4, from *net.UDPAddr, fromID enode.ID, fromKey v4wire.Pubkey) error {
 	if !t.handleReply(fromID, from.IP, h.Packet) {
 		return errUnsolicitedReply
 	}

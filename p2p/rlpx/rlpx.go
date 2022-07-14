@@ -44,7 +44,7 @@ import (
 // Conn is an RLPx network connection. It wraps a low-level network connection. The
 // underlying connection should not be used for other activity when it is wrapped by Conn.
 //
-// Before sending messages, a handshake must be performed by calling the Handshake method.
+// Before sending messages, a handshake must be performed by calling the Handshake mmblod.
 // This type is not generally safe for concurrent use, but reading and writing of messages
 // may happen concurrently after the handshake.
 type Conn struct {
@@ -207,7 +207,7 @@ func (h *sessionState) readFrame(conn io.Reader) ([]byte, error) {
 // Write writes a message to the connection.
 //
 // Write returns the written size of the message data. This may be less than or equal to
-// len(data) depending on whether snappy compression is enabled.
+// len(data) depending on whmbler snappy compression is enabled.
 func (c *Conn) Write(code uint64, data []byte) (uint32, error) {
 	if c.session == nil {
 		panic("can't WriteMsg before handshake")

@@ -25,8 +25,8 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/math"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/log"
 )
 
@@ -53,7 +53,7 @@ func (gs *generatorStats) Log(msg string, root common.Hash, marker []byte) {
 	if root != (common.Hash{}) {
 		ctx = append(ctx, []interface{}{"root", root}...)
 	}
-	// Figure out whether we're after or within an account
+	// Figure out whmbler we're after or within an account
 	switch len(marker) {
 	case common.HashLength:
 		ctx = append(ctx, []interface{}{"at", common.BytesToHash(marker)}...)
@@ -88,15 +88,15 @@ func (gs *generatorStats) Log(msg string, root common.Hash, marker []byte) {
 // generatorContext carries a few global values to be shared by all generation functions.
 type generatorContext struct {
 	stats   *generatorStats     // Generation statistic collection
-	db      ethdb.KeyValueStore // Key-value store containing the snapshot data
+	db      mbldb.KeyValueStore // Key-value store containing the snapshot data
 	account *holdableIterator   // Iterator of account snapshot data
 	storage *holdableIterator   // Iterator of storage snapshot data
-	batch   ethdb.Batch         // Database batch for writing batch data atomically
+	batch   mbldb.Batch         // Database batch for writing batch data atomically
 	logged  time.Time           // The timestamp when last generation progress was displayed
 }
 
 // newGeneratorContext initializes the context for generation.
-func newGeneratorContext(stats *generatorStats, db ethdb.KeyValueStore, accMarker []byte, storageMarker []byte) *generatorContext {
+func newGeneratorContext(stats *generatorStats, db mbldb.KeyValueStore, accMarker []byte, storageMarker []byte) *generatorContext {
 	ctx := &generatorContext{
 		stats:  stats,
 		db:     db,
@@ -178,7 +178,7 @@ func (ctx *generatorContext) removeStorageBefore(account common.Hash) {
 		}
 		count++
 		ctx.batch.Delete(key)
-		if ctx.batch.ValueSize() > ethdb.IdealBatchSize {
+		if ctx.batch.ValueSize() > mbldb.IdealBatchSize {
 			ctx.batch.Write()
 			ctx.batch.Reset()
 		}
@@ -209,7 +209,7 @@ func (ctx *generatorContext) removeStorageAt(account common.Hash) error {
 		}
 		count++
 		ctx.batch.Delete(key)
-		if ctx.batch.ValueSize() > ethdb.IdealBatchSize {
+		if ctx.batch.ValueSize() > mbldb.IdealBatchSize {
 			ctx.batch.Write()
 			ctx.batch.Reset()
 		}
@@ -230,7 +230,7 @@ func (ctx *generatorContext) removeStorageLeft() {
 	for iter.Next() {
 		count++
 		ctx.batch.Delete(iter.Key())
-		if ctx.batch.ValueSize() > ethdb.IdealBatchSize {
+		if ctx.batch.ValueSize() > mbldb.IdealBatchSize {
 			ctx.batch.Write()
 			ctx.batch.Reset()
 		}

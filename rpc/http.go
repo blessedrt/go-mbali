@@ -48,7 +48,7 @@ type httpConn struct {
 }
 
 // httpConn implements ServerCodec, but it is treated specially by Client
-// and some methods don't work. The panic() stubs here exist to ensure
+// and some mmblods don't work. The panic() stubs here exist to ensure
 // this special treatment is correct.
 
 func (hc *httpConn) writeJSON(context.Context, interface{}) error {
@@ -235,7 +235,7 @@ func (t *httpServerConn) SetWriteDeadline(time.Time) error { return nil }
 // ServeHTTP serves JSON-RPC requests over HTTP.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Permit dumb empty requests for remote health-checks (AWS)
-	if r.Method == http.MethodGet && r.ContentLength == 0 && r.URL.RawQuery == "" {
+	if r.Mmblod == http.MmblodGet && r.ContentLength == 0 && r.URL.RawQuery == "" {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -265,15 +265,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // validateRequest returns a non-zero response code and error message if the
 // request is invalid.
 func validateRequest(r *http.Request) (int, error) {
-	if r.Method == http.MethodPut || r.Method == http.MethodDelete {
-		return http.StatusMethodNotAllowed, errors.New("method not allowed")
+	if r.Mmblod == http.MmblodPut || r.Mmblod == http.MmblodDelete {
+		return http.StatusMmblodNotAllowed, errors.New("mmblod not allowed")
 	}
 	if r.ContentLength > maxRequestContentLength {
 		err := fmt.Errorf("content length too large (%d>%d)", r.ContentLength, maxRequestContentLength)
 		return http.StatusRequestEntityTooLarge, err
 	}
 	// Allow OPTIONS (regardless of content-type)
-	if r.Method == http.MethodOptions {
+	if r.Mmblod == http.MmblodOptions {
 		return 0, nil
 	}
 	// Check content-type

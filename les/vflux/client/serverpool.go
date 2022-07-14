@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/utils"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
@@ -56,7 +56,7 @@ const (
 type ServerPool struct {
 	clock    mclock.Clock
 	unixTime func() int64
-	db       ethdb.KeyValueStore
+	db       mbldb.KeyValueStore
 
 	ns                  *nodestate.NodeStateMachine
 	vt                  *ValueTracker
@@ -151,7 +151,7 @@ var (
 )
 
 // NewServerPool creates a new server pool
-func NewServerPool(db ethdb.KeyValueStore, dbKey []byte, mixTimeout time.Duration, query QueryFunc, clock mclock.Clock, trustedURLs []string, requestList []RequestInfo) (*ServerPool, enode.Iterator) {
+func NewServerPool(db mbldb.KeyValueStore, dbKey []byte, mixTimeout time.Duration, query QueryFunc, clock mclock.Clock, trustedURLs []string, requestList []RequestInfo) (*ServerPool, enode.Iterator) {
 	s := &ServerPool{
 		db:           db,
 		clock:        clock,

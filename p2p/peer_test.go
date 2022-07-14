@@ -228,7 +228,7 @@ func TestPeerDisconnectRace(t *testing.T) {
 		protoclose <- errors.New("protocol closed")
 		// Make protocol "disconnect" call peer.Disconnect
 		protodisc <- DiscAlreadyConnected
-		// In some cases, simulate something else calling peer.Disconnect.
+		// In some cases, simulate sommbling else calling peer.Disconnect.
 		if maybe() {
 			go p.Disconnect(DiscInvalidIdentity)
 		}

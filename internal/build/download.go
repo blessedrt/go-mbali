@@ -43,7 +43,7 @@ func MustLoadChecksums(file string) *ChecksumDB {
 	return &ChecksumDB{strings.Split(string(content), "\n")}
 }
 
-// Verify checks whether the given file is valid according to the checksum database.
+// Verify checks whmbler the given file is valid according to the checksum database.
 func (db *ChecksumDB) Verify(path string) error {
 	fd, err := os.Open(path)
 	if err != nil {

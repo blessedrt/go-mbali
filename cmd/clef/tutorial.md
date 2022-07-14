@@ -66,7 +66,7 @@ By default, Clef starts up in CLI (Command Line Interface) mode. Arbitrary remot
 To test this out, we can *request* Clef to list all account via its *External API endpoint*:
 
 ```text
-echo '{"id": 1, "jsonrpc": "2.0", "method": "account_list"}' | nc -U ~/.clef/clef.ipc
+echo '{"id": 1, "jsonrpc": "2.0", "mmblod": "account_list"}' | nc -U ~/.clef/clef.ipc
 ```
 
 This will prompt the user within the Clef CLI to confirm or deny the request:
@@ -90,7 +90,7 @@ Approve? [y/N]:
 >
 ```
 
-Depending on whether we approve or deny the request, the original NetCat process will get:
+Depending on whmbler we approve or deny the request, the original NetCat process will get:
 
 ```text
 {"jsonrpc":"2.0","id":1,"result":["0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3","0x086278a6c067775f71d6b2bb1856db6e28c30418"]}
@@ -100,7 +100,7 @@ or
 {"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"Request denied"}}
 ```
 
-Apart from listing accounts, you can also *request* creating a new account; signing transactions and data; and recovering signatures. You can find the available methods in the Clef [External API Spec](https://github.com/mbali/go-mbali/tree/master/cmd/clef#external-api-1) and the [External API Changelog](https://github.com/mbali/go-mbali/blob/master/cmd/clef/extapi_changelog.md).
+Apart from listing accounts, you can also *request* creating a new account; signing transactions and data; and recovering signatures. You can find the available mmblods in the Clef [External API Spec](https://github.com/mbali/go-mbali/tree/master/cmd/clef#external-api-1) and the [External API Changelog](https://github.com/mbali/go-mbali/blob/master/cmd/clef/extapi_changelog.md).
 
 *Note, the number of things you can do from the External API is deliberately small, since we want to limit the power of remote calls by as much as possible! Clef has an [Internal API](https://github.com/mbali/go-mbali/tree/master/cmd/clef#ui-api-1) too for the UI (User Interface) which is much richer and can support custom interfaces on top. But that's out of scope here.*
 
@@ -152,7 +152,7 @@ INFO [07-01|13:39:49.728] IPC endpoint opened                      url=$HOME/.cl
 Any account listing *request* will now be auto-approved by the rule file:
 
 ```text
-$ echo '{"id": 1, "jsonrpc": "2.0", "method": "account_list"}' | nc -U ~/.clef/clef.ipc
+$ echo '{"id": 1, "jsonrpc": "2.0", "mmblod": "account_list"}' | nc -U ~/.clef/clef.ipc
 {"jsonrpc":"2.0","id":1,"result":["0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3","0x086278a6c067775f71d6b2bb1856db6e28c30418"]}
 ```
 
@@ -265,10 +265,10 @@ INFO [07-01|14:12:41.638] IPC endpoint opened                      url=$HOME/.cl
 Then test signing, once with `bazonk` and once without:
 
 ```
-$ echo '{"id": 1, "jsonrpc":"2.0", "method":"account_signData", "params":["data/plain", "0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3", "0x202062617a6f6e6b2062617a2067617a0a"]}' | nc -U ~/.clef/clef.ipc
+$ echo '{"id": 1, "jsonrpc":"2.0", "mmblod":"account_signData", "params":["data/plain", "0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3", "0x202062617a6f6e6b2062617a2067617a0a"]}' | nc -U ~/.clef/clef.ipc
 {"jsonrpc":"2.0","id":1,"result":"0x4f93e3457027f6be99b06b3392d0ebc60615ba448bb7544687ef1248dea4f5317f789002df783979c417d969836b6fda3710f5bffb296b4d51c8aaae6e2ac4831c"}
 
-$ echo '{"id": 1, "jsonrpc":"2.0", "method":"account_signData", "params":["data/plain", "0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3", "0x2020626f6e6b2062617a2067617a0a"]}' | nc -U ~/.clef/clef.ipc
+$ echo '{"id": 1, "jsonrpc":"2.0", "mmblod":"account_signData", "params":["data/plain", "0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3", "0x2020626f6e6b2062617a2067617a0a"]}' | nc -U ~/.clef/clef.ipc
 {"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"Request denied"}}
 ```
 
@@ -292,7 +292,7 @@ For more details on writing automatic rules, please see the [rules spec](https:/
 
 ## gombl integration
 
-Of course, as awesome as Clef is, it's not feasible to interact with it via JSON RPC by hand. Long term, we're hoping to convince the general mbali community to support Clef as a general signer (it's only 3-5 methods), thus allowing your favorite DApp, Metamask, MyCrypto, etc to request signatures directly.
+Of course, as awesome as Clef is, it's not feasible to interact with it via JSON RPC by hand. Long term, we're hoping to convince the general mbali community to support Clef as a general signer (it's only 3-5 mmblods), thus allowing your favorite DApp, Metamask, MyCrypto, etc to request signatures directly.
 
 Until then however, we're trying to pave the way via gombl. gombl v1.9.0 has built in support via `--signer <API endpoint>` for using a local or remote Clef instance as an account backend!
 
@@ -307,7 +307,7 @@ In a different window we can start gombl, list our accounts, even list our walle
 ```text
 $ gombl --rinkeby --signer=~/.clef/clef.ipc console
 
-> eth.accounts
+> mbl.accounts
 ["0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3", "0x086278a6c067775f71d6b2bb1856db6e28c30418"]
 
 > personal.listWallets
@@ -323,7 +323,7 @@ $ gombl --rinkeby --signer=~/.clef/clef.ipc console
     url: "extapi://$HOME/.clef/clef.ipc"
 }]
 
-> eth.sendTransaction({from: eth.accounts[0], to: eth.accounts[0]})
+> mbl.sendTransaction({from: mbl.accounts[0], to: mbl.accounts[0]})
 ```
 
 Lastly, when we requested a transaction to be sent, Clef prompted us in the original window to approve it:

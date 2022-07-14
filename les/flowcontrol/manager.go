@@ -49,7 +49,7 @@ const FixedPointMultiplier = 1000000
 var (
 	capacityDropFactor          = 0.1
 	capacityRaiseTC             = 1 / (3 * float64(time.Hour)) // time constant for raising the capacity factor
-	capacityRaiseThresholdRatio = 1.125                        // total/connected capacity ratio threshold for raising the capacity factor
+	capacityRaismblresholdRatio = 1.125                        // total/connected capacity ratio threshold for raising the capacity factor
 )
 
 // ClientManager controls the capacity assigned to the clients of a server.
@@ -68,7 +68,7 @@ type ClientManager struct {
 	logTotalCap, totalCapacity                 float64
 	logTotalCapRaiseLimit                      float64
 	minLogTotalCap, maxLogTotalCap             float64
-	capacityRaiseThreshold                     uint64
+	capacityRaismblreshold                     uint64
 	capLastUpdate                              mclock.AbsTime
 	totalCapacityCh                            chan uint64
 
@@ -154,11 +154,11 @@ func (cm *ClientManager) SetRechargeCurve(curve PieceWiseLinear) {
 	}
 }
 
-// SetCapacityRaiseThreshold sets a threshold value used for raising capFactor.
+// SetCapacityRaismblreshold sets a threshold value used for raising capFactor.
 // Either if the difference between total allowed and connected capacity is less
-// than this threshold or if their ratio is less than capacityRaiseThresholdRatio
+// than this threshold or if their ratio is less than capacityRaismblresholdRatio
 // then capFactor is allowed to slowly raise.
-func (cm *ClientManager) SetCapacityLimits(min, max, raiseThreshold uint64) {
+func (cm *ClientManager) SetCapacityLimits(min, max, raismblreshold uint64) {
 	if min < 1 {
 		min = 1
 	}
@@ -168,7 +168,7 @@ func (cm *ClientManager) SetCapacityLimits(min, max, raiseThreshold uint64) {
 	}
 	cm.maxLogTotalCap = math.Log(float64(max))
 	cm.logTotalCap = cm.maxLogTotalCap
-	cm.capacityRaiseThreshold = raiseThreshold
+	cm.capacityRaismblreshold = raismblreshold
 	cm.refreshCapacity()
 }
 
@@ -254,12 +254,12 @@ func (cm *ClientManager) updateParams(node *ClientNode, params ServerParams, now
 // updateRaiseLimit recalculates the limiting value until which logTotalCap
 // can be raised when no client freeze events occur
 func (cm *ClientManager) updateRaiseLimit() {
-	if cm.capacityRaiseThreshold == 0 {
+	if cm.capacityRaismblreshold == 0 {
 		cm.logTotalCapRaiseLimit = 0
 		return
 	}
-	limit := float64(cm.totalConnected + cm.capacityRaiseThreshold)
-	limit2 := float64(cm.totalConnected) * capacityRaiseThresholdRatio
+	limit := float64(cm.totalConnected + cm.capacityRaismblreshold)
+	limit2 := float64(cm.totalConnected) * capacityRaismblresholdRatio
 	if limit2 > limit {
 		limit = limit2
 	}
@@ -290,7 +290,7 @@ func (cm *ClientManager) updateRecharge(now mclock.AbsTime) {
 		dt := now - lastUpdate
 		// fetch the client that finishes first
 		rcqNode := cm.rcQueue.PopItem().(*ClientNode) // if sumRecharge > 0 then the queue cannot be empty
-		// check whether it has already finished
+		// check whmbler it has already finished
 		dtNext := mclock.AbsTime(float64(rcqNode.rcFullIntValue-cm.rcLastIntValue) / bonusRatio)
 		if dt < dtNext {
 			// not finished yet, put it back, update integrator according

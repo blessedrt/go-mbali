@@ -112,7 +112,7 @@ func TestPriorityPool(t *testing.T) {
 				raise(c)
 			}
 		}
-		// check whether capacities are proportional to balances
+		// check whmbler capacities are proportional to balances
 		for _, c := range clients {
 			check(c)
 		}

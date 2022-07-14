@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethash
+package mblash
 
 import (
 	"encoding/json"
@@ -32,7 +32,7 @@ import (
 	"github.com/mbali/go-mbali/log"
 )
 
-// Tests whether remote HTTP servers are correctly notified of new work.
+// Tests whmbler remote HTTP servers are correctly notified of new work.
 func TestRemoteNotify(t *testing.T) {
 	// Start a simple web server to capture notifications.
 	sink := make(chan [3]string)
@@ -49,18 +49,18 @@ func TestRemoteNotify(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Create the custom ethash engine.
-	ethash := NewTester([]string{server.URL}, false)
-	defer ethash.Close()
+	// Create the custom mblash engine.
+	mblash := NewTester([]string{server.URL}, false)
+	defer mblash.Close()
 
 	// Stream a work task and ensure the notification bubbles out.
 	header := &types.Header{Number: big.NewInt(1), Difficulty: big.NewInt(100)}
 	block := types.NewBlockWithHeader(header)
 
-	ethash.Seal(nil, block, nil, nil)
+	mblash.Seal(nil, block, nil, nil)
 	select {
 	case work := <-sink:
-		if want := ethash.SealHash(header).Hex(); work[0] != want {
+		if want := mblash.SealHash(header).Hex(); work[0] != want {
 			t.Errorf("work packet hash mismatch: have %s, want %s", work[0], want)
 		}
 		if want := common.BytesToHash(SeedHash(header.Number.Uint64())).Hex(); work[1] != want {
@@ -75,7 +75,7 @@ func TestRemoteNotify(t *testing.T) {
 	}
 }
 
-// Tests whether remote HTTP servers are correctly notified of new work. (Full pending block body / --miner.notify.full)
+// Tests whmbler remote HTTP servers are correctly notified of new work. (Full pending block body / --miner.notify.full)
 func TestRemoteNotifyFull(t *testing.T) {
 	// Start a simple web server to capture notifications.
 	sink := make(chan map[string]interface{})
@@ -92,20 +92,20 @@ func TestRemoteNotifyFull(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Create the custom ethash engine.
+	// Create the custom mblash engine.
 	config := Config{
 		PowMode:    ModeTest,
 		NotifyFull: true,
 		Log:        testlog.Logger(t, log.LvlWarn),
 	}
-	ethash := New(config, []string{server.URL}, false)
-	defer ethash.Close()
+	mblash := New(config, []string{server.URL}, false)
+	defer mblash.Close()
 
 	// Stream a work task and ensure the notification bubbles out.
 	header := &types.Header{Number: big.NewInt(1), Difficulty: big.NewInt(100)}
 	block := types.NewBlockWithHeader(header)
 
-	ethash.Seal(nil, block, nil, nil)
+	mblash.Seal(nil, block, nil, nil)
 	select {
 	case work := <-sink:
 		if want := "0x" + strconv.FormatUint(header.Number.Uint64(), 16); work["number"] != want {
@@ -137,10 +137,10 @@ func TestRemoteMultiNotify(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Create the custom ethash engine.
-	ethash := NewTester([]string{server.URL}, false)
-	ethash.config.Log = testlog.Logger(t, log.LvlWarn)
-	defer ethash.Close()
+	// Create the custom mblash engine.
+	mblash := NewTester([]string{server.URL}, false)
+	mblash.config.Log = testlog.Logger(t, log.LvlWarn)
+	defer mblash.Close()
 
 	// Provide a results reader.
 	// Otherwise the unread results will be logged asynchronously
@@ -151,7 +151,7 @@ func TestRemoteMultiNotify(t *testing.T) {
 	for i := 0; i < cap(sink); i++ {
 		header := &types.Header{Number: big.NewInt(int64(i)), Difficulty: big.NewInt(100)}
 		block := types.NewBlockWithHeader(header)
-		ethash.Seal(nil, block, results, nil)
+		mblash.Seal(nil, block, results, nil)
 	}
 
 	for i := 0; i < cap(sink); i++ {
@@ -182,14 +182,14 @@ func TestRemoteMultiNotifyFull(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Create the custom ethash engine.
+	// Create the custom mblash engine.
 	config := Config{
 		PowMode:    ModeTest,
 		NotifyFull: true,
 		Log:        testlog.Logger(t, log.LvlWarn),
 	}
-	ethash := New(config, []string{server.URL}, false)
-	defer ethash.Close()
+	mblash := New(config, []string{server.URL}, false)
+	defer mblash.Close()
 
 	// Provide a results reader.
 	// Otherwise the unread results will be logged asynchronously
@@ -200,7 +200,7 @@ func TestRemoteMultiNotifyFull(t *testing.T) {
 	for i := 0; i < cap(sink); i++ {
 		header := &types.Header{Number: big.NewInt(int64(i)), Difficulty: big.NewInt(100)}
 		block := types.NewBlockWithHeader(header)
-		ethash.Seal(nil, block, results, nil)
+		mblash.Seal(nil, block, results, nil)
 	}
 
 	for i := 0; i < cap(sink); i++ {
@@ -213,11 +213,11 @@ func TestRemoteMultiNotifyFull(t *testing.T) {
 	}
 }
 
-// Tests whether stale solutions are correctly processed.
+// Tests whmbler stale solutions are correctly processed.
 func TestStaleSubmission(t *testing.T) {
-	ethash := NewTester(nil, true)
-	defer ethash.Close()
-	api := &API{ethash}
+	mblash := NewTester(nil, true)
+	defer mblash.Close()
+	api := &API{mblash}
 
 	fakeNonce, fakeDigest := types.BlockNonce{0x01, 0x02, 0x03}, common.HexToHash("deadbeef")
 
@@ -266,9 +266,9 @@ func TestStaleSubmission(t *testing.T) {
 
 	for id, c := range testcases {
 		for _, h := range c.headers {
-			ethash.Seal(nil, types.NewBlockWithHeader(h), results, nil)
+			mblash.Seal(nil, types.NewBlockWithHeader(h), results, nil)
 		}
-		if res := api.SubmitWork(fakeNonce, ethash.SealHash(c.headers[c.submitIndex]), fakeDigest); res != c.submitRes {
+		if res := api.SubmitWork(fakeNonce, mblash.SealHash(c.headers[c.submitIndex]), fakeDigest); res != c.submitRes {
 			t.Errorf("case %d submit result mismatch, want %t, get %t", id+1, c.submitRes, res)
 		}
 		if !c.submitRes {
@@ -292,7 +292,7 @@ func TestStaleSubmission(t *testing.T) {
 				t.Errorf("case %d block parent hash mismatch, want %s, get %s", id+1, c.headers[c.submitIndex].ParentHash.Hex(), res.Header().ParentHash.Hex())
 			}
 		case <-time.NewTimer(time.Second).C:
-			t.Errorf("case %d fetch ethash result timeout", id+1)
+			t.Errorf("case %d fetch mblash result timeout", id+1)
 		}
 	}
 }

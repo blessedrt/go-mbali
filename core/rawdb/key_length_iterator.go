@@ -16,18 +16,18 @@
 
 package rawdb
 
-import "github.com/mbali/go-mbali/ethdb"
+import "github.com/mbali/go-mbali/mbldb"
 
 // KeyLengthIterator is a wrapper for a database iterator that ensures only key-value pairs
 // with a specific key length will be returned.
 type KeyLengthIterator struct {
 	requiredKeyLength int
-	ethdb.Iterator
+	mbldb.Iterator
 }
 
 // NewKeyLengthIterator returns a wrapped version of the iterator that will only return key-value
 // pairs where keys with a specific key length will be returned.
-func NewKeyLengthIterator(it ethdb.Iterator, keyLen int) ethdb.Iterator {
+func NewKeyLengthIterator(it mbldb.Iterator, keyLen int) mbldb.Iterator {
 	return &KeyLengthIterator{
 		Iterator:          it,
 		requiredKeyLength: keyLen,

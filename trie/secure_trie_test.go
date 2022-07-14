@@ -24,7 +24,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 )
 
 func newEmptySecure() *SecureTrie {
@@ -67,11 +67,11 @@ func TestSecureDelete(t *testing.T) {
 	trie := newEmptySecure()
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
-		{"ether", ""},
+		{"mbler", ""},
 		{"dog", "puppy"},
 		{"shaman", ""},
 	}

@@ -25,21 +25,21 @@ import (
 	"github.com/mbali/go-mbali/internal/cmdtest"
 )
 
-type testEthkey struct {
+type testmblkey struct {
 	*cmdtest.TestCmd
 }
 
-// spawns ethkey with the given command line args.
-func runEthkey(t *testing.T, args ...string) *testEthkey {
-	tt := new(testEthkey)
+// spawns mblkey with the given command line args.
+func runmblkey(t *testing.T, args ...string) *testmblkey {
+	tt := new(testmblkey)
 	tt.TestCmd = cmdtest.NewTestCmd(t, tt)
-	tt.Run("ethkey-test", args...)
+	tt.Run("mblkey-test", args...)
 	return tt
 }
 
 func TestMain(m *testing.M) {
-	// Run the app if we've been exec'd as "ethkey-test" in runEthkey.
-	reexec.Register("ethkey-test", func() {
+	// Run the app if we've been exec'd as "mblkey-test" in runmblkey.
+	reexec.Register("mblkey-test", func() {
 		if err := app.Run(os.Args); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

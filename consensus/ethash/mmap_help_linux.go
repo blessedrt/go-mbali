@@ -17,7 +17,7 @@
 //go:build linux
 // +build linux
 
-package ethash
+package mblash
 
 import (
 	"os"

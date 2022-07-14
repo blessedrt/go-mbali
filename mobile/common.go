@@ -45,7 +45,7 @@ func NewHashFromBytes(binary []byte) (hash *Hash, _ error) {
 // NewHashFromHex converts a hex string to a hash value.
 func NewHashFromHex(hex string) (hash *Hash, _ error) {
 	h := new(Hash)
-	if err := h.SetHex(hex); err != nil {
+	if err := h.Smblex(hex); err != nil {
 		return nil, err
 	}
 	return h, nil
@@ -65,8 +65,8 @@ func (h *Hash) GetBytes() []byte {
 	return h.hash[:]
 }
 
-// SetHex sets the specified hex string as the hash value.
-func (h *Hash) SetHex(hash string) error {
+// Smblex sets the specified hex string as the hash value.
+func (h *Hash) Smblex(hash string) error {
 	hash = strings.ToLower(hash)
 	if len(hash) >= 2 && hash[:2] == "0x" {
 		hash = hash[2:]
@@ -151,7 +151,7 @@ func NewAddressFromBytes(binary []byte) (address *Address, _ error) {
 // NewAddressFromHex converts a hex string to a address value.
 func NewAddressFromHex(hex string) (address *Address, _ error) {
 	a := new(Address)
-	if err := a.SetHex(hex); err != nil {
+	if err := a.Smblex(hex); err != nil {
 		return nil, err
 	}
 	return a, nil
@@ -171,8 +171,8 @@ func (a *Address) GetBytes() []byte {
 	return a.address[:]
 }
 
-// SetHex sets the specified hex string as the address value.
-func (a *Address) SetHex(address string) error {
+// Smblex sets the specified hex string as the address value.
+func (a *Address) Smblex(address string) error {
 	address = strings.ToLower(address)
 	if len(address) >= 2 && address[:2] == "0x" {
 		address = address[2:]

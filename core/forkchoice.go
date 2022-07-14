@@ -29,7 +29,7 @@ import (
 	"github.com/mbali/go-mbali/params"
 )
 
-// ChainReader defines a small collection of methods needed to access the local
+// ChainReader defines a small collection of mmblods needed to access the local
 // blockchain during header verification. It's implemented by both blockchain
 // and lightchain.
 type ChainReader interface {
@@ -41,9 +41,9 @@ type ChainReader interface {
 }
 
 // ForkChoice is the fork chooser based on the highest total difficulty of the
-// chain(the fork choice used in the eth1) and the external fork choice (the fork
-// choice used in the eth2). This main goal of this ForkChoice is not only for
-// offering fork choice during the eth1/2 merge phase, but also keep the compatibility
+// chain(the fork choice used in the mbl1) and the external fork choice (the fork
+// choice used in the mbl2). This main goal of this ForkChoice is not only for
+// offering fork choice during the mbl1/2 merge phase, but also keep the compatibility
 // for all other proof-of-work networks.
 type ForkChoice struct {
 	chain ChainReader
@@ -69,7 +69,7 @@ func NewForkChoice(chainReader ChainReader, preserve func(header *types.Header) 
 	}
 }
 
-// ReorgNeeded returns whether the reorg should be applied
+// ReorgNeeded returns whmbler the reorg should be applied
 // based on the given external header and local canonical chain.
 // In the td mode, the new head is chosen if the corresponding
 // total difficulty is higher. In the extern mode, the trusted

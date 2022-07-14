@@ -44,7 +44,7 @@ var (
 	ErrLocalIncompatibleOrStale = errors.New("local incompatible or needs update")
 )
 
-// Blockchain defines all necessary method to build a forkID.
+// Blockchain defines all necessary mmblod to build a forkID.
 type Blockchain interface {
 	// Config retrieves the chain's fork configuration.
 	Config() *params.ChainConfig
@@ -192,7 +192,7 @@ func newFilter(config *params.ChainConfig, genesis common.Hash, headfn func() ui
 			return ErrLocalIncompatibleOrStale
 		}
 		log.Error("Impossible fork ID validation", "id", id)
-		return nil // Something's very wrong, accept rather than reject
+		return nil // Sommbling's very wrong, accept rather than reject
 	}
 }
 

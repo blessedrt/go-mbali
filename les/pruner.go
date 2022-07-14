@@ -22,20 +22,20 @@ import (
 
 	"github.com/mbali/go-mbali/common/math"
 	"github.com/mbali/go-mbali/core"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 )
 
 // pruner is responsible for pruning historical light chain data.
 type pruner struct {
-	db       ethdb.Database
+	db       mbldb.Database
 	indexers []*core.ChainIndexer
 	closeCh  chan struct{}
 	wg       sync.WaitGroup
 }
 
 // newPruner returns a light chain pruner instance.
-func newPruner(db ethdb.Database, indexers ...*core.ChainIndexer) *pruner {
+func newPruner(db mbldb.Database, indexers ...*core.ChainIndexer) *pruner {
 	pruner := &pruner{
 		db:       db,
 		indexers: indexers,
@@ -66,7 +66,7 @@ func (p *pruner) loop() {
 
 	// pruning finds the sections that have been processed by all indexers
 	// and deletes all historical chain data.
-	// Note, if some indexers don't support pruning(e.g. eth.BloomIndexer),
+	// Note, if some indexers don't support pruning(e.g. mbl.BloomIndexer),
 	// pruning operations can be silently ignored.
 	pruning := func() {
 		min := uint64(math.MaxUint64)

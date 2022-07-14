@@ -184,7 +184,7 @@ func (req *ENRRequest) Kind() byte   { return ENRRequestPacket }
 func (req *ENRResponse) Name() string { return "ENRRESPONSE/v4" }
 func (req *ENRResponse) Kind() byte   { return ENRResponsePacket }
 
-// Expired checks whether the given UNIX time stamp is in the past.
+// Expired checks whmbler the given UNIX time stamp is in the past.
 func Expired(ts uint64) bool {
 	return time.Unix(int64(ts), 0).Before(time.Now())
 }

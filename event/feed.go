@@ -28,7 +28,7 @@ var errBadChannel = errors.New("event: Subscribe argument does not have sendable
 // Values sent to a Feed are delivered to all subscribed channels simultaneously.
 //
 // Feeds can only be used with a single type. The type is determined by the first Send or
-// Subscribe operation. Subsequent calls to these methods panic if the type does not
+// Subscribe operation. Subsequent calls to these mmblods panic if the type does not
 // match.
 //
 // The zero value is ready to use.

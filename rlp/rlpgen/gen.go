@@ -28,7 +28,7 @@ import (
 
 // buildContext keeps the data needed for make*Op.
 type buildContext struct {
-	topType *types.Named // the type we're creating methods for
+	topType *types.Named // the type we're creating mmblods for
 
 	encoderIface *types.Interface
 	decoderIface *types.Interface
@@ -91,7 +91,7 @@ func (bctx *buildContext) typeToStructType(typ types.Type) *rlpstruct.Type {
 	return t
 }
 
-// genContext is passed to the gen* methods of op when generating
+// genContext is passed to the gen* mmblods of op when generating
 // the output code. It tracks packages to be imported by the output
 // file and assigns unique names of temporary variables.
 type genContext struct {
@@ -158,11 +158,11 @@ type op interface {
 // basicOp handles basic types bool, uint*, string.
 type basicOp struct {
 	typ           types.Type
-	writeMethod   string     // calle write the value
-	writeArgType  types.Type // parameter type of writeMethod
-	decMethod     string
-	decResultType types.Type // return type of decMethod
-	decUseBitSize bool       // if true, result bit size is appended to decMethod
+	writeMmblod   string     // calle write the value
+	writeArgType  types.Type // parameter type of writeMmblod
+	decMmblod     string
+	decResultType types.Type // return type of decMmblod
+	decUseBitSize bool       // if true, result bit size is appended to decMmblod
 }
 
 func (*buildContext) makeBasicOp(typ *types.Basic) (op, error) {
@@ -170,20 +170,20 @@ func (*buildContext) makeBasicOp(typ *types.Basic) (op, error) {
 	kind := typ.Kind()
 	switch {
 	case kind == types.Bool:
-		op.writeMethod = "WriteBool"
+		op.writeMmblod = "WriteBool"
 		op.writeArgType = types.Typ[types.Bool]
-		op.decMethod = "Bool"
+		op.decMmblod = "Bool"
 		op.decResultType = types.Typ[types.Bool]
 	case kind >= types.Uint8 && kind <= types.Uint64:
-		op.writeMethod = "WriteUint64"
+		op.writeMmblod = "WriteUint64"
 		op.writeArgType = types.Typ[types.Uint64]
-		op.decMethod = "Uint"
+		op.decMmblod = "Uint"
 		op.decResultType = typ
 		op.decUseBitSize = true
 	case kind == types.String:
-		op.writeMethod = "WriteString"
+		op.writeMmblod = "WriteString"
 		op.writeArgType = types.Typ[types.String]
-		op.decMethod = "String"
+		op.decMmblod = "String"
 		op.decResultType = types.Typ[types.String]
 	default:
 		return nil, fmt.Errorf("unhandled basic type: %v", typ)
@@ -198,9 +198,9 @@ func (*buildContext) makeByteSliceOp(typ *types.Slice) op {
 	bslice := types.NewSlice(types.Typ[types.Uint8])
 	return basicOp{
 		typ:           typ,
-		writeMethod:   "WriteBytes",
+		writeMmblod:   "WriteBytes",
 		writeArgType:  bslice,
-		decMethod:     "Bytes",
+		decMmblod:     "Bytes",
 		decResultType: bslice,
 	}
 }
@@ -209,9 +209,9 @@ func (bctx *buildContext) makeRawValueOp() op {
 	bslice := types.NewSlice(types.Typ[types.Uint8])
 	return basicOp{
 		typ:           bctx.rawValueType,
-		writeMethod:   "Write",
+		writeMmblod:   "Write",
 		writeArgType:  bslice,
-		decMethod:     "Raw",
+		decMmblod:     "Raw",
 		decResultType: bslice,
 	}
 }
@@ -228,25 +228,25 @@ func (op basicOp) genWrite(ctx *genContext, v string) string {
 	if op.writeNeedsConversion() {
 		v = fmt.Sprintf("%s(%s)", op.writeArgType, v)
 	}
-	return fmt.Sprintf("w.%s(%s)\n", op.writeMethod, v)
+	return fmt.Sprintf("w.%s(%s)\n", op.writeMmblod, v)
 }
 
 func (op basicOp) genDecode(ctx *genContext) (string, string) {
 	var (
 		resultV = ctx.temp()
 		result  = resultV
-		method  = op.decMethod
+		mmblod  = op.decMmblod
 	)
 	if op.decUseBitSize {
 		// Note: For now, this only works for platform-independent integer
 		// sizes. makeBasicOp forbids the platform-dependent types.
 		var sizes types.StdSizes
-		method = fmt.Sprintf("%s%d", op.decMethod, sizes.Sizeof(op.typ)*8)
+		mmblod = fmt.Sprintf("%s%d", op.decMmblod, sizes.Sizeof(op.typ)*8)
 	}
 
-	// Call the decoder method.
+	// Call the decoder mmblod.
 	var b bytes.Buffer
-	fmt.Fprintf(&b, "%s, err := dec.%s()\n", resultV, method)
+	fmt.Fprintf(&b, "%s, err := dec.%s()\n", resultV, mmblod)
 	fmt.Fprintf(&b, "if err != nil { return err }\n")
 	if op.decodeNeedsConversion() {
 		conv := ctx.temp()
@@ -285,7 +285,7 @@ func (op byteArrayOp) genDecode(ctx *genContext) (string, string) {
 
 // bigIntNoPtrOp handles non-pointer big.Int.
 // This exists because big.Int has it's own decoder operation on rlp.Stream,
-// but the decode method returns *big.Int, so it needs to be dereferenced.
+// but the decode mmblod returns *big.Int, so it needs to be dereferenced.
 type bigIntOp struct {
 	pointer bool
 }
@@ -680,7 +680,7 @@ func (bctx *buildContext) makeOp(name *types.Named, typ types.Type, tags rlpstru
 	}
 }
 
-// generateDecoder generates the DecodeRLP method on 'typ'.
+// generateDecoder generates the DecodeRLP mmblod on 'typ'.
 func generateDecoder(ctx *genContext, typ string, op op) []byte {
 	ctx.resetTemp()
 	ctx.addImport(pathOfPackageRLP)
@@ -695,7 +695,7 @@ func generateDecoder(ctx *genContext, typ string, op op) []byte {
 	return b.Bytes()
 }
 
-// generateEncoder generates the EncodeRLP method on 'typ'.
+// generateEncoder generates the EncodeRLP mmblod on 'typ'.
 func generateEncoder(ctx *genContext, typ string, op op) []byte {
 	ctx.resetTemp()
 	ctx.addImport("io")

@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-package ethtest
+package mbltest
 
 import (
 	"crypto/ecdsa"
 	"fmt"
 	"time"
 
-	"github.com/mbali/go-mbali/eth/protocols/eth"
+	"github.com/mbali/go-mbali/mbl/protocols/mbl"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/p2p/rlpx"
 	"github.com/mbali/go-mbali/rlp"
@@ -73,54 +73,54 @@ type Pong struct{}
 
 func (p Pong) Code() int { return 0x03 }
 
-// Status is the network packet for the status message for eth/64 and later.
-type Status eth.StatusPacket
+// Status is the network packet for the status message for mbl/64 and later.
+type Status mbl.StatusPacket
 
 func (s Status) Code() int { return 16 }
 
 // NewBlockHashes is the network packet for the block announcements.
-type NewBlockHashes eth.NewBlockHashesPacket
+type NewBlockHashes mbl.NewBlockHashesPacket
 
 func (nbh NewBlockHashes) Code() int { return 17 }
 
-type Transactions eth.TransactionsPacket
+type Transactions mbl.TransactionsPacket
 
 func (t Transactions) Code() int { return 18 }
 
 // GetBlockHeaders represents a block header query.
-type GetBlockHeaders eth.GetBlockHeadersPacket
+type GetBlockHeaders mbl.GetBlockHeadersPacket
 
 func (g GetBlockHeaders) Code() int { return 19 }
 
-type BlockHeaders eth.BlockHeadersPacket
+type BlockHeaders mbl.BlockHeadersPacket
 
 func (bh BlockHeaders) Code() int { return 20 }
 
 // GetBlockBodies represents a GetBlockBodies request
-type GetBlockBodies eth.GetBlockBodiesPacket
+type GetBlockBodies mbl.GetBlockBodiesPacket
 
 func (gbb GetBlockBodies) Code() int { return 21 }
 
 // BlockBodies is the network packet for block content distribution.
-type BlockBodies eth.BlockBodiesPacket
+type BlockBodies mbl.BlockBodiesPacket
 
 func (bb BlockBodies) Code() int { return 22 }
 
 // NewBlock is the network packet for the block propagation message.
-type NewBlock eth.NewBlockPacket
+type NewBlock mbl.NewBlockPacket
 
 func (nb NewBlock) Code() int { return 23 }
 
 // NewPooledTransactionHashes is the network packet for the tx hash propagation message.
-type NewPooledTransactionHashes eth.NewPooledTransactionHashesPacket
+type NewPooledTransactionHashes mbl.NewPooledTransactionHashesPacket
 
 func (nb NewPooledTransactionHashes) Code() int { return 24 }
 
-type GetPooledTransactions eth.GetPooledTransactionsPacket
+type GetPooledTransactions mbl.GetPooledTransactionsPacket
 
 func (gpt GetPooledTransactions) Code() int { return 25 }
 
-type PooledTransactions eth.PooledTransactionsPacket
+type PooledTransactions mbl.PooledTransactionsPacket
 
 func (pt PooledTransactions) Code() int { return 26 }
 
@@ -135,7 +135,7 @@ type Conn struct {
 	caps                       []p2p.Cap
 }
 
-// Read reads an eth packet from the connection.
+// Read reads an mbl packet from the connection.
 func (c *Conn) Read() Message {
 	code, rawData, _, err := c.Conn.Read()
 	if err != nil {
@@ -184,7 +184,7 @@ func (c *Conn) Read() Message {
 	return msg
 }
 
-// Read66 reads an eth66 packet from the connection.
+// Read66 reads an mbl66 packet from the connection.
 func (c *Conn) Read66() (uint64, Message) {
 	code, rawData, _, err := c.Conn.Read()
 	if err != nil {
@@ -204,29 +204,29 @@ func (c *Conn) Read66() (uint64, Message) {
 	case (Status{}).Code():
 		msg = new(Status)
 	case (GetBlockHeaders{}).Code():
-		ethMsg := new(eth.GetBlockHeadersPacket66)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
+		mblMsg := new(mbl.GetBlockHeadersPacket66)
+		if err := rlp.DecodeBytes(rawData, mblMsg); err != nil {
 			return 0, errorf("could not rlp decode message: %v", err)
 		}
-		return ethMsg.RequestId, GetBlockHeaders(*ethMsg.GetBlockHeadersPacket)
+		return mblMsg.RequestId, GetBlockHeaders(*mblMsg.GetBlockHeadersPacket)
 	case (BlockHeaders{}).Code():
-		ethMsg := new(eth.BlockHeadersPacket66)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
+		mblMsg := new(mbl.BlockHeadersPacket66)
+		if err := rlp.DecodeBytes(rawData, mblMsg); err != nil {
 			return 0, errorf("could not rlp decode message: %v", err)
 		}
-		return ethMsg.RequestId, BlockHeaders(ethMsg.BlockHeadersPacket)
+		return mblMsg.RequestId, BlockHeaders(mblMsg.BlockHeadersPacket)
 	case (GetBlockBodies{}).Code():
-		ethMsg := new(eth.GetBlockBodiesPacket66)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
+		mblMsg := new(mbl.GetBlockBodiesPacket66)
+		if err := rlp.DecodeBytes(rawData, mblMsg); err != nil {
 			return 0, errorf("could not rlp decode message: %v", err)
 		}
-		return ethMsg.RequestId, GetBlockBodies(ethMsg.GetBlockBodiesPacket)
+		return mblMsg.RequestId, GetBlockBodies(mblMsg.GetBlockBodiesPacket)
 	case (BlockBodies{}).Code():
-		ethMsg := new(eth.BlockBodiesPacket66)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
+		mblMsg := new(mbl.BlockBodiesPacket66)
+		if err := rlp.DecodeBytes(rawData, mblMsg); err != nil {
 			return 0, errorf("could not rlp decode message: %v", err)
 		}
-		return ethMsg.RequestId, BlockBodies(ethMsg.BlockBodiesPacket)
+		return mblMsg.RequestId, BlockBodies(mblMsg.BlockBodiesPacket)
 	case (NewBlock{}).Code():
 		msg = new(NewBlock)
 	case (NewBlockHashes{}).Code():
@@ -236,17 +236,17 @@ func (c *Conn) Read66() (uint64, Message) {
 	case (NewPooledTransactionHashes{}).Code():
 		msg = new(NewPooledTransactionHashes)
 	case (GetPooledTransactions{}.Code()):
-		ethMsg := new(eth.GetPooledTransactionsPacket66)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
+		mblMsg := new(mbl.GetPooledTransactionsPacket66)
+		if err := rlp.DecodeBytes(rawData, mblMsg); err != nil {
 			return 0, errorf("could not rlp decode message: %v", err)
 		}
-		return ethMsg.RequestId, GetPooledTransactions(ethMsg.GetPooledTransactionsPacket)
+		return mblMsg.RequestId, GetPooledTransactions(mblMsg.GetPooledTransactionsPacket)
 	case (PooledTransactions{}.Code()):
-		ethMsg := new(eth.PooledTransactionsPacket66)
-		if err := rlp.DecodeBytes(rawData, ethMsg); err != nil {
+		mblMsg := new(mbl.PooledTransactionsPacket66)
+		if err := rlp.DecodeBytes(rawData, mblMsg); err != nil {
 			return 0, errorf("could not rlp decode message: %v", err)
 		}
-		return ethMsg.RequestId, PooledTransactions(ethMsg.PooledTransactionsPacket)
+		return mblMsg.RequestId, PooledTransactions(mblMsg.PooledTransactionsPacket)
 	default:
 		msg = errorf("invalid message code: %d", code)
 	}
@@ -260,7 +260,7 @@ func (c *Conn) Read66() (uint64, Message) {
 	return 0, errorf("invalid message: %s", string(rawData))
 }
 
-// Write writes a eth packet to the connection.
+// Write writes a mbl packet to the connection.
 func (c *Conn) Write(msg Message) error {
 	payload, err := rlp.EncodeToBytes(msg)
 	if err != nil {
@@ -270,8 +270,8 @@ func (c *Conn) Write(msg Message) error {
 	return err
 }
 
-// Write66 writes an eth66 packet to the connection.
-func (c *Conn) Write66(req eth.Packet, code int) error {
+// Write66 writes an mbl66 packet to the connection.
+func (c *Conn) Write66(req mbl.Packet, code int) error {
 	payload, err := rlp.EncodeToBytes(req)
 	if err != nil {
 		return err

@@ -158,10 +158,10 @@ func (c *Console) init(preload []string) error {
 	// Configure the input prompter for history and tab completion.
 	if c.prompter != nil {
 		if content, err := os.ReadFile(c.histPath); err != nil {
-			c.prompter.SetHistory(nil)
+			c.prompter.Smblistory(nil)
 		} else {
 			c.history = strings.Split(string(content), "\n")
-			c.prompter.SetHistory(c.history)
+			c.prompter.Smblistory(c.history)
 		}
 		c.prompter.SetWordCompleter(c.AutoCompleteInput)
 	}
@@ -205,7 +205,7 @@ func (c *Console) initExtensions() error {
 	if err != nil {
 		return fmt.Errorf("api modules: %v", err)
 	}
-	aliases := map[string]struct{}{"eth": {}, "personal": {}}
+	aliases := map[string]struct{}{"mbl": {}, "personal": {}}
 	for api := range apis {
 		if api == "web3" {
 			continue
@@ -239,23 +239,23 @@ func (c *Console) initAdmin(vm *goja.Runtime, bridge *bridge) {
 	}
 }
 
-// initPersonal redirects account-related API methods through the bridge.
+// initPersonal redirects account-related API mmblods through the bridge.
 //
 // If the console is in interactive mode and the 'personal' API is available, override
-// the openWallet, unlockAccount, newAccount and sign methods since these require user
-// interaction. The original web3 callbacks are stored in 'jeth'. These will be called
+// the openWallet, unlockAccount, newAccount and sign mmblods since these require user
+// interaction. The original web3 callbacks are stored in 'jmbl'. These will be called
 // by the bridge after the prompt and send the original web3 request to the backend.
 func (c *Console) initPersonal(vm *goja.Runtime, bridge *bridge) {
 	personal := getObject(vm, "personal")
 	if personal == nil || c.prompter == nil {
 		return
 	}
-	jeth := vm.NewObject()
-	vm.Set("jeth", jeth)
-	jeth.Set("openWallet", personal.Get("openWallet"))
-	jeth.Set("unlockAccount", personal.Get("unlockAccount"))
-	jeth.Set("newAccount", personal.Get("newAccount"))
-	jeth.Set("sign", personal.Get("sign"))
+	jmbl := vm.NewObject()
+	vm.Set("jmbl", jmbl)
+	jmbl.Set("openWallet", personal.Get("openWallet"))
+	jmbl.Set("unlockAccount", personal.Get("unlockAccount"))
+	jmbl.Set("newAccount", personal.Get("newAccount"))
+	jmbl.Set("sign", personal.Get("sign"))
 	personal.Set("openWallet", jsre.MakeCallback(vm, bridge.OpenWallet))
 	personal.Set("unlockAccount", jsre.MakeCallback(vm, bridge.UnlockAccount))
 	personal.Set("newAccount", jsre.MakeCallback(vm, bridge.NewAccount))
@@ -272,7 +272,7 @@ func (c *Console) clearHistory() {
 	}
 }
 
-// consoleOutput is an override for the console.log and console.error methods to
+// consoleOutput is an override for the console.log and console.error mmblods to
 // stream the output into the configured output stream instead of stdout.
 func (c *Console) consoleOutput(call goja.FunctionCall) goja.Value {
 	var output []string
@@ -284,17 +284,17 @@ func (c *Console) consoleOutput(call goja.FunctionCall) goja.Value {
 }
 
 // AutoCompleteInput is a pre-assembled word completer to be used by the user
-// input prompter to provide hints to the user about the methods available.
+// input prompter to provide hints to the user about the mmblods available.
 func (c *Console) AutoCompleteInput(line string, pos int) (string, []string, string) {
 	// No completions can be provided for empty inputs
 	if len(line) == 0 || pos == 0 {
 		return "", nil, ""
 	}
 	// Chunck data to relevant part for autocompletion
-	// E.g. in case of nested lines eth.getBalance(eth.coinb<tab><tab>
+	// E.g. in case of nested lines mbl.getBalance(mbl.coinb<tab><tab>
 	start := pos - 1
 	for ; start > 0; start-- {
-		// Skip all methods and namespaces (i.e. including the dot)
+		// Skip all mmblods and namespaces (i.e. including the dot)
 		if line[start] == '.' || (line[start] >= 'a' && line[start] <= 'z') || (line[start] >= 'A' && line[start] <= 'Z') {
 			continue
 		}
@@ -319,9 +319,9 @@ func (c *Console) Welcome() {
 	if res, err := c.jsre.Run(`
 		var message = "instance: " + web3.version.node + "\n";
 		try {
-			message += "coinbase: " + eth.coinbase + "\n";
+			message += "coinbase: " + mbl.coinbase + "\n";
 		} catch (err) {}
-		message += "at block: " + eth.blockNumber + " (" + new Date(1000 * eth.getBlock(eth.blockNumber).timestamp) + ")\n";
+		message += "at block: " + mbl.blockNumber + " (" + new Date(1000 * mbl.getBlock(mbl.blockNumber).timestamp) + ")\n";
 		try {
 			message += " datadir: " + admin.datadir + "\n";
 		} catch (err) {}

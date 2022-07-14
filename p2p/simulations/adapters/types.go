@@ -249,7 +249,7 @@ func assignTCPPort() (uint16, error) {
 	return uint16(p), nil
 }
 
-// ServiceContext is a collection of options and methods which can be utilised
+// ServiceContext is a collection of options and mmblods which can be utilised
 // when starting services
 type ServiceContext struct {
 	RPCDialer

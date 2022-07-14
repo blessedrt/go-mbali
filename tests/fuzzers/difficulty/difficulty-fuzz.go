@@ -23,7 +23,7 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core/types"
 )
 
@@ -103,7 +103,7 @@ func (f *fuzzer) fuzz() int {
 	// Number can range between 0 and up to 32 bytes (but not so that the child exceeds it)
 	{
 		// However, if we use astronomic numbers, then the bomb exp karatsuba calculation
-		// in the legacy methods)
+		// in the legacy mmblods)
 		// times out, so we limit it to fit within reasonable bounds
 		number := new(big.Int).SetBytes(f.readSlice(0, 4)) // 4 bytes: 32 bits: block num max 4 billion
 		header.Number = number
@@ -130,9 +130,9 @@ func (f *fuzzer) fuzz() int {
 		bigFn  calculator
 		u256Fn calculator
 	}{
-		{ethash.FrontierDifficultyCalculator, ethash.CalcDifficultyFrontierU256},
-		{ethash.HomesteadDifficultyCalculator, ethash.CalcDifficultyHomesteadU256},
-		{ethash.DynamicDifficultyCalculator(bombDelay), ethash.MakeDifficultyCalculatorU256(bombDelay)},
+		{mblash.FrontierDifficultyCalculator, mblash.CalcDifficultyFrontierU256},
+		{mblash.HomesteadDifficultyCalculator, mblash.CalcDifficultyHomesteadU256},
+		{mblash.DynamicDifficultyCalculator(bombDelay), mblash.MakeDifficultyCalculatorU256(bombDelay)},
 	} {
 		want := pair.bigFn(time, header)
 		have := pair.u256Fn(time, header)

@@ -16,7 +16,7 @@
 
 // This file contains the code snippets from the developer's guide embedded into
 // Go tests. This ensures that any code published in out guides will not break
-// accidentally via some code update. If some API changes nonetheless that needs
+// accidentally via some code update. If some API changes nonmbleless that needs
 // modifying this file, please port any modification over into the developer's
 // guide wiki pages too!
 
@@ -47,7 +47,7 @@ func TestAccountManagement(t *testing.T) {
 		t.Fatalf("Failed to create new account: %v", err)
 	}
 	// Export the newly created account with a different passphrase. The returned
-	// data from this method invocation is a JSON encoded, encrypted key-file
+	// data from this mmblod invocation is a JSON encoded, encrypted key-file
 	jsonAcc, err := ks.Export(newAcc, "Creation password", "Export password")
 	if err != nil {
 		t.Fatalf("Failed to export account: %v", err)

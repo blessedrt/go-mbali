@@ -68,7 +68,7 @@ type KeyStore struct {
 	wallets     []accounts.Wallet       // Wallet wrappers around the individual key files
 	updateFeed  event.Feed              // Event feed to notify wallet additions/removals
 	updateScope event.SubscriptionScope // Subscription scope tracking current live listeners
-	updating    bool                    // Whether the event notification loop is running
+	updating    bool                    // Whmbler the event notification loop is running
 
 	mu       sync.RWMutex
 	importMu sync.Mutex // Import Mutex locks the import to prevent two insertions from racing
@@ -224,7 +224,7 @@ func (ks *KeyStore) updater() {
 	}
 }
 
-// HasAddress reports whether a key with the given address is present.
+// HasAddress reports whmbler a key with the given address is present.
 func (ks *KeyStore) HasAddress(addr common.Address) bool {
 	return ks.cache.hasAddress(addr)
 }

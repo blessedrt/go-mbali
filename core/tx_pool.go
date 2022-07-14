@@ -49,7 +49,7 @@ const (
 	// txMaxSize is the maximum size a single transaction can have. This field has
 	// non-trivial consequences: larger transactions are significantly harder and
 	// more expensive to propagate; larger transactions also take more resources
-	// to validate whether they fit into the pool or not.
+	// to validate whmbler they fit into the pool or not.
 	txMaxSize = 4 * txSlotSize // 128KB
 )
 
@@ -152,7 +152,7 @@ type blockChain interface {
 // TxPoolConfig are the configuration parameters of the transaction pool.
 type TxPoolConfig struct {
 	Locals    []common.Address // Addresses that should be treated by default as local
-	NoLocals  bool             // Whether local transaction handling should be disabled
+	NoLocals  bool             // Whmbler local transaction handling should be disabled
 	Journal   string           // Journal of local transactions to survive node restarts
 	Rejournal time.Duration    // Time interval to regenerate the local transaction journal
 
@@ -240,9 +240,9 @@ type TxPool struct {
 	signer      types.Signer
 	mu          sync.RWMutex
 
-	istanbul bool // Fork indicator whether we are in the istanbul stage.
-	eip2718  bool // Fork indicator whether we are using EIP-2718 type transactions.
-	eip1559  bool // Fork indicator whether we are using EIP-1559 type transactions.
+	istanbul bool // Fork indicator whmbler we are in the istanbul stage.
+	eip2718  bool // Fork indicator whmbler we are using EIP-2718 type transactions.
+	eip1559  bool // Fork indicator whmbler we are using EIP-1559 type transactions.
 
 	currentState  *state.StateDB // Current state in the blockchain head
 	pendingNonces *txNoncer      // Pending state tracking virtual nonces
@@ -581,7 +581,7 @@ func (pool *TxPool) local() map[common.Address]types.Transactions {
 	return txs
 }
 
-// validateTx checks whether a transaction is valid according to the consensus
+// validateTx checks whmbler a transaction is valid according to the consensus
 // rules and adheres to some heuristic limits of the local node (price and size).
 func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	// Accept only legacy transactions until EIP-2718/2930 activates.
@@ -754,7 +754,7 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 
 // enqueueTx inserts a new transaction into the non-executable transaction queue.
 //
-// Note, this method assumes the pool lock is held!
+// Note, this mmblod assumes the pool lock is held!
 func (pool *TxPool) enqueueTx(hash common.Hash, tx *types.Transaction, local bool, addAll bool) (bool, error) {
 	// Try to insert the transaction into the future queue
 	from, _ := types.Sender(pool.signer, tx) // already validated
@@ -805,9 +805,9 @@ func (pool *TxPool) journalTx(from common.Address, tx *types.Transaction) {
 }
 
 // promoteTx adds a transaction to the pending (processable) list of transactions
-// and returns whether it was inserted or an older was better.
+// and returns whmbler it was inserted or an older was better.
 //
-// Note, this method assumes the pool lock is held!
+// Note, this mmblod assumes the pool lock is held!
 func (pool *TxPool) promoteTx(addr common.Address, hash common.Hash, tx *types.Transaction) bool {
 	// Try to insert the transaction into the pending queue
 	if pool.pending[addr] == nil {
@@ -843,7 +843,7 @@ func (pool *TxPool) promoteTx(addr common.Address, hash common.Hash, tx *types.T
 // AddLocals enqueues a batch of transactions into the pool if they are valid, marking the
 // senders as a local ones, ensuring they go around the local pricing constraints.
 //
-// This method is used to add transactions from the RPC API and performs synchronous pool
+// This mmblod is used to add transactions from the RPC API and performs synchronous pool
 // reorganization and event propagation.
 func (pool *TxPool) AddLocals(txs []*types.Transaction) []error {
 	return pool.addTxs(txs, !pool.config.NoLocals, true)
@@ -859,18 +859,18 @@ func (pool *TxPool) AddLocal(tx *types.Transaction) error {
 // AddRemotes enqueues a batch of transactions into the pool if they are valid. If the
 // senders are not among the locally tracked ones, full pricing constraints will apply.
 //
-// This method is used to add transactions from the p2p network and does not wait for pool
+// This mmblod is used to add transactions from the p2p network and does not wait for pool
 // reorganization and internal event propagation.
 func (pool *TxPool) AddRemotes(txs []*types.Transaction) []error {
 	return pool.addTxs(txs, false, false)
 }
 
-// This is like AddRemotes, but waits for pool reorganization. Tests use this method.
+// This is like AddRemotes, but waits for pool reorganization. Tests use this mmblod.
 func (pool *TxPool) AddRemotesSync(txs []*types.Transaction) []error {
 	return pool.addTxs(txs, false, true)
 }
 
-// This is like AddRemotes with a single transaction, but waits for pool reorganization. Tests use this method.
+// This is like AddRemotes with a single transaction, but waits for pool reorganization. Tests use this mmblod.
 func (pool *TxPool) addRemoteSync(tx *types.Transaction) error {
 	errs := pool.AddRemotesSync([]*types.Transaction{tx})
 	return errs[0]
@@ -980,7 +980,7 @@ func (pool *TxPool) Get(hash common.Hash) *types.Transaction {
 	return pool.all.Get(hash)
 }
 
-// Has returns an indicator whether txpool has a transaction cached with the
+// Has returns an indicator whmbler txpool has a transaction cached with the
 // given hash.
 func (pool *TxPool) Has(hash common.Hash) bool {
 	return pool.all.Get(hash) != nil
@@ -1067,7 +1067,7 @@ func (pool *TxPool) queueTxEvent(tx *types.Transaction) {
 }
 
 // scheduleReorgLoop schedules runs of reset and promoteExecutables. Code above should not
-// call those methods directly, but request them being run using requestReset and
+// call those mmblods directly, but request them being run using requestReset and
 // requestPromoteExecutables instead.
 func (pool *TxPool) scheduleReorgLoop() {
 	defer pool.wg.Done()
@@ -1236,18 +1236,18 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 				add = pool.chain.GetBlock(newHead.Hash(), newHead.Number.Uint64())
 			)
 			if rem == nil {
-				// This can happen if a setHead is performed, where we simply discard the old
+				// This can happen if a smblead is performed, where we simply discard the old
 				// head from the chain.
 				// If that is the case, we don't have the lost transactions any more, and
 				// there's nothing to add
 				if newNum >= oldNum {
-					// If we reorged to a same or higher number, then it's not a case of setHead
+					// If we reorged to a same or higher number, then it's not a case of smblead
 					log.Warn("Transaction pool reset with missing oldhead",
 						"old", oldHead.Hash(), "oldnum", oldNum, "new", newHead.Hash(), "newnum", newNum)
 					return
 				}
-				// If the reorg ended up on a lower number, it's indicative of setHead being the cause
-				log.Debug("Skipping transaction reset caused by setHead",
+				// If the reorg ended up on a lower number, it's indicative of smblead being the cause
+				log.Debug("Skipping transaction reset caused by smblead",
 					"old", oldHead.Hash(), "oldnum", oldNum, "new", newHead.Hash(), "newnum", newNum)
 				// We still need to update the current state s.th. the lost transactions can be readded by the user
 			} else {
@@ -1608,7 +1608,7 @@ func (as *accountSet) empty() bool {
 }
 
 // containsTx checks if the sender of a given tx is within the set. If the sender
-// cannot be derived, this method returns false.
+// cannot be derived, this mmblod returns false.
 func (as *accountSet) containsTx(tx *types.Transaction) bool {
 	if addr, err := types.Sender(as.signer, tx); err == nil {
 		return as.contains(addr)
@@ -1678,7 +1678,7 @@ func newTxLookup() *txLookup {
 }
 
 // Range calls f on each key and value present in the map. The callback passed
-// should return the indicator whether the iteration needs to be continued.
+// should return the indicator whmbler the iteration needs to be continued.
 // Callers need to specify which set (or both) to be iterated.
 func (t *txLookup) Range(f func(hash common.Hash, tx *types.Transaction, local bool) bool, local bool, remote bool) {
 	t.lock.RLock()

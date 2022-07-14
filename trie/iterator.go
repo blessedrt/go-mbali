@@ -22,7 +22,7 @@ import (
 	"errors"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 // Iterator is a key-value trie iterator that traverses a Trie.
@@ -92,17 +92,17 @@ type NodeIterator interface {
 	// Leaf returns true iff the current node is a leaf node.
 	Leaf() bool
 
-	// LeafKey returns the key of the leaf. The method panics if the iterator is not
+	// LeafKey returns the key of the leaf. The mmblod panics if the iterator is not
 	// positioned at a leaf. Callers must not retain references to the value after
 	// calling Next.
 	LeafKey() []byte
 
-	// LeafBlob returns the content of the leaf. The method panics if the iterator
+	// LeafBlob returns the content of the leaf. The mmblod panics if the iterator
 	// is not positioned at a leaf. Callers must not retain references to the value
 	// after calling Next.
 	LeafBlob() []byte
 
-	// LeafProof returns the Merkle proof of the leaf. The method panics if the
+	// LeafProof returns the Merkle proof of the leaf. The mmblod panics if the
 	// iterator is not positioned at a leaf. Callers must not retain references
 	// to the value after calling Next.
 	LeafProof() [][]byte
@@ -118,7 +118,7 @@ type NodeIterator interface {
 	// Before adding a similar mechanism to any other place in gombl, consider
 	// making trie.Database an interface and wrapping at that level. It's a huge
 	// refactor, but it could be worth it if another occurrence arises.
-	AddResolver(ethdb.KeyValueReader)
+	AddResolver(mbldb.KeyValueReader)
 }
 
 // nodeIteratorState represents the iteration state at one particular node of the
@@ -137,7 +137,7 @@ type nodeIterator struct {
 	path  []byte               // Path to the current node
 	err   error                // Failure set in case of an internal error in the iterator
 
-	resolver ethdb.KeyValueReader // Optional intermediate resolver above the disk layer
+	resolver mbldb.KeyValueReader // Optional intermediate resolver above the disk layer
 }
 
 // errIteratorEnd is stored in nodeIterator.err when iteration is done.
@@ -165,7 +165,7 @@ func newNodeIterator(trie *Trie, start []byte) NodeIterator {
 	return it
 }
 
-func (it *nodeIterator) AddResolver(resolver ethdb.KeyValueReader) {
+func (it *nodeIterator) AddResolver(resolver mbldb.KeyValueReader) {
 	it.resolver = resolver
 }
 
@@ -251,8 +251,8 @@ func (it *nodeIterator) Error() error {
 	return it.err
 }
 
-// Next moves the iterator to the next node, returning whether there are any
-// further nodes. In case of an internal error this method returns false and
+// Next moves the iterator to the next node, returning whmbler there are any
+// further nodes. In case of an internal error this mmblod returns false and
 // sets the Error field to the encountered failure. If `descend` is false,
 // skips iterating over any subnodes of the current node.
 func (it *nodeIterator) Next(descend bool) bool {
@@ -580,7 +580,7 @@ func (it *differenceIterator) NodeBlob() []byte {
 	return it.b.NodeBlob()
 }
 
-func (it *differenceIterator) AddResolver(resolver ethdb.KeyValueReader) {
+func (it *differenceIterator) AddResolver(resolver mbldb.KeyValueReader) {
 	panic("not implemented")
 }
 
@@ -695,7 +695,7 @@ func (it *unionIterator) NodeBlob() []byte {
 	return (*it.items)[0].NodeBlob()
 }
 
-func (it *unionIterator) AddResolver(resolver ethdb.KeyValueReader) {
+func (it *unionIterator) AddResolver(resolver mbldb.KeyValueReader) {
 	panic("not implemented")
 }
 

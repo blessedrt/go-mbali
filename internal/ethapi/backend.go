@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package ethapi implements the general mbali API functions.
-package ethapi
+// Package mblapi implements the general mbali API functions.
+package mblapi
 
 import (
 	"context"
@@ -31,7 +31,7 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rpc"
@@ -45,16 +45,16 @@ type Backend interface {
 
 	SuggestGasTipCap(ctx context.Context) (*big.Int, error)
 	FeeHistory(ctx context.Context, blockCount int, lastBlock rpc.BlockNumber, rewardPercentiles []float64) (*big.Int, [][]*big.Int, []*big.Int, []float64, error)
-	ChainDb() ethdb.Database
+	ChainDb() mbldb.Database
 	AccountManager() *accounts.Manager
 	ExtRPCEnabled() bool
-	RPCGasCap() uint64            // global gas cap for eth_call over rpc: DoS protection
-	RPCEVMTimeout() time.Duration // global timeout for eth_call over rpc: DoS protection
+	RPCGasCap() uint64            // global gas cap for mbl_call over rpc: DoS protection
+	RPCEVMTimeout() time.Duration // global timeout for mbl_call over rpc: DoS protection
 	RPCTxFeeCap() float64         // global tx fee cap for all transaction related APIs
 	UnprotectedAllowed() bool     // allows only for EIP155 transactions.
 
 	// Blockchain API
-	SetHead(number uint64)
+	Smblead(number uint64)
 	HeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Header, error)
 	HeaderByHash(ctx context.Context, hash common.Hash) (*types.Header, error)
 	HeaderByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) (*types.Header, error)
@@ -100,17 +100,17 @@ func GetAPIs(apiBackend Backend) []rpc.API {
 	nonceLock := new(AddrLocker)
 	return []rpc.API{
 		{
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   NewPublicmbaliAPI(apiBackend),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   NewPublicBlockChainAPI(apiBackend),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   NewPublicTransactionPoolAPI(apiBackend, nonceLock),
 			Public:    true,
@@ -129,7 +129,7 @@ func GetAPIs(apiBackend Backend) []rpc.API {
 			Version:   "1.0",
 			Service:   NewPrivateDebugAPI(apiBackend),
 		}, {
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   NewPublicAccountAPI(apiBackend.AccountManager()),
 			Public:    true,

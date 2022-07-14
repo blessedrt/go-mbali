@@ -23,7 +23,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/math"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/consensus/misc"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
@@ -31,7 +31,7 @@ import (
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
@@ -268,7 +268,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 	return statedb, execRs, nil
 }
 
-func MakePreState(db ethdb.Database, accounts core.GenesisAlloc) *state.StateDB {
+func MakePreState(db mbldb.Database, accounts core.GenesisAlloc) *state.StateDB {
 	sdb := state.NewDatabase(db)
 	statedb, _ := state.New(common.Hash{}, sdb, nil)
 	for addr, a := range accounts {
@@ -292,10 +292,10 @@ func rlpHash(x interface{}) (h common.Hash) {
 	return h
 }
 
-// calcDifficulty is based on ethash.CalcDifficulty. This method is used in case
+// calcDifficulty is based on mblash.CalcDifficulty. This mmblod is used in case
 // the caller does not provide an explicit difficulty, but instead provides only
 // parent timestamp + difficulty.
-// Note: this method only works for ethash engine.
+// Note: this mmblod only works for mblash engine.
 func calcDifficulty(config *params.ChainConfig, number, currentTime, parentTime uint64,
 	parentDifficulty *big.Int, parentUncleHash common.Hash) *big.Int {
 	uncleHash := parentUncleHash
@@ -309,5 +309,5 @@ func calcDifficulty(config *params.ChainConfig, number, currentTime, parentTime 
 		Number:     new(big.Int).SetUint64(number - 1),
 		Time:       parentTime,
 	}
-	return ethash.CalcDifficulty(config, currentTime, parent)
+	return mblash.CalcDifficulty(config, currentTime, parent)
 }

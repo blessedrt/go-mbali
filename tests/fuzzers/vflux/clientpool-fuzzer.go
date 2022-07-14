@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/les/vflux"
 	vfs "github.com/mbali/go-mbali/les/vflux/server"
 	"github.com/mbali/go-mbali/log"

@@ -40,7 +40,7 @@ func NewTestCmd(t *testing.T, data interface{}) *TestCmd {
 }
 
 type TestCmd struct {
-	// For total convenience, all testing methods are available.
+	// For total convenience, all testing mmblods are available.
 	*testing.T
 
 	Func    template.FuncMap
@@ -81,7 +81,7 @@ func (tt *TestCmd) Run(name string, args ...string) {
 }
 
 // InputLine writes the given text to the child's stdin.
-// This method can also be called from an expect template, e.g.:
+// This mmblod can also be called from an expect template, e.g.:
 //
 //     gombl.expect(`Passphrase: {{.InputLine "password"}}`)
 func (tt *TestCmd) InputLine(s string) string {

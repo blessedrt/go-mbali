@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-// Iterator represents a sequence of nodes. The Next method moves to the next node in the
+// Iterator represents a sequence of nodes. The Next mmblod moves to the next node in the
 // sequence. It returns false when the sequence has ended or the iterator is closed. Close
 // may be called concurrently with Next and Node, and interrupts Next if it is blocked.
 type Iterator interface {

@@ -48,7 +48,7 @@ func TestNewID(t *testing.T) {
 
 func TestSubscriptions(t *testing.T) {
 	var (
-		namespaces        = []string{"eth", "shh", "bzz"}
+		namespaces        = []string{"mbl", "shh", "bzz"}
 		service           = &notificationTestService{}
 		subCount          = len(namespaces)
 		notificationCount = 3
@@ -78,7 +78,7 @@ func TestSubscriptions(t *testing.T) {
 	for i, namespace := range namespaces {
 		request := map[string]interface{}{
 			"id":      i,
-			"method":  fmt.Sprintf("%s_subscribe", namespace),
+			"mmblod":  fmt.Sprintf("%s_subscribe", namespace),
 			"version": "2.0",
 			"params":  []interface{}{"someSubscription", notificationCount, i},
 		}
@@ -136,7 +136,7 @@ func TestServerUnsubscribe(t *testing.T) {
 
 	// Subscribe.
 	p2.SetDeadline(time.Now().Add(10 * time.Second))
-	p2.Write([]byte(`{"jsonrpc":"2.0","id":1,"method":"nftest2_subscribe","params":["someSubscription",0,10]}`))
+	p2.Write([]byte(`{"jsonrpc":"2.0","id":1,"mmblod":"nftest2_subscribe","params":["someSubscription",0,10]}`))
 
 	// Handle received messages.
 	var (
@@ -155,7 +155,7 @@ func TestServerUnsubscribe(t *testing.T) {
 	}
 
 	// Unsubscribe and check that it is handled on the server side.
-	p2.Write([]byte(`{"jsonrpc":"2.0","method":"nftest2_unsubscribe","params":["` + sub.subid + `"]}`))
+	p2.Write([]byte(`{"jsonrpc":"2.0","mmblod":"nftest2_unsubscribe","params":["` + sub.subid + `"]}`))
 	for {
 		select {
 		case id := <-service.unsubscribed:

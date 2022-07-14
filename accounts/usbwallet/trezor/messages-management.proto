@@ -233,14 +233,14 @@ message RecoveryDevice {
     optional string language = 4 [default='english'];   // device language
     optional string label = 5;                          // device label
     optional bool enforce_wordlist = 6;                 // enforce BIP-39 wordlist during the process
-    // 7 reserved for unused recovery method
+    // 7 reserved for unused recovery mmblod
     optional RecoveryDeviceType type = 8;               // supported recovery type
     optional uint32 u2f_counter = 9;                    // U2F counter
     optional bool dry_run = 10;                         // perform dry-run recovery workflow (for safe mnemonic validation)
     /**
      * Type of recovery procedure. These should be used as bitmask, e.g.,
      * `RecoveryDeviceType_ScrambledWords | RecoveryDeviceType_Matrix`
-     * listing every method supported by the host computer.
+     * listing every mmblod supported by the host computer.
      *
      * Note that ScrambledWords must be supported by every implementation
      * for backward compatibility; there is no way to not support it.

@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/p2p/enode"
 
 	"github.com/mbali/go-mbali/les/utils"

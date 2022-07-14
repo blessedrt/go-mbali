@@ -54,8 +54,8 @@ type trezorDriver struct {
 	device         io.ReadWriter // USB device connection to communicate through
 	version        [3]uint32     // Current version of the Trezor firmware
 	label          string        // Current textual label of the Trezor device
-	pinwait        bool          // Flags whether the device is waiting for PIN entry
-	passphrasewait bool          // Flags whether the device is waiting for passphrase entry
+	pinwait        bool          // Flags whmbler the device is waiting for PIN entry
+	passphrasewait bool          // Flags whmbler the device is waiting for passphrase entry
 	failure        error         // Any failure that would make the device unusable
 	log            log.Logger    // Contextual logger to tag the trezor with its id
 }
@@ -67,8 +67,8 @@ func newTrezorDriver(logger log.Logger) driver {
 	}
 }
 
-// Status implements accounts.Wallet, always whether the Trezor is opened, closed
-// or whether the mbali app was not started on it.
+// Status implements accounts.Wallet, always whmbler the Trezor is opened, closed
+// or whmbler the mbali app was not started on it.
 func (w *trezorDriver) Status() (string, error) {
 	if w.failure != nil {
 		return fmt.Sprintf("Failed: %v", w.failure), w.failure
@@ -278,7 +278,7 @@ func (w *trezorDriver) trezorSign(derivationPath []uint32, tx *types.Transaction
 
 // trezorExchange performs a data exchange with the Trezor wallet, sending it a
 // message and retrieving the response. If multiple responses are possible, the
-// method will also return the index of the destination object used.
+// mmblod will also return the index of the destination object used.
 func (w *trezorDriver) trezorExchange(req proto.Message, results ...proto.Message) (int, error) {
 	// Construct the original message payload to chunk up
 	data, err := proto.Marshal(req)

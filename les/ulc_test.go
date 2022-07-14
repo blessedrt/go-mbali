@@ -29,10 +29,10 @@ import (
 	"github.com/mbali/go-mbali/p2p/enode"
 )
 
-func TestULCAnnounceThresholdLes2(t *testing.T) { testULCAnnounceThreshold(t, 2) }
-func TestULCAnnounceThresholdLes3(t *testing.T) { testULCAnnounceThreshold(t, 3) }
+func TestULCAnnouncmblresholdLes2(t *testing.T) { testULCAnnouncmblreshold(t, 2) }
+func TestULCAnnouncmblresholdLes3(t *testing.T) { testULCAnnouncmblreshold(t, 3) }
 
-func testULCAnnounceThreshold(t *testing.T, protocol int) {
+func testULCAnnouncmblreshold(t *testing.T, protocol int) {
 	// todo figure out why it takes fetcher so longer to fetcher the announced header.
 	t.Skip("Sometimes it can failed")
 	var cases = []struct {

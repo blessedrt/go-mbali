@@ -138,10 +138,10 @@ func gasExtCodeCopyEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memo
 	return gas, nil
 }
 
-// gasEip2929AccountCheck checks whether the first stack item (as address) is present in the access list.
-// If it is, this method returns '0', otherwise 'cold-warm' gas, presuming that the opcode using it
+// gasEip2929AccountCheck checks whmbler the first stack item (as address) is present in the access list.
+// If it is, this mmblod returns '0', otherwise 'cold-warm' gas, presuming that the opcode using it
 // is also using 'warm' as constant factor.
-// This method is used by:
+// This mmblod is used by:
 // - extcodehash,
 // - extcodesize,
 // - (ext) balance

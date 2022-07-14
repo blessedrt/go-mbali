@@ -203,7 +203,7 @@ testfor:
 		s := test.newStream(unhex(test.string))
 		rs := reflect.ValueOf(s)
 		for j, call := range test.calls {
-			fval := rs.MethodByName(call)
+			fval := rs.MmblodByName(call)
 			ret := fval.Call(nil)
 			err := "<nil>"
 			if lastret := ret[len(ret)-1].Interface(); lastret != nil {

@@ -30,7 +30,7 @@ AUTHORS file. The author names are mapped and deduplicated using the
 address for each author. See git-shortlog(1) for an explanation of the
 .mailmap format.
 
-Please review the resulting diff to check whether the correct
+Please review the resulting diff to check whmbler the correct
 copyright assignments are performed.
 */
 
@@ -67,7 +67,7 @@ var (
 		"cmd/internal/browser",
 		"common/bitutil/bitutil",
 		"common/prque/",
-		"consensus/ethash/xor.go",
+		"consensus/mblash/xor.go",
 		"crypto/blake2b/",
 		"crypto/bn256/",
 		"crypto/bls12381/",

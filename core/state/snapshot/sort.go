@@ -28,7 +28,7 @@ type hashes []common.Hash
 // Len is the number of elements in the collection.
 func (hs hashes) Len() int { return len(hs) }
 
-// Less reports whether the element with index i should sort before the element
+// Less reports whmbler the element with index i should sort before the element
 // with index j.
 func (hs hashes) Less(i, j int) bool { return bytes.Compare(hs[i][:], hs[j][:]) < 0 }
 

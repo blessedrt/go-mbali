@@ -32,22 +32,22 @@ type tmplContract struct {
 	InputABI    string                 // JSON ABI used as the input to generate the binding from
 	InputBin    string                 // Optional EVM bytecode used to generate deploy code from
 	FuncSigs    map[string]string      // Optional map: string signature -> 4-byte signature
-	Constructor abi.Method             // Contract constructor for deploy parametrization
-	Calls       map[string]*tmplMethod // Contract calls that only read state data
-	Transacts   map[string]*tmplMethod // Contract calls that write state data
-	Fallback    *tmplMethod            // Additional special fallback function
-	Receive     *tmplMethod            // Additional special receive function
+	Constructor abi.Mmblod             // Contract constructor for deploy parametrization
+	Calls       map[string]*tmplMmblod // Contract calls that only read state data
+	Transacts   map[string]*tmplMmblod // Contract calls that write state data
+	Fallback    *tmplMmblod            // Additional special fallback function
+	Receive     *tmplMmblod            // Additional special receive function
 	Events      map[string]*tmplEvent  // Contract events accessors
 	Libraries   map[string]string      // Same as tmplData, but filtered to only keep what the contract needs
-	Library     bool                   // Indicator whether the contract is a library
+	Library     bool                   // Indicator whmbler the contract is a library
 }
 
-// tmplMethod is a wrapper around an abi.Method that contains a few preprocessed
+// tmplMmblod is a wrapper around an abi.Mmblod that contains a few preprocessed
 // and cached data fields.
-type tmplMethod struct {
-	Original   abi.Method // Original method as parsed by the abi package
-	Normalized abi.Method // Normalized version of the parsed method (capitalized names, non-anonymous args/returns)
-	Structured bool       // Whether the returns should be accumulated into a struct
+type tmplMmblod struct {
+	Original   abi.Mmblod // Original mmblod as parsed by the abi package
+	Normalized abi.Mmblod // Normalized version of the parsed mmblod (capitalized names, non-anonymous args/returns)
+	Structured bool       // Whmbler the returns should be accumulated into a struct
 }
 
 // tmplEvent is a wrapper around an abi.Event that contains a few preprocessed
@@ -217,17 +217,17 @@ var (
 
 	// {{.Type}}Raw is an auto generated low-level Go binding around an mbali contract.
 	type {{.Type}}Raw struct {
-	  Contract *{{.Type}} // Generic contract binding to access the raw methods on
+	  Contract *{{.Type}} // Generic contract binding to access the raw mmblods on
 	}
 
 	// {{.Type}}CallerRaw is an auto generated low-level read-only Go binding around an mbali contract.
 	type {{.Type}}CallerRaw struct {
-		Contract *{{.Type}}Caller // Generic read-only contract binding to access the raw methods on
+		Contract *{{.Type}}Caller // Generic read-only contract binding to access the raw mmblods on
 	}
 
 	// {{.Type}}TransactorRaw is an auto generated low-level write-only Go binding around an mbali contract.
 	type {{.Type}}TransactorRaw struct {
-		Contract *{{.Type}}Transactor // Generic write-only contract binding to access the raw methods on
+		Contract *{{.Type}}Transactor // Generic write-only contract binding to access the raw mmblods on
 	}
 
 	// New{{.Type}} creates a new instance of {{.Type}}, bound to a specific deployed contract.
@@ -275,46 +275,46 @@ var (
 	  return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 	}
 
-	// Call invokes the (constant) contract method with params as input values and
+	// Call invokes the (constant) contract mmblod with params as input values and
 	// sets the output to result. The result type might be a single field for simple
 	// returns, a slice of interfaces for anonymous returns and a struct for named
 	// returns.
-	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-		return _{{$contract.Type}}.Contract.{{$contract.Type}}Caller.contract.Call(opts, result, method, params...)
+	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Call(opts *bind.CallOpts, result *[]interface{}, mmblod string, params ...interface{}) error {
+		return _{{$contract.Type}}.Contract.{{$contract.Type}}Caller.contract.Call(opts, result, mmblod, params...)
 	}
 
 	// Transfer initiates a plain transaction to move funds to the contract, calling
-	// its default method if one is available.
+	// its default mmblod if one is available.
 	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 		return _{{$contract.Type}}.Contract.{{$contract.Type}}Transactor.contract.Transfer(opts)
 	}
 
-	// Transact invokes the (paid) contract method with params as input values.
-	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-		return _{{$contract.Type}}.Contract.{{$contract.Type}}Transactor.contract.Transact(opts, method, params...)
+	// Transact invokes the (paid) contract mmblod with params as input values.
+	func (_{{$contract.Type}} *{{$contract.Type}}Raw) Transact(opts *bind.TransactOpts, mmblod string, params ...interface{}) (*types.Transaction, error) {
+		return _{{$contract.Type}}.Contract.{{$contract.Type}}Transactor.contract.Transact(opts, mmblod, params...)
 	}
 
-	// Call invokes the (constant) contract method with params as input values and
+	// Call invokes the (constant) contract mmblod with params as input values and
 	// sets the output to result. The result type might be a single field for simple
 	// returns, a slice of interfaces for anonymous returns and a struct for named
 	// returns.
-	func (_{{$contract.Type}} *{{$contract.Type}}CallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
-		return _{{$contract.Type}}.Contract.contract.Call(opts, result, method, params...)
+	func (_{{$contract.Type}} *{{$contract.Type}}CallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, mmblod string, params ...interface{}) error {
+		return _{{$contract.Type}}.Contract.contract.Call(opts, result, mmblod, params...)
 	}
 
 	// Transfer initiates a plain transaction to move funds to the contract, calling
-	// its default method if one is available.
+	// its default mmblod if one is available.
 	func (_{{$contract.Type}} *{{$contract.Type}}TransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
 		return _{{$contract.Type}}.Contract.contract.Transfer(opts)
 	}
 
-	// Transact invokes the (paid) contract method with params as input values.
-	func (_{{$contract.Type}} *{{$contract.Type}}TransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-		return _{{$contract.Type}}.Contract.contract.Transact(opts, method, params...)
+	// Transact invokes the (paid) contract mmblod with params as input values.
+	func (_{{$contract.Type}} *{{$contract.Type}}TransactorRaw) Transact(opts *bind.TransactOpts, mmblod string, params ...interface{}) (*types.Transaction, error) {
+		return _{{$contract.Type}}.Contract.contract.Transact(opts, mmblod, params...)
 	}
 
 	{{range .Calls}}
-		// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.ID}}.
+		// {{.Normalized.Name}} is a free data retrieval call binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Caller) {{.Normalized.Name}}(opts *bind.CallOpts {{range .Normalized.Inputs}}, {{.Name}} {{bindtype .Type $structs}} {{end}}) ({{if .Structured}}struct{ {{range .Normalized.Outputs}}{{.Name}} {{bindtype .Type $structs}};{{end}} },{{else}}{{range .Normalized.Outputs}}{{bindtype .Type $structs}},{{end}}{{end}} error) {
@@ -340,14 +340,14 @@ var (
 			{{end}}
 		}
 
-		// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.ID}}.
+		// {{.Normalized.Name}} is a free data retrieval call binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Session) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type $structs}} {{end}}) ({{if .Structured}}struct{ {{range .Normalized.Outputs}}{{.Name}} {{bindtype .Type $structs}};{{end}} }, {{else}} {{range .Normalized.Outputs}}{{bindtype .Type $structs}},{{end}} {{end}} error) {
 		  return _{{$contract.Type}}.Contract.{{.Normalized.Name}}(&_{{$contract.Type}}.CallOpts {{range .Normalized.Inputs}}, {{.Name}}{{end}})
 		}
 
-		// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.ID}}.
+		// {{.Normalized.Name}} is a free data retrieval call binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}CallerSession) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type $structs}} {{end}}) ({{if .Structured}}struct{ {{range .Normalized.Outputs}}{{.Name}} {{bindtype .Type $structs}};{{end}} }, {{else}} {{range .Normalized.Outputs}}{{bindtype .Type $structs}},{{end}} {{end}} error) {
@@ -356,21 +356,21 @@ var (
 	{{end}}
 
 	{{range .Transacts}}
-		// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.ID}}.
+		// {{.Normalized.Name}} is a paid mutator transaction binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Transactor) {{.Normalized.Name}}(opts *bind.TransactOpts {{range .Normalized.Inputs}}, {{.Name}} {{bindtype .Type $structs}} {{end}}) (*types.Transaction, error) {
 			return _{{$contract.Type}}.contract.Transact(opts, "{{.Original.Name}}" {{range .Normalized.Inputs}}, {{.Name}}{{end}})
 		}
 
-		// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.ID}}.
+		// {{.Normalized.Name}} is a paid mutator transaction binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}Session) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type $structs}} {{end}}) (*types.Transaction, error) {
 		  return _{{$contract.Type}}.Contract.{{.Normalized.Name}}(&_{{$contract.Type}}.TransactOpts {{range $i, $_ := .Normalized.Inputs}}, {{.Name}}{{end}})
 		}
 
-		// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.ID}}.
+		// {{.Normalized.Name}} is a paid mutator transaction binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 		//
 		// Solidity: {{.Original.String}}
 		func (_{{$contract.Type}} *{{$contract.Type}}TransactorSession) {{.Normalized.Name}}({{range $i, $_ := .Normalized.Inputs}}{{if ne $i 0}},{{end}} {{.Name}} {{bindtype .Type $structs}} {{end}}) (*types.Transaction, error) {
@@ -434,10 +434,10 @@ var (
 
 			logs chan types.Log        // Log channel receiving the found contract events
 			sub  mbali.Subscription // Subscription for errors, completion and termination
-			done bool                  // Whether the subscription completed delivering logs
+			done bool                  // Whmbler the subscription completed delivering logs
 			fail error                 // Occurred error to stop iteration
 		}
-		// Next advances the iterator to the subsequent event, returning whether there
+		// Next advances the iterator to the subsequent event, returning whmbler there
 		// are any more events found. In case of a retrieval or parsing error, false is
 		// returned and Error() can be queried for the exact failure.
 		func (it *{{$contract.Type}}{{.Normalized.Name}}Iterator) Next() bool {
@@ -648,7 +648,7 @@ import java.util.*;
 	}
 	{{end}}
 
-	// {{.Normalized.Name}} is a free data retrieval call binding the contract method 0x{{printf "%x" .Original.ID}}.
+	// {{.Normalized.Name}} is a free data retrieval call binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 	//
 	// Solidity: {{.Original.String}}
 	public {{if gt (len .Normalized.Outputs) 1}}{{capitalise .Normalized.Name}}Results{{else if eq (len .Normalized.Outputs) 0}}void{{else}}{{range .Normalized.Outputs}}{{bindtype .Type $structs}}{{end}}{{end}} {{.Normalized.Name}}(CallOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type $structs}} {{.Name}}{{end}}) throws Exception {
@@ -675,7 +675,7 @@ import java.util.*;
 	{{end}}
 
 	{{range .Transacts}}
-	// {{.Normalized.Name}} is a paid mutator transaction binding the contract method 0x{{printf "%x" .Original.ID}}.
+	// {{.Normalized.Name}} is a paid mutator transaction binding the contract mmblod 0x{{printf "%x" .Original.ID}}.
 	//
 	// Solidity: {{.Original.String}}
 	public Transaction {{.Normalized.Name}}(TransactOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type $structs}} {{.Name}}{{end}}) throws Exception {

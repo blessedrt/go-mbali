@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/mbali/go-mbali/cmd/devp2p/internal/ethtest"
+	"github.com/mbali/go-mbali/cmd/devp2p/internal/mbltest"
 	"github.com/mbali/go-mbali/crypto"
 	"github.com/mbali/go-mbali/internal/utesting"
 	"github.com/mbali/go-mbali/p2p"
@@ -35,7 +35,7 @@ var (
 		Usage: "RLPx Commands",
 		Subcommands: []cli.Command{
 			rlpxPingCommand,
-			rlpxEthTestCommand,
+			rlpxmblTestCommand,
 			rlpxSnapTestCommand,
 		},
 	}
@@ -44,11 +44,11 @@ var (
 		Usage:  "ping <node>",
 		Action: rlpxPing,
 	}
-	rlpxEthTestCommand = cli.Command{
-		Name:      "eth-test",
+	rlpxmblTestCommand = cli.Command{
+		Name:      "mbl-test",
 		Usage:     "Runs tests against a node",
 		ArgsUsage: "<node> <chain.rlp> <genesis.json>",
-		Action:    rlpxEthTest,
+		Action:    rlpxmblTest,
 		Flags: []cli.Flag{
 			testPatternFlag,
 			testTAPFlag,
@@ -84,7 +84,7 @@ func rlpxPing(ctx *cli.Context) error {
 	}
 	switch code {
 	case 0:
-		var h ethtest.Hello
+		var h mbltest.Hello
 		if err := rlp.DecodeBytes(data, &h); err != nil {
 			return fmt.Errorf("invalid handshake: %v", err)
 		}
@@ -101,21 +101,21 @@ func rlpxPing(ctx *cli.Context) error {
 	return nil
 }
 
-// rlpxEthTest runs the eth protocol test suite.
-func rlpxEthTest(ctx *cli.Context) error {
+// rlpxmblTest runs the mbl protocol test suite.
+func rlpxmblTest(ctx *cli.Context) error {
 	if ctx.NArg() < 3 {
 		exit("missing path to chain.rlp as command-line argument")
 	}
-	suite, err := ethtest.NewSuite(getNodeArg(ctx), ctx.Args()[1], ctx.Args()[2])
+	suite, err := mbltest.NewSuite(getNodeArg(ctx), ctx.Args()[1], ctx.Args()[2])
 	if err != nil {
 		exit(err)
 	}
-	// check if given node supports eth66, and if so, run eth66 protocol tests as well
+	// check if given node supports mbl66, and if so, run mbl66 protocol tests as well
 	is66Failed, _ := utesting.Run(utesting.Test{Name: "Is_66", Fn: suite.Is_66})
 	if is66Failed {
-		return runTests(ctx, suite.EthTests())
+		return runTests(ctx, suite.mblTests())
 	}
-	return runTests(ctx, suite.AllEthTests())
+	return runTests(ctx, suite.AllmblTests())
 }
 
 // rlpxSnapTest runs the snap protocol test suite.
@@ -123,7 +123,7 @@ func rlpxSnapTest(ctx *cli.Context) error {
 	if ctx.NArg() < 3 {
 		exit("missing path to chain.rlp as command-line argument")
 	}
-	suite, err := ethtest.NewSuite(getNodeArg(ctx), ctx.Args()[1], ctx.Args()[2])
+	suite, err := mbltest.NewSuite(getNodeArg(ctx), ctx.Args()[1], ctx.Args()[2])
 	if err != nil {
 		exit(err)
 	}

@@ -15,7 +15,7 @@
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package remotedb implements the key-value database layer based on a remote gombl
-// node. Under the hood, it utilises the `debug_dbGet` method to implement a
+// node. Under the hood, it utilises the `debug_dbGet` mmblod to implement a
 // read-only database.
 // There really are no guarantees in this database, since the local gombl does not
 // exclusive access, but it can be used for basic diagnostics of a remote node.
@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/mbali/go-mbali/common/hexutil"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/rpc"
 )
 
@@ -85,7 +85,7 @@ func (db *Database) AncientSize(kind string) (uint64, error) {
 	panic("not supported")
 }
 
-func (db *Database) ReadAncients(fn func(op ethdb.AncientReaderOp) error) (err error) {
+func (db *Database) ReadAncients(fn func(op mbldb.AncientReaderOp) error) (err error) {
 	return fn(db)
 }
 
@@ -97,7 +97,7 @@ func (db *Database) Delete(key []byte) error {
 	panic("not supported")
 }
 
-func (db *Database) ModifyAncients(f func(ethdb.AncientWriteOp) error) (int64, error) {
+func (db *Database) ModifyAncients(f func(mbldb.AncientWriteOp) error) (int64, error) {
 	panic("not supported")
 }
 
@@ -117,15 +117,15 @@ func (db *Database) MigrateTable(s string, f func([]byte) ([]byte, error)) error
 	panic("not supported")
 }
 
-func (db *Database) NewBatch() ethdb.Batch {
+func (db *Database) NewBatch() mbldb.Batch {
 	panic("not supported")
 }
 
-func (db *Database) NewBatchWithSize(size int) ethdb.Batch {
+func (db *Database) NewBatchWithSize(size int) mbldb.Batch {
 	panic("not supported")
 }
 
-func (db *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+func (db *Database) NewIterator(prefix []byte, start []byte) mbldb.Iterator {
 	panic("not supported")
 }
 
@@ -141,7 +141,7 @@ func (db *Database) Compact(start []byte, limit []byte) error {
 	return nil
 }
 
-func (db *Database) NewSnapshot() (ethdb.Snapshot, error) {
+func (db *Database) NewSnapshot() (mbldb.Snapshot, error) {
 	panic("not supported")
 }
 
@@ -162,7 +162,7 @@ func dialRPC(endpoint string) (*rpc.Client, error) {
 	return rpc.Dial(endpoint)
 }
 
-func New(endpoint string) (ethdb.Database, error) {
+func New(endpoint string) (mbldb.Database, error) {
 	client, err := dialRPC(endpoint)
 	if err != nil {
 		return nil, err

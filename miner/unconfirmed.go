@@ -25,7 +25,7 @@ import (
 	"github.com/mbali/go-mbali/log"
 )
 
-// chainRetriever is used by the unconfirmed block set to verify whether a previously
+// chainRetriever is used by the unconfirmed block set to verify whmbler a previously
 // mined block is part of the canonical chain or not.
 type chainRetriever interface {
 	// gombleaderByNumber retrieves the canonical header associated with a block number.
@@ -106,7 +106,7 @@ func (set *unconfirmedBlocks) Shift(height uint64) {
 		case header.Hash() == next.hash:
 			log.Info("🔗 block reached canonical chain", "number", next.index, "hash", next.hash)
 		default:
-			// Block is not canonical, check whether we have an uncle or a lost block
+			// Block is not canonical, check whmbler we have an uncle or a lost block
 			included := false
 			for number := next.index; !included && number < next.index+uint64(set.depth) && number <= height; number++ {
 				if block := set.chain.GetBlockByNumber(number); block != nil {

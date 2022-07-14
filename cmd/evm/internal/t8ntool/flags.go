@@ -119,17 +119,17 @@ var (
 		Name:  "seal.clique",
 		Usage: "Seal block with Clique. `stdin` or file name of where to find the Clique sealing data.",
 	}
-	SealEthashFlag = cli.BoolFlag{
-		Name:  "seal.ethash",
-		Usage: "Seal block with ethash.",
+	SealmblashFlag = cli.BoolFlag{
+		Name:  "seal.mblash",
+		Usage: "Seal block with mblash.",
 	}
-	SealEthashDirFlag = cli.StringFlag{
-		Name:  "seal.ethash.dir",
-		Usage: "Path to ethash DAG. If none exists, a new DAG will be generated.",
+	SealmblashDirFlag = cli.StringFlag{
+		Name:  "seal.mblash.dir",
+		Usage: "Path to mblash DAG. If none exists, a new DAG will be generated.",
 	}
-	SealEthashModeFlag = cli.StringFlag{
-		Name:  "seal.ethash.mode",
-		Usage: "Defines the type and amount of PoW verification an ethash engine makes.",
+	SealmblashModeFlag = cli.StringFlag{
+		Name:  "seal.mblash.mode",
+		Usage: "Defines the type and amount of PoW verification an mblash engine makes.",
 		Value: "normal",
 	}
 	RewardFlag = cli.Int64Flag{

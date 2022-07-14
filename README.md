@@ -42,8 +42,8 @@ directory.
 |   `abigen`    | Source code generator to convert mbali contract definitions into easy to use, compile-time type-safe Go packages. It operates on plain [mbali contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html) with expanded functionality if the contract bytecode is also available. However, it also accepts Solidity source files, making development much more streamlined. Please see our [Native DApps](https://gombl.mbali.org/docs/dapp/native-bindings) page for details. |
 |  `bootnode`   | Stripped down version of our mbali client implementation that only takes part in the network node discovery protocol, but does not run any of the higher level application protocols. It can be used as a lightweight bootstrap node to aid in finding peers in private networks.                                                                                                                                                                                                                                                                 |
 |     `evm`     | Developer utility version of the EVM (mbali Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode. Its purpose is to allow isolated, fine-grained debugging of EVM opcodes (e.g. `evm --code 60ff60ff --debug run`).                                                                                                                                                                                                                                                                     |
-|   `rlpdump`   | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://eth.wiki/en/fundamentals/rlp)) dumps (data encoding used by the mbali protocol both network as well as consensus wise) to user-friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`).                                                                                                                                                                                                                                 |
-|   `puppeth`   | a CLI wizard that aids in creating a new mbali network.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+|   `rlpdump`   | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://mbl.wiki/en/fundamentals/rlp)) dumps (data encoding used by the mbali protocol both network as well as consensus wise) to user-friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`).                                                                                                                                                                                                                                 |
+|   `puppmbl`   | a CLI wizard that aids in creating a new mbali network.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ## Running `gombl`
 
@@ -84,7 +84,7 @@ This command will:
    causing it to download more data in exchange for avoiding processing the entire history
    of the mbali network, which is very CPU intensive.
  * Start up `gombl`'s built-in interactive [JavaScript console](https://gombl.mbali.org/docs/interface/javascript-console),
-   (via the trailing `console` subcommand) through which you can interact using [`web3` methods](https://github.com/ChainSafe/web3.js/blob/0.20.7/DOCUMENTATION.md) 
+   (via the trailing `console` subcommand) through which you can interact using [`web3` mmblods](https://github.com/ChainSafe/web3.js/blob/0.20.7/DOCUMENTATION.md) 
    (note: the `web3` version bundled within `gombl` is very old, and not up to date with official docs),
    as well as `gombl`'s own [management APIs](https://gombl.mbali.org/docs/rpc/server).
    This tool is optional and if you leave it out you can always attach to an already running
@@ -96,7 +96,7 @@ Transitioning towards developers, if you'd like to play around with creating mba
 contracts, you almost certainly would like to do that without any real money involved until
 you get the hang of the entire system. In other words, instead of attaching to the main
 network, you want to join the **test** network with your node, which is fully equivalent to
-the main network, but with play-Ether only.
+the main network, but with play-mbler only.
 
 ```shell
 $ gombl --goerli console
@@ -136,7 +136,7 @@ $ gombl --rinkeby console
 ### Full node on the Ropsten test network
 
 In addition to Görli and Rinkeby, gombl also supports the ancient Ropsten testnet. The
-Ropsten test network is based on the Ethash proof-of-work consensus algorithm. As such,
+Ropsten test network is based on the mblash proof-of-work consensus algorithm. As such,
 it has certain extra overhead and is more susceptible to reorganization attacks due to the
 network's low difficulty/security.
 
@@ -188,7 +188,7 @@ accessible from the outside.
 
 As a developer, sooner rather than later you'll want to start interacting with `gombl` and the
 mbali network via your own programs and not manually through the console. To aid
-this, `gombl` has built-in support for a JSON-RPC based APIs ([standard APIs](https://eth.wiki/json-rpc/API)
+this, `gombl` has built-in support for a JSON-RPC based APIs ([standard APIs](https://mbl.wiki/json-rpc/API)
 and [`gombl` specific APIs](https://gombl.mbali.org/docs/rpc/server)).
 These can be exposed via HTTP, WebSockets and IPC (UNIX sockets on UNIX based
 platforms, and named pipes on Windows).
@@ -203,15 +203,15 @@ HTTP based JSON-RPC API options:
   * `--http` Enable the HTTP-RPC server
   * `--http.addr` HTTP-RPC server listening interface (default: `localhost`)
   * `--http.port` HTTP-RPC server listening port (default: `8545`)
-  * `--http.api` API's offered over the HTTP-RPC interface (default: `eth,net,web3`)
+  * `--http.api` API's offered over the HTTP-RPC interface (default: `mbl,net,web3`)
   * `--http.corsdomain` Comma separated list of domains from which to accept cross origin requests (browser enforced)
   * `--ws` Enable the WS-RPC server
   * `--ws.addr` WS-RPC server listening interface (default: `localhost`)
   * `--ws.port` WS-RPC server listening port (default: `8546`)
-  * `--ws.api` API's offered over the WS-RPC interface (default: `eth,net,web3`)
+  * `--ws.api` API's offered over the WS-RPC interface (default: `mbl,net,web3`)
   * `--ws.origins` Origins from which to accept websockets requests
   * `--ipcdisable` Disable the IPC-RPC server
-  * `--ipcapi` API's offered over the IPC-RPC interface (default: `admin,debug,eth,miner,net,personal,shh,txpool,web3`)
+  * `--ipcapi` API's offered over the IPC-RPC interface (default: `admin,debug,mbl,miner,net,personal,shh,txpool,web3`)
   * `--ipcpath` Filename for IPC socket/pipe within the datadir (explicit paths escape it)
 
 You'll need to use your own programming environments' capabilities (libraries, tools, etc) to
@@ -297,7 +297,7 @@ $ bootnode --genkey=boot.key
 $ bootnode --nodekey=boot.key
 ```
 
-With the bootnode online, it will display an [`enode` URL](https://eth.wiki/en/fundamentals/enode-url-format)
+With the bootnode online, it will display an [`enode` URL](https://mbl.wiki/en/fundamentals/enode-url-format)
 that other nodes can use to connect to it and exchange peer information. Make sure to
 replace the displayed IP address information (most probably `[::]`) with your externally
 accessible IP to get the actual `enode` URL.
@@ -323,9 +323,9 @@ also need to configure a miner to process transactions and create new blocks for
 #### Running a private miner
 
 Mining on the public mbali network is a complex task as it's only feasible using GPUs,
-requiring an OpenCL or CUDA enabled `ethminer` instance. For information on such a
-setup, please consult the [EtherMining subreddit](https://www.reddit.com/r/EtherMining/)
-and the [ethminer](https://github.com/mbali-mining/ethminer) repository.
+requiring an OpenCL or CUDA enabled `mblminer` instance. For information on such a
+setup, please consult the [mblerMining subreddit](https://www.reddit.com/r/mblerMining/)
+and the [mblminer](https://github.com/mbali-mining/mblminer) repository.
 
 In a private network setting, however a single CPU miner instance is more than enough for
 practical purposes as it can produce a stable stream of blocks at the correct intervals
@@ -334,11 +334,11 @@ ones either). To start a `gombl` instance for mining, run it with all your usual
 by:
 
 ```shell
-$ gombl <usual-flags> --mine --miner.threads=1 --miner.etherbase=0x0000000000000000000000000000000000000000
+$ gombl <usual-flags> --mine --miner.threads=1 --miner.mblerbase=0x0000000000000000000000000000000000000000
 ```
 
 Which will start mining blocks and transactions on a single CPU thread, crediting all
-proceedings to the account specified by `--miner.etherbase`. You can further tune the mining
+proceedings to the account specified by `--miner.mblerbase`. You can further tune the mining
 by changing the default gas limit blocks converge to (`--miner.targetgaslimit`) and the price
 transactions are accepted at (`--miner.gasprice`).
 
@@ -362,7 +362,7 @@ Please make sure your contributions adhere to our coding guidelines:
    guidelines.
  * Pull requests need to be based on and opened against the `master` branch.
  * Commit messages should be prefixed with the package(s) they modify.
-   * E.g. "eth, rpc: make trace configs optional"
+   * E.g. "mbl, rpc: make trace configs optional"
 
 Please see the [Developers' Guide](https://gombl.mbali.org/docs/developers/devguide)
 for more details on configuring your environment, managing project dependencies, and

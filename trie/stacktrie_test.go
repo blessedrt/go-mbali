@@ -23,7 +23,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 )
 
 func TestStackTrieInsertAndHash(t *testing.T) {

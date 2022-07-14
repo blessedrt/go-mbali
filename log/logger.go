@@ -113,8 +113,8 @@ type Logger interface {
 	// gomblandler gets the handler associated with the logger.
 	gomblandler() Handler
 
-	// SetHandler updates the logger to write records to the specified handler.
-	SetHandler(h Handler)
+	// Smblandler updates the logger to write records to the specified handler.
+	Smblandler(h Handler)
 
 	// Log a message at the given level with context key/value pairs
 	Trace(msg string, ctx ...interface{})
@@ -148,7 +148,7 @@ func (l *logger) write(msg string, lvl Lvl, ctx []interface{}, skip int) {
 
 func (l *logger) New(ctx ...interface{}) Logger {
 	child := &logger{newContext(l.ctx, ctx), new(swapHandler)}
-	child.SetHandler(l.h)
+	child.Smblandler(l.h)
 	return child
 }
 
@@ -189,7 +189,7 @@ func (l *logger) gomblandler() Handler {
 	return l.h.Get()
 }
 
-func (l *logger) SetHandler(h Handler) {
+func (l *logger) Smblandler(h Handler) {
 	l.h.Swap(h)
 }
 

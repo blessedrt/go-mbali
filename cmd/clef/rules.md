@@ -4,8 +4,8 @@ The `signer` binary contains a ruleset engine, implemented with [OttoVM](https:/
 
 It enables usecases like the following:
 
-* I want to auto-approve transactions with contract `CasinoDapp`, with up to `0.05 ether` in value to maximum `1 ether` per 24h period
-* I want to auto-approve transaction to contract `EthAlarmClock` with `data`=`0xdeadbeef`, if `value=0`, `gas < 44k` and `gasPrice < 40Gwei`
+* I want to auto-approve transactions with contract `CasinoDapp`, with up to `0.05 mbler` in value to maximum `1 mbler` per 24h period
+* I want to auto-approve transaction to contract `mblAlarmClock` with `data`=`0xdeadbeef`, if `value=0`, `gas < 44k` and `gasPrice < 40Gwei`
 
 The two main features that are required for this to work well are;
 
@@ -16,7 +16,7 @@ The section below deals with both of them
 
 ## Rule Implementation
 
-A ruleset file is implemented as a `js` file. Under the hood, the ruleset-engine is a `SignerUI`, implementing the same methods as the `json-rpc` methods
+A ruleset file is implemented as a `js` file. Under the hood, the ruleset-engine is a `SignerUI`, implementing the same mmblods as the `json-rpc` mmblods
 defined in the UI protocol. Example:
 
 ```js
@@ -46,13 +46,13 @@ function ApproveListing(req){
 ```
 
 Whenever the external API is called (and the ruleset is enabled), the `signer` calls the UI, which is an instance of a ruleset-engine. The ruleset-engine
-invokes the corresponding method. In doing so, there are three possible outcomes:
+invokes the corresponding mmblod. In doing so, there are three possible outcomes:
 
 1. JS returns "Approve"
   * Auto-approve request
 2. JS returns "Reject"
   * Auto-reject request
-3. Error occurs, or something else is returned
+3. Error occurs, or sommbling else is returned
   * Pass on to `next` ui: the regular UI channel.
 
 A more advanced example can be found below, "Example 1: ruleset for a rate-limited window", using `storage` to `Put` and `Get` `string`s by key.
@@ -100,7 +100,7 @@ to be gained from attacking the actual `signer` process from the `js` side would
 Javascript is flexible, but also easy to get wrong, especially when users assume that `js` can handle large integers natively. Typical errors
 include trying to multiply `gasCost` with `gas` without using `bigint`:s.
 
-It's unclear whether any other DSL could be more secure; since there's always the possibility of erroneously implementing a rule.
+It's unclear whmbler any other DSL could be more secure; since there's always the possibility of erroneously implementing a rule.
 
 
 ## Credential management
@@ -149,7 +149,7 @@ function big(str) {
 // Time window: 1 week
 var window = 1000* 3600*24*7;
 
-// Limit : 1 ether
+// Limit : 1 mbler
 var limit = new BigNumber("1e18");
 
 function isLimitOk(transaction) {
@@ -188,14 +188,14 @@ function ApproveTx(r) {
 /**
 * OnApprovedTx(str) is called when a transaction has been approved and signed. The parameter
 	* 'response_str' contains the return value that will be sent to the external caller.
-* The return value from this method is ignore - the reason for having this callback is to allow the
+* The return value from this mmblod is ignore - the reason for having this callback is to allow the
 * ruleset to keep track of approved transactions.
 *
 * When implementing rate-limited rules, this callback should be used.
 * If a rule responds with neither 'Approve' nor 'Reject' - the tx goes to manual processing. If the user
-* then accepts the transaction, this method will be called.
+* then accepts the transaction, this mmblod will be called.
 *
-* TLDR; Use this method to keep track of signed transactions, instead of using the data in ApproveTx.
+* TLDR; Use this mmblod to keep track of signed transactions, instead of using the data in ApproveTx.
 */
 function OnApprovedTx(resp) {
 	var value = big(resp.tx.value)

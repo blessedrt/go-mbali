@@ -43,11 +43,11 @@ const (
 
 var wsBufferPool = new(sync.Pool)
 
-// WebsocketHandler returns a handler that serves JSON-RPC to WebSocket connections.
+// Websockmblandler returns a handler that serves JSON-RPC to WebSocket connections.
 //
 // allowedOrigins should be a comma-separated list of allowed origin URLs.
 // To allow connections with any origin, pass "*".
-func (s *Server) WebsocketHandler(allowedOrigins []string) http.Handler {
+func (s *Server) Websockmblandler(allowedOrigins []string) http.Handler {
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  wsReadBuffer,
 		WriteBufferSize: wsWriteBuffer,

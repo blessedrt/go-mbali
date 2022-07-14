@@ -26,8 +26,8 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 )
 
 func TestEmptyIterator(t *testing.T) {
@@ -47,12 +47,12 @@ func TestIterator(t *testing.T) {
 	trie := newEmpty()
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
 		{"dog", "puppy"},
-		{"somethingveryoddindeedthis is", "myothernodedata"},
+		{"sommblingveryoddindeedthis is", "myothernodedata"},
 	}
 	all := make(map[string]string)
 	for _, val := range vals {
@@ -460,7 +460,7 @@ func checkIteratorNoDups(t *testing.T, it NodeIterator, seen map[string]bool) in
 
 type loggingDb struct {
 	getCount uint64
-	backend  ethdb.KeyValueStore
+	backend  mbldb.KeyValueStore
 }
 
 func (l *loggingDb) Has(key []byte) (bool, error) {
@@ -480,19 +480,19 @@ func (l *loggingDb) Delete(key []byte) error {
 	return l.backend.Delete(key)
 }
 
-func (l *loggingDb) NewBatch() ethdb.Batch {
+func (l *loggingDb) NewBatch() mbldb.Batch {
 	return l.backend.NewBatch()
 }
 
-func (l *loggingDb) NewBatchWithSize(size int) ethdb.Batch {
+func (l *loggingDb) NewBatchWithSize(size int) mbldb.Batch {
 	return l.backend.NewBatchWithSize(size)
 }
 
-func (l *loggingDb) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+func (l *loggingDb) NewIterator(prefix []byte, start []byte) mbldb.Iterator {
 	return l.backend.NewIterator(prefix, start)
 }
 
-func (l *loggingDb) NewSnapshot() (ethdb.Snapshot, error) {
+func (l *loggingDb) NewSnapshot() (mbldb.Snapshot, error) {
 	return l.backend.NewSnapshot()
 }
 
@@ -552,12 +552,12 @@ func TestIteratorNodeBlob(t *testing.T) {
 	)
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
 		{"dog", "puppy"},
-		{"somethingveryoddindeedthis is", "myothernodedata"},
+		{"sommblingveryoddindeedthis is", "myothernodedata"},
 	}
 	all := make(map[string]string)
 	for _, val := range vals {

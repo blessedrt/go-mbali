@@ -33,8 +33,8 @@ func (w *wizard) deployNode(boot bool) {
 		log.Error("No genesis block configured")
 		return
 	}
-	if w.conf.ethstats == "" {
-		log.Error("No ethstats server configured")
+	if w.conf.mblstats == "" {
+		log.Error("No mblstats server configured")
 		return
 	}
 	// Select the server to interact with
@@ -67,14 +67,14 @@ func (w *wizard) deployNode(boot bool) {
 		fmt.Printf("Where should data be stored on the remote machine? (default = %s)\n", infos.datadir)
 		infos.datadir = w.readDefaultString(infos.datadir)
 	}
-	if w.conf.Genesis.Config.Ethash != nil && !boot {
+	if w.conf.Genesis.Config.mblash != nil && !boot {
 		fmt.Println()
-		if infos.ethashdir == "" {
-			fmt.Printf("Where should the ethash mining DAGs be stored on the remote machine?\n")
-			infos.ethashdir = w.readString()
+		if infos.mblashdir == "" {
+			fmt.Printf("Where should the mblash mining DAGs be stored on the remote machine?\n")
+			infos.mblashdir = w.readString()
 		} else {
-			fmt.Printf("Where should the ethash mining DAGs be stored on the remote machine? (default = %s)\n", infos.ethashdir)
-			infos.ethashdir = w.readDefaultString(infos.ethashdir)
+			fmt.Printf("Where should the mblash mining DAGs be stored on the remote machine? (default = %s)\n", infos.mblashdir)
+			infos.mblashdir = w.readDefaultString(infos.mblashdir)
 		}
 	}
 	// Figure out which port to listen on
@@ -94,29 +94,29 @@ func (w *wizard) deployNode(boot bool) {
 
 	// Set a proper name to report on the stats page
 	fmt.Println()
-	if infos.ethstats == "" {
+	if infos.mblstats == "" {
 		fmt.Printf("What should the node be called on the stats page?\n")
-		infos.ethstats = w.readString() + ":" + w.conf.ethstats
+		infos.mblstats = w.readString() + ":" + w.conf.mblstats
 	} else {
-		fmt.Printf("What should the node be called on the stats page? (default = %s)\n", infos.ethstats)
-		infos.ethstats = w.readDefaultString(infos.ethstats) + ":" + w.conf.ethstats
+		fmt.Printf("What should the node be called on the stats page? (default = %s)\n", infos.mblstats)
+		infos.mblstats = w.readDefaultString(infos.mblstats) + ":" + w.conf.mblstats
 	}
 	// If the node is a miner/signer, load up needed credentials
 	if !boot {
-		if w.conf.Genesis.Config.Ethash != nil {
-			// Ethash based miners only need an etherbase to mine against
+		if w.conf.Genesis.Config.mblash != nil {
+			// mblash based miners only need an mblerbase to mine against
 			fmt.Println()
-			if infos.etherbase == "" {
+			if infos.mblerbase == "" {
 				fmt.Printf("What address should the miner use?\n")
 				for {
 					if address := w.readAddress(); address != nil {
-						infos.etherbase = address.Hex()
+						infos.mblerbase = address.Hex()
 						break
 					}
 				}
 			} else {
-				fmt.Printf("What address should the miner use? (default = %s)\n", infos.etherbase)
-				infos.etherbase = w.readDefaultAddress(common.HexToAddress(infos.etherbase)).Hex()
+				fmt.Printf("What address should the miner use? (default = %s)\n", infos.mblerbase)
+				infos.mblerbase = w.readDefaultAddress(common.HexToAddress(infos.mblerbase)).Hex()
 			}
 		} else if w.conf.Genesis.Config.Clique != nil {
 			// If a previous signer was already set, offer to reuse it

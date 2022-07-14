@@ -47,40 +47,40 @@ var (
 	errInvalidUncleHash = errors.New("invalid uncle hash")
 )
 
-// Beacon is a consensus engine that combines the eth1 consensus and proof-of-stake
-// algorithm. There is a special flag inside to decide whether to use legacy consensus
-// rules or new rules. The transition rule is described in the eth1/2 merge spec.
+// Beacon is a consensus engine that combines the mbl1 consensus and proof-of-stake
+// algorithm. There is a special flag inside to decide whmbler to use legacy consensus
+// rules or new rules. The transition rule is described in the mbl1/2 merge spec.
 // https://github.com/mbali/EIPs/blob/master/EIPS/eip-3675.md
 //
 // The beacon here is a half-functional consensus engine with partial functions which
 // is only used for necessary consensus checks. The legacy consensus engine can be any
 // engine implements the consensus interface (except the beacon itself).
 type Beacon struct {
-	ethone consensus.Engine // Original consensus engine used in eth1, e.g. ethash or clique
+	mblone consensus.Engine // Original consensus engine used in mbl1, e.g. mblash or clique
 }
 
-// New creates a consensus engine with the given embedded eth1 engine.
-func New(ethone consensus.Engine) *Beacon {
-	if _, ok := ethone.(*Beacon); ok {
+// New creates a consensus engine with the given embedded mbl1 engine.
+func New(mblone consensus.Engine) *Beacon {
+	if _, ok := mblone.(*Beacon); ok {
 		panic("nested consensus engine")
 	}
-	return &Beacon{ethone: ethone}
+	return &Beacon{mblone: mblone}
 }
 
 // Author implements consensus.Engine, returning the verified author of the block.
 func (beacon *Beacon) Author(header *types.Header) (common.Address, error) {
 	if !beacon.IsPoSHeader(header) {
-		return beacon.ethone.Author(header)
+		return beacon.mblone.Author(header)
 	}
 	return header.Coinbase, nil
 }
 
-// VerifyHeader checks whether a header conforms to the consensus rules of the
+// VerifyHeader checks whmbler a header conforms to the consensus rules of the
 // stock mbali consensus engine.
 func (beacon *Beacon) VerifyHeader(chain consensus.ChainHeaderReader, header *types.Header, seal bool) error {
 	reached, _ := IsTTDReached(chain, header.ParentHash, header.Number.Uint64()-1)
 	if !reached {
-		return beacon.ethone.VerifyHeader(chain, header, seal)
+		return beacon.mblone.VerifyHeader(chain, header, seal)
 	}
 	// Short circuit if the parent is not known
 	parent := chain.gombleader(header.ParentHash, header.Number.Uint64()-1)
@@ -92,12 +92,12 @@ func (beacon *Beacon) VerifyHeader(chain consensus.ChainHeaderReader, header *ty
 }
 
 // VerifyHeaders is similar to VerifyHeader, but verifies a batch of headers
-// concurrently. The method returns a quit channel to abort the operations and
+// concurrently. The mmblod returns a quit channel to abort the operations and
 // a results channel to retrieve the async verifications.
 // VerifyHeaders expect the headers to be ordered and continuous.
 func (beacon *Beacon) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
 	if !beacon.IsPoSHeader(headers[len(headers)-1]) {
-		return beacon.ethone.VerifyHeaders(chain, headers, seals)
+		return beacon.mblone.VerifyHeaders(chain, headers, seals)
 	}
 	var (
 		preHeaders  []*types.Header
@@ -127,7 +127,7 @@ func (beacon *Beacon) VerifyHeaders(chain consensus.ChainHeaderReader, headers [
 			old, new, out      = 0, len(preHeaders), 0
 			errors             = make([]error, len(headers))
 			done               = make([]bool, len(headers))
-			oldDone, oldResult = beacon.ethone.VerifyHeaders(chain, preHeaders, preSeals)
+			oldDone, oldResult = beacon.mblone.VerifyHeaders(chain, preHeaders, preSeals)
 			newDone, newResult = beacon.verifyHeaders(chain, postHeaders, preHeaders[len(preHeaders)-1])
 		)
 		for {
@@ -158,7 +158,7 @@ func (beacon *Beacon) VerifyHeaders(chain consensus.ChainHeaderReader, headers [
 // rules of the mbali consensus engine.
 func (beacon *Beacon) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
 	if !beacon.IsPoSHeader(block.Header()) {
-		return beacon.ethone.VerifyUncles(chain, block)
+		return beacon.mblone.VerifyUncles(chain, block)
 	}
 	// Verify that there is no uncle block. It's explicitly disabled in the beacon
 	if len(block.Uncles()) > 0 {
@@ -167,7 +167,7 @@ func (beacon *Beacon) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 	return nil
 }
 
-// verifyHeader checks whether a header conforms to the consensus rules of the
+// verifyHeader checks whmbler a header conforms to the consensus rules of the
 // stock mbali consensus engine. The difference between the beacon and classic is
 // (a) The following fields are expected to be constants:
 //     - difficulty is expected to be 0
@@ -209,7 +209,7 @@ func (beacon *Beacon) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 }
 
 // verifyHeaders is similar to verifyHeader, but verifies a batch of headers
-// concurrently. The method returns a quit channel to abort the operations and
+// concurrently. The mmblod returns a quit channel to abort the operations and
 // a results channel to retrieve the async verifications. An additional parent
 // header will be passed if the relevant header is not in the database yet.
 func (beacon *Beacon) verifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header, ancestor *types.Header) (chan<- struct{}, <-chan error) {
@@ -257,7 +257,7 @@ func (beacon *Beacon) Prepare(chain consensus.ChainHeaderReader, header *types.H
 		return err
 	}
 	if !reached {
-		return beacon.ethone.Prepare(chain, header)
+		return beacon.mblone.Prepare(chain, header)
 	}
 	header.Difficulty = beaconDifficulty
 	return nil
@@ -268,7 +268,7 @@ func (beacon *Beacon) Finalize(chain consensus.ChainHeaderReader, header *types.
 	// Finalize is different with Prepare, it can be used in both block generation
 	// and verification. So determine the consensus rules by header type.
 	if !beacon.IsPoSHeader(header) {
-		beacon.ethone.Finalize(chain, header, state, txs, uncles)
+		beacon.mblone.Finalize(chain, header, state, txs, uncles)
 		return
 	}
 	// The block reward is no longer handled here. It's done by the
@@ -282,7 +282,7 @@ func (beacon *Beacon) FinalizeAndAssemble(chain consensus.ChainHeaderReader, hea
 	// FinalizeAndAssemble is different with Prepare, it can be used in both block
 	// generation and verification. So determine the consensus rules by header type.
 	if !beacon.IsPoSHeader(header) {
-		return beacon.ethone.FinalizeAndAssemble(chain, header, state, txs, uncles, receipts)
+		return beacon.mblone.FinalizeAndAssemble(chain, header, state, txs, uncles, receipts)
 	}
 	// Finalize and assemble the block
 	beacon.Finalize(chain, header, state, txs, uncles)
@@ -292,11 +292,11 @@ func (beacon *Beacon) FinalizeAndAssemble(chain consensus.ChainHeaderReader, hea
 // Seal generates a new sealing request for the given input block and pushes
 // the result into the given channel.
 //
-// Note, the method returns immediately and will send the result async. More
+// Note, the mmblod returns immediately and will send the result async. More
 // than one result may also be returned depending on the consensus algorithm.
 func (beacon *Beacon) Seal(chain consensus.ChainHeaderReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
 	if !beacon.IsPoSHeader(block.Header()) {
-		return beacon.ethone.Seal(chain, block, results, stop)
+		return beacon.mblone.Seal(chain, block, results, stop)
 	}
 	// The seal verification is done by the external consensus engine,
 	// return directly without pushing any block back. In another word
@@ -307,7 +307,7 @@ func (beacon *Beacon) Seal(chain consensus.ChainHeaderReader, block *types.Block
 
 // SealHash returns the hash of a block prior to it being sealed.
 func (beacon *Beacon) SealHash(header *types.Header) common.Hash {
-	return beacon.ethone.SealHash(header)
+	return beacon.mblone.SealHash(header)
 }
 
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
@@ -316,19 +316,19 @@ func (beacon *Beacon) SealHash(header *types.Header) common.Hash {
 func (beacon *Beacon) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
 	// Transition isn't triggered yet, use the legacy rules for calculation
 	if reached, _ := IsTTDReached(chain, parent.Hash(), parent.Number.Uint64()); !reached {
-		return beacon.ethone.CalcDifficulty(chain, time, parent)
+		return beacon.mblone.CalcDifficulty(chain, time, parent)
 	}
 	return beaconDifficulty
 }
 
 // APIs implements consensus.Engine, returning the user facing RPC APIs.
 func (beacon *Beacon) APIs(chain consensus.ChainHeaderReader) []rpc.API {
-	return beacon.ethone.APIs(chain)
+	return beacon.mblone.APIs(chain)
 }
 
 // Close shutdowns the consensus engine
 func (beacon *Beacon) Close() error {
-	return beacon.ethone.Close()
+	return beacon.mblone.Close()
 }
 
 // IsPoSHeader reports the header belongs to the PoS-stage with some special fields.
@@ -341,18 +341,18 @@ func (beacon *Beacon) IsPoSHeader(header *types.Header) bool {
 	return header.Difficulty.Cmp(beaconDifficulty) == 0
 }
 
-// InnerEngine returns the embedded eth1 consensus engine.
+// InnerEngine returns the embedded mbl1 consensus engine.
 func (beacon *Beacon) InnerEngine() consensus.Engine {
-	return beacon.ethone
+	return beacon.mblone
 }
 
 // SetThreads updates the mining threads. Delegate the call
-// to the eth1 engine if it's threaded.
+// to the mbl1 engine if it's threaded.
 func (beacon *Beacon) SetThreads(threads int) {
 	type threaded interface {
 		SetThreads(threads int)
 	}
-	if th, ok := beacon.ethone.(threaded); ok {
+	if th, ok := beacon.mblone.(threaded); ok {
 		th.SetThreads(threads)
 	}
 }

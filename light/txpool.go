@@ -28,7 +28,7 @@ import (
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
@@ -59,7 +59,7 @@ type TxPool struct {
 	mu           sync.RWMutex
 	chain        *LightChain
 	odr          OdrBackend
-	chainDb      ethdb.Database
+	chainDb      mbldb.Database
 	relay        TxRelayBackend
 	head         common.Hash
 	nonce        map[common.Address]uint64            // "pending" nonce
@@ -67,12 +67,12 @@ type TxPool struct {
 	mined        map[common.Hash][]*types.Transaction // mined transactions by block hash
 	clearIdx     uint64                               // earliest block nr that can contain mined tx info
 
-	istanbul bool // Fork indicator whether we are in the istanbul stage.
-	eip2718  bool // Fork indicator whether we are in the eip2718 stage.
+	istanbul bool // Fork indicator whmbler we are in the istanbul stage.
+	eip2718  bool // Fork indicator whmbler we are in the eip2718 stage.
 }
 
 // TxRelayBackend provides an interface to the mechanism that forwards transacions
-// to the ETH network. The implementations of the functions should be non-blocking.
+// to the mbl network. The implementations of the functions should be non-blocking.
 //
 // Send instructs backend to forward new transactions
 // NewHead notifies backend about a new head after processed by the tx pool,
@@ -342,7 +342,7 @@ func (pool *TxPool) Stats() (pending int) {
 	return
 }
 
-// validateTx checks whether a transaction is valid according to the consensus rules.
+// validateTx checks whmbler a transaction is valid according to the consensus rules.
 func (pool *TxPool) validateTx(ctx context.Context, tx *types.Transaction) error {
 	// Validate sender
 	var (

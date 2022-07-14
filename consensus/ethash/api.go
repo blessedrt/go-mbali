@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethash
+package mblash
 
 import (
 	"errors"
@@ -24,11 +24,11 @@ import (
 	"github.com/mbali/go-mbali/core/types"
 )
 
-var errEthashStopped = errors.New("ethash stopped")
+var errmblashStopped = errors.New("mblash stopped")
 
-// API exposes ethash related methods for the RPC interface.
+// API exposes mblash related mmblods for the RPC interface.
 type API struct {
-	ethash *Ethash
+	mblash *mblash
 }
 
 // GetWork returns a work package for external miner.
@@ -39,7 +39,7 @@ type API struct {
 //   result[2] - 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
 //   result[3] - hex encoded block number
 func (api *API) GetWork() ([4]string, error) {
-	if api.ethash.remote == nil {
+	if api.mblash.remote == nil {
 		return [4]string{}, errors.New("not supported")
 	}
 
@@ -48,9 +48,9 @@ func (api *API) GetWork() ([4]string, error) {
 		errc   = make(chan error, 1)
 	)
 	select {
-	case api.ethash.remote.fetchWorkCh <- &sealWork{errc: errc, res: workCh}:
-	case <-api.ethash.remote.exitCh:
-		return [4]string{}, errEthashStopped
+	case api.mblash.remote.fetchWorkCh <- &sealWork{errc: errc, res: workCh}:
+	case <-api.mblash.remote.exitCh:
+		return [4]string{}, errmblashStopped
 	}
 	select {
 	case work := <-workCh:
@@ -64,19 +64,19 @@ func (api *API) GetWork() ([4]string, error) {
 // It returns an indication if the work was accepted.
 // Note either an invalid solution, a stale work a non-existent work will return false.
 func (api *API) SubmitWork(nonce types.BlockNonce, hash, digest common.Hash) bool {
-	if api.ethash.remote == nil {
+	if api.mblash.remote == nil {
 		return false
 	}
 
 	var errc = make(chan error, 1)
 	select {
-	case api.ethash.remote.submitWorkCh <- &mineResult{
+	case api.mblash.remote.submitWorkCh <- &mineResult{
 		nonce:     nonce,
 		mixDigest: digest,
 		hash:      hash,
 		errc:      errc,
 	}:
-	case <-api.ethash.remote.exitCh:
+	case <-api.mblash.remote.exitCh:
 		return false
 	}
 	err := <-errc
@@ -90,14 +90,14 @@ func (api *API) SubmitWork(nonce types.BlockNonce, hash, digest common.Hash) boo
 // It accepts the miner hash rate and an identifier which must be unique
 // between nodes.
 func (api *API) SubmitHashrate(rate hexutil.Uint64, id common.Hash) bool {
-	if api.ethash.remote == nil {
+	if api.mblash.remote == nil {
 		return false
 	}
 
 	var done = make(chan struct{}, 1)
 	select {
-	case api.ethash.remote.submitRateCh <- &hashrate{done: done, rate: uint64(rate), id: id}:
-	case <-api.ethash.remote.exitCh:
+	case api.mblash.remote.submitRateCh <- &hashrate{done: done, rate: uint64(rate), id: id}:
+	case <-api.mblash.remote.exitCh:
 		return false
 	}
 
@@ -108,5 +108,5 @@ func (api *API) SubmitHashrate(rate hexutil.Uint64, id common.Hash) bool {
 
 // gomblashrate returns the current hashrate for local CPU miner and remote miner.
 func (api *API) gomblashrate() uint64 {
-	return uint64(api.ethash.Hashrate())
+	return uint64(api.mblash.Hashrate())
 }

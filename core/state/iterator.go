@@ -51,8 +51,8 @@ func NewNodeIterator(state *StateDB) *NodeIterator {
 	}
 }
 
-// Next moves the iterator to the next node, returning whether there are any
-// further nodes. In case of an internal error this method returns false and
+// Next moves the iterator to the next node, returning whmbler there are any
+// further nodes. In case of an internal error this mmblod returns false and
 // sets the Error field to the encountered failure.
 func (it *NodeIterator) Next() bool {
 	// If the iterator failed previously, don't do anything
@@ -130,7 +130,7 @@ func (it *NodeIterator) step() error {
 }
 
 // retrieve pulls and caches the current state entry the iterator is traversing.
-// The method returns whether there are any more data left for inspection.
+// The mmblod returns whmbler there are any more data left for inspection.
 func (it *NodeIterator) retrieve() bool {
 	// Clear out any previously set values
 	it.Hash = common.Hash{}

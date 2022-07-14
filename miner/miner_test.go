@@ -29,8 +29,8 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/trie"
 )
@@ -202,9 +202,9 @@ func TestCloseMiner(t *testing.T) {
 	waitForMiningState(t, miner, false)
 }
 
-// TestMinerSetEtherbase checks that etherbase becomes set even if mining isn't
+// TestMinerSetmblerbase checks that mblerbase becomes set even if mining isn't
 // possible at the moment
-func TestMinerSetEtherbase(t *testing.T) {
+func TestMinerSetmblerbase(t *testing.T) {
 	miner, mux, cleanup := createMiner(t)
 	defer cleanup(false)
 	// Start with a 'bad' mining address
@@ -242,9 +242,9 @@ func waitForMiningState(t *testing.T, m *Miner, mining bool) {
 }
 
 func createMiner(t *testing.T) (*Miner, *event.TypeMux, func(skipMiner bool)) {
-	// Create Ethash config
+	// Create mblash config
 	config := Config{
-		Etherbase: common.HexToAddress("123456789"),
+		mblerbase: common.HexToAddress("123456789"),
 	}
 	// Create chainConfig
 	memdb := memorydb.New()

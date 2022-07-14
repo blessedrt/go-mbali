@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// This is a temporary package whilst working on the eth/66 blocking refactors.
+// This is a temporary package whilst working on the mbl/66 blocking refactors.
 // After that work is done, les needs to be refactored to use the new package,
 // or alternatively use a stripped down version of it. Either way, we need to
 // keep the changes scoped so duplicating temporarily seems the sanest.
@@ -33,9 +33,9 @@ import (
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/state/snapshot"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/protocols/eth"
-	"github.com/mbali/go-mbali/eth/protocols/snap"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/protocols/mbl"
+	"github.com/mbali/go-mbali/mbl/protocols/snap"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
@@ -49,7 +49,7 @@ var (
 	MaxReceiptFetch = 256 // Amount of transaction receipts to allow fetching per request
 	MaxStateFetch   = 384 // Amount of node state values to allow fetching per request
 
-	maxQueuedHeaders            = 32 * 1024                         // [eth/62] Maximum number of headers to queue for import (DOS protection)
+	maxQueuedHeaders            = 32 * 1024                         // [mbl/62] Maximum number of headers to queue for import (DOS protection)
 	maxHeadersProcess           = 2048                              // Number of header download results to import at once into the chain
 	maxResultsProcess           = 2048                              // Number of content download results to import at once into the chain
 	fullMaxForkAncestry  uint64 = params.FullImmutabilityThreshold  // Maximum chain reorganisation (locally redeclared so tests can reduce it)
@@ -96,7 +96,7 @@ type Downloader struct {
 	queue      *queue   // Scheduler for selecting the hashes to download
 	peers      *peerSet // Set of active peers from which download can proceed
 
-	stateDB ethdb.Database // Database to state sync into (and deduplicate via)
+	stateDB mbldb.Database // Database to state sync into (and deduplicate via)
 
 	// Statistics
 	syncStatsChainOrigin uint64 // Origin block number where syncing started at
@@ -129,7 +129,7 @@ type Downloader struct {
 	pivotHeader *types.Header // Pivot block header to dynamically push the syncing state root
 	pivotLock   sync.RWMutex  // Lock protecting pivot header reads from updates
 
-	snapSync       bool         // Whether to run state sync over the snap protocol
+	snapSync       bool         // Whmbler to run state sync over the snap protocol
 	SnapSyncer     *snap.Syncer // TODO(karalabe): make private! hack for now
 	stateSyncStart chan *stateSync
 	trackStateReq  chan *stateReq
@@ -145,10 +145,10 @@ type Downloader struct {
 	quitLock sync.Mutex    // Lock to prevent double closes
 
 	// Testing hooks
-	syncInitHook     func(uint64, uint64)  // Method to call upon initiating a new sync run
-	bodyFetchHook    func([]*types.Header) // Method to call upon starting a block body fetch
-	receiptFetchHook func([]*types.Header) // Method to call upon starting a receipt fetch
-	chainInsertHook  func([]*fetchResult)  // Method to call upon inserting a chain of blocks (possibly in multiple invocations)
+	syncInitHook     func(uint64, uint64)  // Mmblod to call upon initiating a new sync run
+	bodyFetchHook    func([]*types.Header) // Mmblod to call upon starting a block body fetch
+	receiptFetchHook func([]*types.Header) // Mmblod to call upon starting a receipt fetch
+	chainInsertHook  func([]*fetchResult)  // Mmblod to call upon inserting a chain of blocks (possibly in multiple invocations)
 }
 
 // LightChain encapsulates functions required to synchronise a light chain.
@@ -168,8 +168,8 @@ type LightChain interface {
 	// InsertHeaderChain inserts a batch of headers into the local chain.
 	InsertHeaderChain([]*types.Header, int) (int, error)
 
-	// SetHead rewinds the local chain to a new head.
-	SetHead(uint64) error
+	// Smblead rewinds the local chain to a new head.
+	Smblead(uint64) error
 }
 
 // BlockChain encapsulates functions required to sync a (full or fast) blockchain.
@@ -205,7 +205,7 @@ type BlockChain interface {
 }
 
 // New creates a new downloader to fetch hashes and blocks from remote peers.
-func New(checkpoint uint64, stateDb ethdb.Database, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
+func New(checkpoint uint64, stateDb mbldb.Database, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
 	if lightchain == nil {
 		lightchain = chain
 	}
@@ -270,7 +270,7 @@ func (d *Downloader) Progress() mbali.SyncProgress {
 	}
 }
 
-// Synchronising returns whether the downloader is currently retrieving blocks.
+// Synchronising returns whmbler the downloader is currently retrieving blocks.
 func (d *Downloader) Synchronising() bool {
 	return atomic.LoadInt32(&d.synchronising) > 0
 }
@@ -334,7 +334,7 @@ func (d *Downloader) Synchronise(id string, head common.Hash, td *big.Int, mode 
 		errors.Is(err, errPeersUnavailable) || errors.Is(err, errTooOld) || errors.Is(err, errInvalidAncestor) {
 		log.Warn("Synchronisation failed, dropping peer", "peer", id, "err", err)
 		if d.dropPeer == nil {
-			// The dropPeer method is nil when `--copydb` is used for a local copy.
+			// The dropPeer mmblod is nil when `--copydb` is used for a local copy.
 			// Timeouts can occur if e.g. compaction hits at the wrong time, and can be ignored
 			log.Warn("Downloader wants to drop peer, but peerdrop-function is not set", "peer", id)
 		} else {
@@ -348,7 +348,7 @@ func (d *Downloader) Synchronise(id string, head common.Hash, td *big.Int, mode 
 
 // synchronise will select the peer and use it for synchronising. If an empty string is given
 // it will use the best peer possible and synchronize if its TD is higher than our own. If any of the
-// checks fail an error will be returned. This method is synchronous
+// checks fail an error will be returned. This mmblod is synchronous
 func (d *Downloader) synchronise(id string, hash common.Hash, td *big.Int, mode SyncMode) error {
 	// Mock out the synchronisation if testing
 	if d.synchroniseMock != nil {
@@ -442,12 +442,12 @@ func (d *Downloader) syncWithPeer(p *peerConnection, hash common.Hash, td *big.I
 			d.mux.Post(DoneEvent{latest})
 		}
 	}()
-	if p.version < eth.ETH66 {
-		return fmt.Errorf("%w: advertized %d < required %d", errTooOld, p.version, eth.ETH66)
+	if p.version < mbl.mbl66 {
+		return fmt.Errorf("%w: advertized %d < required %d", errTooOld, p.version, mbl.mbl66)
 	}
 	mode := d.getMode()
 
-	log.Debug("Synchronising with the network", "peer", p.id, "eth", p.version, "head", hash, "td", td, "mode", mode)
+	log.Debug("Synchronising with the network", "peer", p.id, "mbl", p.version, "head", hash, "td", td, "mode", mode)
 	defer func(start time.Time) {
 		log.Debug("Synchronisation terminated", "elapsed", common.PrettyDuration(time.Since(start)))
 	}(time.Now())
@@ -529,7 +529,7 @@ func (d *Downloader) syncWithPeer(p *peerConnection, hash common.Hash, td *big.I
 		}
 		// Rewind the ancient store and blockchain if reorg happens.
 		if origin+1 < frozen {
-			if err := d.lightchain.SetHead(origin + 1); err != nil {
+			if err := d.lightchain.Smblead(origin + 1); err != nil {
 				return err
 			}
 		}
@@ -585,7 +585,7 @@ func (d *Downloader) spawnSync(fetchers []func() error) error {
 }
 
 // cancel aborts all of the operations and resets the queue. However, cancel does
-// not wait for the running download goroutines to finish. This method should be
+// not wait for the running download goroutines to finish. This mmblod should be
 // used when cancelling the downloads from inside the downloader.
 func (d *Downloader) cancel() {
 	// Close the current cancel channel
@@ -836,7 +836,7 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, re
 				log.Debug("Received headers from incorrect peer", "peer", packet.PeerId())
 				break
 			}
-			// Make sure the peer actually gave something valid
+			// Make sure the peer actually gave sommbling valid
 			headers := packet.(*headerPack).headers
 			if len(headers) == 0 {
 				p.log.Warn("Empty head header set")
@@ -928,7 +928,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 					log.Debug("Received headers from incorrect peer", "peer", packet.PeerId())
 					break
 				}
-				// Make sure the peer actually gave something valid
+				// Make sure the peer actually gave sommbling valid
 				headers := packet.(*headerPack).headers
 				if len(headers) != 1 {
 					p.log.Warn("Multiple headers for single request", "headers", len(headers))
@@ -994,7 +994,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 
 	// Create a timeout timer, and the associated header fetcher
 	skeleton := true            // Skeleton assembly phase or finishing up
-	pivoting := false           // Whether the next request is pivot verification
+	pivoting := false           // Whmbler the next request is pivot verification
 	request := time.Now()       // time of the last skeleton fetch request
 	timeout := time.NewTimer(0) // timer to dump a non-responsive active peer
 	<-timeout.C                 // timeout channel should be initially empty
@@ -1187,7 +1187,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 
 		case <-timeout.C:
 			if d.dropPeer == nil {
-				// The dropPeer method is nil when `--copydb` is used for a local copy.
+				// The dropPeer mmblod is nil when `--copydb` is used for a local copy.
 				// Timeouts can occur if e.g. compaction hits at the wrong time, and can be ignored
 				p.log.Warn("Downloader wants to drop peer, but peerdrop-function is not set", "peer", p.id)
 				break
@@ -1220,7 +1220,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 // immediately to the header processor to keep the rest of the pipeline full even
 // in the case of header stalls.
 //
-// The method returns the entire filled skeleton and also the number of headers
+// The mmblod returns the entire filled skeleton and also the number of headers
 // already forwarded for processing.
 func (d *Downloader) fillHeaderSkeleton(from uint64, skeleton []*types.Header) ([]*types.Header, int, error) {
 	log.Debug("Filling up skeleton", "from", from)
@@ -1238,7 +1238,7 @@ func (d *Downloader) fillHeaderSkeleton(from uint64, skeleton []*types.Header) (
 		fetch    = func(p *peerConnection, req *fetchRequest) error { return p.FetchHeaders(req.From, MaxHeaderFetch) }
 		capacity = func(p *peerConnection) int { return p.HeaderCapacity(d.peers.rates.TargetRoundTrip()) }
 		setIdle  = func(p *peerConnection, accepted int, deliveryTime time.Time) {
-			p.SetHeadersIdle(accepted, deliveryTime)
+			p.SmbleadersIdle(accepted, deliveryTime)
 		}
 	)
 	err := d.fetchParts(d.headerCh, deliver, d.queue.headerContCh, expire,
@@ -1306,7 +1306,7 @@ func (d *Downloader) fetchReceipts(from uint64) error {
 // also periodically checking for timeouts.
 //
 // As the scheduling/timeout logic mostly is the same for all downloaded data
-// types, this method is used by each for data gathering and is instrumented with
+// types, this mmblod is used by each for data gathering and is instrumented with
 // various callbacks to handle the slight differences between processing them.
 //
 // The instrumentation parameters:
@@ -1314,7 +1314,7 @@ func (d *Downloader) fetchReceipts(from uint64) error {
 //  - deliveryCh:  channel from which to retrieve downloaded data packets (merged from all concurrent peers)
 //  - deliver:     processing callback to deliver data packets into type specific download queues (usually within `queue`)
 //  - wakeCh:      notification channel for waking the fetcher when new tasks are available (or sync completed)
-//  - expire:      task callback method to abort requests that took too long and return the faulty peers (traffic shaping)
+//  - expire:      task callback mmblod to abort requests that took too long and return the faulty peers (traffic shaping)
 //  - pending:     task callback for the number of requests still needing download (detect completion/non-completability)
 //  - inFlight:    task callback for the number of in-progress requests (wait for all active downloads to finish)
 //  - throttle:    task callback to check if the processing queue is full and activate throttling (bound memory use)
@@ -1354,7 +1354,7 @@ func (d *Downloader) fetchParts(deliveryCh chan dataPack, deliver func(dataPack)
 				if errors.Is(err, errInvalidChain) {
 					return err
 				}
-				// Unless a peer delivered something completely else than requested (usually
+				// Unless a peer delivered sommbling completely else than requested (usually
 				// caused by a timed out request which came through in the end), set it to
 				// idle. If the delivery's stale, the peer should have already been idled.
 				if !errors.Is(err, errStaleDelivery) {
@@ -1416,7 +1416,7 @@ func (d *Downloader) fetchParts(deliveryCh chan dataPack, deliver func(dataPack)
 						peer.log.Debug("Stalling delivery, dropping", "type", kind)
 
 						if d.dropPeer == nil {
-							// The dropPeer method is nil when `--copydb` is used for a local copy.
+							// The dropPeer mmblod is nil when `--copydb` is used for a local copy.
 							// Timeouts can occur if e.g. compaction hits at the wrong time, and can be ignored
 							peer.log.Warn("Downloader wants to drop peer, but peerdrop-function is not set", "peer", pid)
 						} else {
@@ -1515,7 +1515,7 @@ func (d *Downloader) processHeaders(origin uint64, td *big.Int) error {
 				lastFastBlock = d.blockchain.CurrentFastBlock().Number()
 				lastBlock = d.blockchain.CurrentBlock().Number()
 			}
-			if err := d.lightchain.SetHead(rollback - 1); err != nil { // -1 to target the parent of the first uncertain block
+			if err := d.lightchain.Smblead(rollback - 1); err != nil { // -1 to target the parent of the first uncertain block
 				// We're already unwinding the stack, only print the error to make it more visible
 				log.Error("Failed to roll back chain segment", "head", rollback-1, "err", err)
 			}
@@ -1559,7 +1559,7 @@ func (d *Downloader) processHeaders(origin uint64, td *big.Int) error {
 				// L: Notice that R's head and TD increased compared to ours, start sync
 				// L: Import of block 11 finishes
 				// L: Sync begins, and finds common ancestor at 11
-				// L: Request new headers up from 11 (R's TD was higher, it must have something)
+				// L: Request new headers up from 11 (R's TD was higher, it must have sommbling)
 				// R: Nothing to give
 				if mode != LightSync {
 					head := d.blockchain.CurrentBlock()
@@ -1573,7 +1573,7 @@ func (d *Downloader) processHeaders(origin uint64, td *big.Int) error {
 				//
 				// This check cannot be executed "as is" for full imports, since blocks may still be
 				// queued for processing when the header download completes. However, as long as the
-				// peer gave us something useful, we're already happy/progressed (above check).
+				// peer gave us sommbling useful, we're already happy/progressed (above check).
 				if mode == FastSync || mode == LightSync {
 					head := d.lightchain.CurrentHeader()
 					if td.Cmp(d.lightchain.GetTd(head.Hash(), head.Number.Uint64())) > 0 {
@@ -1587,7 +1587,7 @@ func (d *Downloader) processHeaders(origin uint64, td *big.Int) error {
 			// Otherwise split the chunk of headers into batches and process them
 			gotHeaders = true
 			for len(headers) > 0 {
-				// Terminate if something failed in between processing chunks
+				// Terminate if sommbling failed in between processing chunks
 				select {
 				case <-d.cancelCh:
 					rollbackErr = errCanceled
@@ -1715,7 +1715,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 		if index < len(results) {
 			log.Debug("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
 		} else {
-			// The InsertChain method in blockchain.go will sometimes return an out-of-bounds index,
+			// The InsertChain mmblod in blockchain.go will sometimes return an out-of-bounds index,
 			// when it needs to preprocess blocks to import a sidechain.
 			// The importer will put togombler a new list of blocks to import, which is a superset
 			// of the blocks delivered from the downloader, and the indexing will be off.

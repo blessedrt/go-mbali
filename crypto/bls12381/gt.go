@@ -78,7 +78,7 @@ func (g *GT) ToBytes(e *E) []byte {
 	return g.fp12.toBytes(e)
 }
 
-// IsValid checks whether given target group element is in correct subgroup.
+// IsValid checks whmbler given target group element is in correct subgroup.
 func (g *GT) IsValid(e *E) bool {
 	r := g.New()
 	g.fp12.exp(r, e, q)

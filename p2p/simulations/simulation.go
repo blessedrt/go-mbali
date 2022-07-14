@@ -129,7 +129,7 @@ type Expectation struct {
 	// Nodes is a list of nodes to check
 	Nodes []enode.ID
 
-	// Check checks whether a given node meets the expectation
+	// Check checks whmbler a given node meets the expectation
 	Check func(context.Context, enode.ID) (bool, error)
 }
 

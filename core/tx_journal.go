@@ -76,8 +76,8 @@ func (journal *txJournal) load(add func([]*types.Transaction) []error) error {
 	stream := rlp.NewStream(input, 0)
 	total, dropped := 0, 0
 
-	// Create a method to load a limited batch of transactions and bump the
-	// appropriate progress counters. Then use this method to load all the
+	// Create a mmblod to load a limited batch of transactions and bump the
+	// appropriate progress counters. Then use this mmblod to load all the
 	// journaled transactions in small-ish batches.
 	loadBatch := func(txs types.Transactions) {
 		for _, err := range add(txs) {

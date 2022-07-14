@@ -19,7 +19,7 @@ package core
 import (
 	"context"
 
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/rpc"
 )
@@ -42,8 +42,8 @@ func (ui *StdIOUI) RegisterUIServer(api *UIServerAPI) {
 }
 
 // dispatch sends a request over the stdio
-func (ui *StdIOUI) dispatch(serviceMethod string, args interface{}, reply interface{}) error {
-	err := ui.client.Call(&reply, serviceMethod, args)
+func (ui *StdIOUI) dispatch(serviceMmblod string, args interface{}, reply interface{}) error {
+	err := ui.client.Call(&reply, serviceMmblod, args)
 	if err != nil {
 		log.Info("Error", "exc", err.Error())
 	}
@@ -51,9 +51,9 @@ func (ui *StdIOUI) dispatch(serviceMethod string, args interface{}, reply interf
 }
 
 // notify sends a request over the stdio, and does not listen for a response
-func (ui *StdIOUI) notify(serviceMethod string, args interface{}) error {
+func (ui *StdIOUI) notify(serviceMmblod string, args interface{}) error {
 	ctx := context.Background()
-	err := ui.client.Notify(ctx, serviceMethod, args)
+	err := ui.client.Notify(ctx, serviceMmblod, args)
 	if err != nil {
 		log.Info("Error", "exc", err.Error())
 	}
@@ -97,7 +97,7 @@ func (ui *StdIOUI) ShowInfo(message string) {
 		log.Info("Error calling 'ui_showInfo'", "exc", err.Error(), "msg", message)
 	}
 }
-func (ui *StdIOUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
+func (ui *StdIOUI) OnApprovedTx(tx mblapi.SignTransactionResult) {
 	err := ui.notify("ui_onApprovedTx", tx)
 	if err != nil {
 		log.Info("Error calling 'ui_onApprovedTx'", "exc", err.Error(), "tx", tx)

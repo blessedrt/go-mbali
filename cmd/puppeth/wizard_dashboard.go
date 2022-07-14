@@ -60,7 +60,7 @@ func (w *wizard) deployDashboard() {
 			available[service] = append(available[service], server)
 		}
 	}
-	for _, service := range []string{"ethstats", "explorer", "faucet"} {
+	for _, service := range []string{"mblstats", "explorer", "faucet"} {
 		// Gather all the locally hosted pages of this type
 		var pages []string
 		for _, server := range available[service] {
@@ -71,8 +71,8 @@ func (w *wizard) deployDashboard() {
 			// If there's a service running on the machine, retrieve it's port number
 			var port int
 			switch service {
-			case "ethstats":
-				if infos, err := checkEthstats(client, w.network); err == nil {
+			case "mblstats":
+				if infos, err := checkmblstats(client, w.network); err == nil {
 					port = infos.port
 				}
 			case "explorer":
@@ -119,18 +119,18 @@ func (w *wizard) deployDashboard() {
 		}
 		// Save the users choice
 		switch service {
-		case "ethstats":
-			infos.ethstats = page
+		case "mblstats":
+			infos.mblstats = page
 		case "explorer":
 			infos.explorer = page
 		case "faucet":
 			infos.faucet = page
 		}
 	}
-	// If we have ethstats running, ask whether to make the secret public or not
-	if w.conf.ethstats != "" {
+	// If we have mblstats running, ask whmbler to make the secret public or not
+	if w.conf.mblstats != "" {
 		fmt.Println()
-		fmt.Println("Include ethstats secret on dashboard (y/n)? (default = yes)")
+		fmt.Println("Include mblstats secret on dashboard (y/n)? (default = yes)")
 		infos.trusted = w.readDefaultYesNo(true)
 	}
 	// Try to deploy the dashboard container on the host

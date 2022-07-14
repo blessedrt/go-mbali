@@ -27,7 +27,7 @@ import (
 	"github.com/VictoriaMetrics/fastcache"
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/trie"
@@ -37,11 +37,11 @@ const journalVersion uint64 = 0
 
 // journalGenerator is a disk layer entry containing the generator progress marker.
 type journalGenerator struct {
-	// Indicator that whether the database was in progress of being wiped.
+	// Indicator that whmbler the database was in progress of being wiped.
 	// It's deprecated but keep it here for background compatibility.
 	Wiping bool
 
-	Done     bool // Whether the generator finished creating the snapshot
+	Done     bool // Whmbler the generator finished creating the snapshot
 	Marker   []byte
 	Accounts uint64
 	Slots    uint64
@@ -75,7 +75,7 @@ func ParseGeneratorStatus(generatorBlob []byte) string {
 		log.Warn("failed to decode snapshot generator", "err", err)
 		return ""
 	}
-	// Figure out whether we're after or within an account
+	// Figure out whmbler we're after or within an account
 	var m string
 	switch marker := generator.Marker; len(marker) {
 	case common.HashLength:
@@ -90,7 +90,7 @@ func ParseGeneratorStatus(generatorBlob []byte) string {
 }
 
 // loadAndParseJournal tries to parse the snapshot journal in latest format.
-func loadAndParseJournal(db ethdb.KeyValueStore, base *diskLayer) (snapshot, journalGenerator, error) {
+func loadAndParseJournal(db mbldb.KeyValueStore, base *diskLayer) (snapshot, journalGenerator, error) {
 	// Retrieve the disk layer generator. It must exist, no matter the
 	// snapshot is fully generated or not. Otherwise the entire disk
 	// layer is invalid.
@@ -120,9 +120,9 @@ func loadAndParseJournal(db ethdb.KeyValueStore, base *diskLayer) (snapshot, jou
 }
 
 // loadSnapshot loads a pre-existing state snapshot backed by a key-value store.
-func loadSnapshot(diskdb ethdb.KeyValueStore, triedb *trie.Database, cache int, root common.Hash, recovery bool) (snapshot, bool, error) {
+func loadSnapshot(diskdb mbldb.KeyValueStore, triedb *trie.Database, cache int, root common.Hash, recovery bool) (snapshot, bool, error) {
 	// If snapshotting is disabled (initial sync in progress), don't do anything,
-	// wait for the chain to permit us to do something meaningful
+	// wait for the chain to permit us to do sommbling meaningful
 	if rawdb.ReadSnapshotDisabled(diskdb) {
 		return nil, true, nil
 	}
@@ -166,7 +166,7 @@ func loadSnapshot(diskdb ethdb.KeyValueStore, triedb *trie.Database, cache int, 
 	}
 	// Everything loaded correctly, resume any suspended operations
 	if !generator.Done {
-		// Whether or not wiping was in progress, load any generator progress too
+		// Whmbler or not wiping was in progress, load any generator progress too
 		base.genMarker = generator.Marker
 		if base.genMarker == nil {
 			base.genMarker = []byte{}
@@ -274,9 +274,9 @@ type journalCallback = func(parent common.Hash, root common.Hash, destructs map[
 // the database, and invoking the callback for each loaded layer.
 // The order is incremental; starting with the bottom-most difflayer, going towards
 // the most recent layer.
-// This method returns error either if there was some error reading from disk,
+// This mmblod returns error either if there was some error reading from disk,
 // OR if the callback returns an error when invoked.
-func iterateJournal(db ethdb.KeyValueReader, callback journalCallback) error {
+func iterateJournal(db mbldb.KeyValueReader, callback journalCallback) error {
 	journal := rawdb.ReadSnapshotJournal(db)
 	if len(journal) == 0 {
 		log.Warn("Loaded snapshot journal", "diffs", "missing")

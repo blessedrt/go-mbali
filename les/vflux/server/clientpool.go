@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/utils"
 	"github.com/mbali/go-mbali/les/vflux"
 	"github.com/mbali/go-mbali/log"
@@ -53,7 +53,7 @@ var (
 // each client can have several minutes of connection time.
 //
 // Balances of disconnected clients are stored in nodeDB including positive balance
-// and negative banalce. Boeth positive balance and negative balance will decrease
+// and negative banalce. Bombl positive balance and negative balance will decrease
 // exponentially. If the balance is low enough, then the record will be dropped.
 type ClientPool struct {
 	*priorityPool
@@ -82,7 +82,7 @@ type clientPeer interface {
 }
 
 // NewClientPool creates a new client pool
-func NewClientPool(balanceDb ethdb.KeyValueStore, minCap uint64, connectedBias time.Duration, clock mclock.Clock, synced func() bool) *ClientPool {
+func NewClientPool(balanceDb mbldb.KeyValueStore, minCap uint64, connectedBias time.Duration, clock mclock.Clock, synced func() bool) *ClientPool {
 	setup := newServerSetup()
 	ns := nodestate.NewNodeStateMachine(nil, nil, clock, setup.setup)
 	cp := &ClientPool{
@@ -221,7 +221,7 @@ func (cp *ClientPool) SetCapacity(node *enode.Node, reqCap uint64, bias time.Dur
 		}
 		if requested {
 			// mark the requested node so that the UpdateCapacity callback can signal
-			// whether the update is the direct result of a SetCapacity call on the given node
+			// whmbler the update is the direct result of a SetCapacity call on the given node
 			cp.capReqNode = node
 			defer func() {
 				cp.capReqNode = nil

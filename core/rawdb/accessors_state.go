@@ -18,18 +18,18 @@ package rawdb
 
 import (
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 )
 
 // ReadPreimage retrieves a single preimage of the provided hash.
-func ReadPreimage(db ethdb.KeyValueReader, hash common.Hash) []byte {
+func ReadPreimage(db mbldb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(preimageKey(hash))
 	return data
 }
 
 // ReadCode retrieves the contract code of the provided code hash.
-func ReadCode(db ethdb.KeyValueReader, hash common.Hash) []byte {
+func ReadCode(db mbldb.KeyValueReader, hash common.Hash) []byte {
 	// Try with the prefixed code scheme first, if not then try with legacy
 	// scheme.
 	data := ReadCodeWithPrefix(db, hash)
@@ -43,20 +43,20 @@ func ReadCode(db ethdb.KeyValueReader, hash common.Hash) []byte {
 // ReadCodeWithPrefix retrieves the contract code of the provided code hash.
 // The main difference between this function and ReadCode is this function
 // will only check the existence with latest scheme(with prefix).
-func ReadCodeWithPrefix(db ethdb.KeyValueReader, hash common.Hash) []byte {
+func ReadCodeWithPrefix(db mbldb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(codeKey(hash))
 	return data
 }
 
 // ReadTrieNode retrieves the trie node of the provided hash.
-func ReadTrieNode(db ethdb.KeyValueReader, hash common.Hash) []byte {
+func ReadTrieNode(db mbldb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(hash.Bytes())
 	return data
 }
 
 // HasCode checks if the contract code corresponding to the
 // provided code hash is present in the db.
-func HasCode(db ethdb.KeyValueReader, hash common.Hash) bool {
+func HasCode(db mbldb.KeyValueReader, hash common.Hash) bool {
 	// Try with the prefixed code scheme first, if not then try with legacy
 	// scheme.
 	if ok := HasCodeWithPrefix(db, hash); ok {
@@ -69,19 +69,19 @@ func HasCode(db ethdb.KeyValueReader, hash common.Hash) bool {
 // HasCodeWithPrefix checks if the contract code corresponding to the
 // provided code hash is present in the db. This function will only check
 // presence using the prefix-scheme.
-func HasCodeWithPrefix(db ethdb.KeyValueReader, hash common.Hash) bool {
+func HasCodeWithPrefix(db mbldb.KeyValueReader, hash common.Hash) bool {
 	ok, _ := db.Has(codeKey(hash))
 	return ok
 }
 
 // HasTrieNode checks if the trie node with the provided hash is present in db.
-func HasTrieNode(db ethdb.KeyValueReader, hash common.Hash) bool {
+func HasTrieNode(db mbldb.KeyValueReader, hash common.Hash) bool {
 	ok, _ := db.Has(hash.Bytes())
 	return ok
 }
 
 // WritePreimages writes the provided set of preimages to the database.
-func WritePreimages(db ethdb.KeyValueWriter, preimages map[common.Hash][]byte) {
+func WritePreimages(db mbldb.KeyValueWriter, preimages map[common.Hash][]byte) {
 	for hash, preimage := range preimages {
 		if err := db.Put(preimageKey(hash), preimage); err != nil {
 			log.Crit("Failed to store trie preimage", "err", err)
@@ -92,28 +92,28 @@ func WritePreimages(db ethdb.KeyValueWriter, preimages map[common.Hash][]byte) {
 }
 
 // WriteCode writes the provided contract code database.
-func WriteCode(db ethdb.KeyValueWriter, hash common.Hash, code []byte) {
+func WriteCode(db mbldb.KeyValueWriter, hash common.Hash, code []byte) {
 	if err := db.Put(codeKey(hash), code); err != nil {
 		log.Crit("Failed to store contract code", "err", err)
 	}
 }
 
 // WriteTrieNode writes the provided trie node database.
-func WriteTrieNode(db ethdb.KeyValueWriter, hash common.Hash, node []byte) {
+func WriteTrieNode(db mbldb.KeyValueWriter, hash common.Hash, node []byte) {
 	if err := db.Put(hash.Bytes(), node); err != nil {
 		log.Crit("Failed to store trie node", "err", err)
 	}
 }
 
 // DeleteCode deletes the specified contract code from the database.
-func DeleteCode(db ethdb.KeyValueWriter, hash common.Hash) {
+func DeleteCode(db mbldb.KeyValueWriter, hash common.Hash) {
 	if err := db.Delete(codeKey(hash)); err != nil {
 		log.Crit("Failed to delete contract code", "err", err)
 	}
 }
 
 // DeleteTrieNode deletes the specified trie node from the database.
-func DeleteTrieNode(db ethdb.KeyValueWriter, hash common.Hash) {
+func DeleteTrieNode(db mbldb.KeyValueWriter, hash common.Hash) {
 	if err := db.Delete(hash.Bytes()); err != nil {
 		log.Crit("Failed to delete trie node", "err", err)
 	}

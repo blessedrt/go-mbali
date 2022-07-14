@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// This file contains a miner stress test based on the Ethash consensus engine.
+// This file contains a miner stress test based on the mblash consensus engine.
 package main
 
 import (
@@ -27,13 +27,13 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/fdlimit"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/miner"
 	"github.com/mbali/go-mbali/node"
@@ -43,7 +43,7 @@ import (
 )
 
 func main() {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	fdlimit.Raise(2048)
 
 	// Generate a batch of accounts to seal and fund with
@@ -51,10 +51,10 @@ func main() {
 	for i := 0; i < len(faucets); i++ {
 		faucets[i], _ = crypto.GenerateKey()
 	}
-	// Pre-generate the ethash mining DAG so we don't race
-	ethash.MakeDataset(1, ethconfig.Defaults.Ethash.DatasetDir)
+	// Pre-generate the mblash mining DAG so we don't race
+	mblash.MakeDataset(1, mblconfig.Defaults.mblash.DatasetDir)
 
-	// Create an Ethash network based off of the Ropsten config
+	// Create an mblash network based off of the Ropsten config
 	genesis := makeGenesis(faucets)
 
 	// Handle interrupts.
@@ -63,12 +63,12 @@ func main() {
 
 	var (
 		stacks []*node.Node
-		nodes  []*eth.mbali
+		nodes  []*mbl.mbali
 		enodes []*enode.Node
 	)
 	for i := 0; i < 4; i++ {
 		// Start the node and wait until it's up
-		stack, ethBackend, err := makeMiner(genesis)
+		stack, mblBackend, err := makeMiner(genesis)
 		if err != nil {
 			panic(err)
 		}
@@ -83,7 +83,7 @@ func main() {
 		}
 		// Start tracking the node and its enode
 		stacks = append(stacks, stack)
-		nodes = append(nodes, ethBackend)
+		nodes = append(nodes, mblBackend)
 		enodes = append(enodes, stack.Server().Self())
 	}
 
@@ -130,7 +130,7 @@ func main() {
 	}
 }
 
-// makeGenesis creates a custom Ethash genesis block based on some pre-defined
+// makeGenesis creates a custom mblash genesis block based on some pre-defined
 // faucet accounts.
 func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	genesis := core.DefaultRopstenGenesisBlock()
@@ -149,7 +149,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	return genesis
 }
 
-func makeMiner(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
+func makeMiner(genesis *core.Genesis) (*node.Node, *mbl.mbali, error) {
 	// Define the basic configurations for the mbali node
 	datadir, _ := os.MkdirTemp("", "")
 
@@ -169,17 +169,17 @@ func makeMiner(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	ethBackend, err := eth.New(stack, &ethconfig.Config{
+	mblBackend, err := mbl.New(stack, &mblconfig.Config{
 		Genesis:         genesis,
 		NetworkId:       genesis.Config.ChainID.Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
 		TxPool:          core.DefaultTxPoolConfig,
-		GPO:             ethconfig.Defaults.GPO,
-		Ethash:          ethconfig.Defaults.Ethash,
+		GPO:             mblconfig.Defaults.GPO,
+		mblash:          mblconfig.Defaults.mblash,
 		Miner: miner.Config{
-			Etherbase: common.Address{1},
+			mblerbase: common.Address{1},
 			GasCeil:   genesis.GasLimit * 11 / 10,
 			GasPrice:  big.NewInt(1),
 			Recommit:  time.Second,
@@ -190,5 +190,5 @@ func makeMiner(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
 	}
 
 	err = stack.Start()
-	return stack, ethBackend, err
+	return stack, mblBackend, err
 }

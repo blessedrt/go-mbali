@@ -43,7 +43,7 @@ var (
 	}
 	vmoduleFlag = cli.StringFlag{
 		Name:  "vmodule",
-		Usage: "Per-module verbosity: comma-separated list of <pattern>=<level> (e.g. eth/*=5,p2p=4)",
+		Usage: "Per-module verbosity: comma-separated list of <pattern>=<level> (e.g. mbl/*=5,p2p=4)",
 		Value: "",
 	}
 	logjsonFlag = cli.BoolFlag{
@@ -113,7 +113,7 @@ var glogger *log.GlogHandler
 func init() {
 	glogger = log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.LvlInfo)
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 }
 
 // Setup initializes profiling and logging based on the CLI flags.
@@ -130,7 +130,7 @@ func Setup(ctx *cli.Context) error {
 		}
 		ostream = log.StreamHandler(output, log.TerminalFormat(usecolor))
 	}
-	glogger.SetHandler(ostream)
+	glogger.Smblandler(ostream)
 
 	// logging
 	verbosity := ctx.GlobalInt(verbosityFlag.Name)
@@ -147,7 +147,7 @@ func Setup(ctx *cli.Context) error {
 	backtrace := ctx.GlobalString(backtraceAtFlag.Name)
 	glogger.BacktraceAt(backtrace)
 
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 
 	// profiling, tracing
 	runtime.MemProfileRate = memprofilerateFlag.Value

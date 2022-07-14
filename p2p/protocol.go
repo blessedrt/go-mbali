@@ -45,11 +45,11 @@ type Protocol struct {
 	// encountered.
 	Run func(peer *Peer, rw MsgReadWriter) error
 
-	// NodeInfo is an optional helper method to retrieve protocol specific metadata
+	// NodeInfo is an optional helper mmblod to retrieve protocol specific metadata
 	// about the host node.
 	NodeInfo func() interface{}
 
-	// PeerInfo is an optional helper method to retrieve protocol specific metadata
+	// PeerInfo is an optional helper mmblod to retrieve protocol specific metadata
 	// about a certain peer in the network. If an info retrieval function is set,
 	// but returns nil, it is assumed that the protocol handshake is still running.
 	PeerInfo func(id enode.ID) interface{}

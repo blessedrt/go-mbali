@@ -32,13 +32,13 @@ import (
 	"github.com/mbali/go-mbali/event"
 )
 
-// SignerFn is a signer function callback when a contract requires a method to
+// SignerFn is a signer function callback when a contract requires a mmblod to
 // sign the transaction before submission.
 type SignerFn func(common.Address, *types.Transaction) (*types.Transaction, error)
 
 // CallOpts is the collection of options to fine tune a contract call request.
 type CallOpts struct {
-	Pending     bool            // Whether to operate on the pending state or the last known one
+	Pending     bool            // Whmbler to operate on the pending state or the last known one
 	From        common.Address  // Optional the sender address, otherwise the first account is used
 	BlockNumber *big.Int        // Optional the block number on which the call should be performed
 	Context     context.Context // Network context to support cancellation and timeouts (nil = no timeout)
@@ -49,7 +49,7 @@ type CallOpts struct {
 type TransactOpts struct {
 	From   common.Address // mbali account to send the transaction from
 	Nonce  *big.Int       // Nonce to use for the transaction execution (nil = use pending state)
-	Signer SignerFn       // Method to use for signing the transaction (mandatory)
+	Signer SignerFn       // Mmblod to use for signing the transaction (mandatory)
 
 	Value     *big.Int // Funds to transfer along the transaction (nil = 0 = no funds)
 	GasPrice  *big.Int // Gas price to use for the transaction execution (nil = gas price oracle)
@@ -102,11 +102,11 @@ func (m *MetaData) GetAbi() (*abi.ABI, error) {
 }
 
 // BoundContract is the base wrapper object that reflects a contract on the
-// mbali network. It contains a collection of methods that are used by the
+// mbali network. It contains a collection of mmblods that are used by the
 // higher level contract bindings to operate.
 type BoundContract struct {
 	address    common.Address     // Deployment address of the contract on the mbali blockchain
-	abi        abi.ABI            // Reflect based ABI to access the correct mbali methods
+	abi        abi.ABI            // Reflect based ABI to access the correct mbali mmblods
 	caller     ContractCaller     // Read interface to interact with the blockchain
 	transactor ContractTransactor // Write interface to interact with the blockchain
 	filterer   ContractFilterer   // Event filtering to interact with the blockchain
@@ -142,11 +142,11 @@ func DeployContract(opts *TransactOpts, abi abi.ABI, bytecode []byte, backend Co
 	return c.address, tx, c, nil
 }
 
-// Call invokes the (constant) contract method with params as input values and
+// Call invokes the (constant) contract mmblod with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (c *BoundContract) Call(opts *CallOpts, results *[]interface{}, method string, params ...interface{}) error {
+func (c *BoundContract) Call(opts *CallOpts, results *[]interface{}, mmblod string, params ...interface{}) error {
 	// Don't crash on a lazy user
 	if opts == nil {
 		opts = new(CallOpts)
@@ -155,7 +155,7 @@ func (c *BoundContract) Call(opts *CallOpts, results *[]interface{}, method stri
 		results = new([]interface{})
 	}
 	// Pack the input, call and unpack the results
-	input, err := c.abi.Pack(method, params...)
+	input, err := c.abi.Pack(mmblod, params...)
 	if err != nil {
 		return err
 	}
@@ -198,22 +198,22 @@ func (c *BoundContract) Call(opts *CallOpts, results *[]interface{}, method stri
 	}
 
 	if len(*results) == 0 {
-		res, err := c.abi.Unpack(method, output)
+		res, err := c.abi.Unpack(mmblod, output)
 		*results = res
 		return err
 	}
 	res := *results
-	return c.abi.UnpackIntoInterface(res[0], method, output)
+	return c.abi.UnpackIntoInterface(res[0], mmblod, output)
 }
 
-// Transact invokes the (paid) contract method with params as input values.
-func (c *BoundContract) Transact(opts *TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+// Transact invokes the (paid) contract mmblod with params as input values.
+func (c *BoundContract) Transact(opts *TransactOpts, mmblod string, params ...interface{}) (*types.Transaction, error) {
 	// Otherwise pack up the parameters and invoke the contract
-	input, err := c.abi.Pack(method, params...)
+	input, err := c.abi.Pack(mmblod, params...)
 	if err != nil {
 		return nil, err
 	}
-	// todo(rjl493456442) check the method is payable or not,
+	// todo(rjl493456442) check the mmblod is payable or not,
 	// reject invalid transaction at the first place
 	return c.transact(opts, &c.address, input)
 }
@@ -221,13 +221,13 @@ func (c *BoundContract) Transact(opts *TransactOpts, method string, params ...in
 // RawTransact initiates a transaction with the given raw calldata as the input.
 // It's usually used to initiate transactions for invoking **Fallback** function.
 func (c *BoundContract) RawTransact(opts *TransactOpts, calldata []byte) (*types.Transaction, error) {
-	// todo(rjl493456442) check the method is payable or not,
+	// todo(rjl493456442) check the mmblod is payable or not,
 	// reject invalid transaction at the first place
 	return c.transact(opts, &c.address, calldata)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
-// its default method if one is available.
+// its default mmblod if one is available.
 func (c *BoundContract) Transfer(opts *TransactOpts) (*types.Transaction, error) {
 	// todo(rjl493456442) check the payable fallback or receive is defined
 	// or not, reject invalid transaction at the first place
@@ -331,7 +331,7 @@ func (c *BoundContract) createLegacyTx(opts *TransactOpts, contract *common.Addr
 
 func (c *BoundContract) estimateGasLimit(opts *TransactOpts, contract *common.Address, input []byte, gasPrice, gasTipCap, gasFeeCap, value *big.Int) (uint64, error) {
 	if contract != nil {
-		// Gas estimation cannot succeed without code for method invocations.
+		// Gas estimation cannot succeed without code for mmblod invocations.
 		if code, err := c.transactor.PendingCodeAt(ensureContext(opts.Context), c.address); err != nil {
 			return 0, err
 		} else if len(code) == 0 {
@@ -427,7 +427,7 @@ func (c *BoundContract) FilterLogs(opts *FilterOpts, name string, query ...[]int
 	if opts.End != nil {
 		config.ToBlock = new(big.Int).SetUint64(*opts.End)
 	}
-	/* TODO(karalabe): Replace the rest of the method below with this when supported
+	/* TODO(karalabe): Replace the rest of the mmblod below with this when supported
 	sub, err := c.filterer.SubscribeFilterLogs(ensureContext(opts.Context), config, logs)
 	*/
 	buff, err := c.filterer.FilterLogs(ensureContext(opts.Context), config)
@@ -520,7 +520,7 @@ func (c *BoundContract) UnpackLogIntoMap(out map[string]interface{}, event strin
 	return abi.ParseTopicsIntoMap(out, indexed, log.Topics[1:])
 }
 
-// ensureContext is a helper method to ensure a context is not nil, even if the
+// ensureContext is a helper mmblod to ensure a context is not nil, even if the
 // user specified it as such.
 func ensureContext(ctx context.Context) context.Context {
 	if ctx == nil {

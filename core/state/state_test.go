@@ -24,11 +24,11 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 type stateTest struct {
-	db    ethdb.Database
+	db    mbldb.Database
 	state *StateDB
 }
 

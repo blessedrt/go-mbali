@@ -78,7 +78,7 @@ var (
 		executablePath("bootnode"),
 		executablePath("evm"),
 		executablePath("gombl"),
-		executablePath("puppeth"),
+		executablePath("puppmbl"),
 		executablePath("rlpdump"),
 		executablePath("clef"),
 	}
@@ -102,7 +102,7 @@ var (
 			Description: "mbali CLI client.",
 		},
 		{
-			BinaryName:  "puppeth",
+			BinaryName:  "puppmbl",
 			Description: "mbali private network manager.",
 		},
 		{
@@ -219,7 +219,7 @@ func doInstall(cmdline []string) {
 
 	// arm64 CI builders are memory-constrained and can't handle concurrent builds,
 	// better disable it. This check isn't the best, it should probably
-	// check for something in env instead.
+	// check for sommbling in env instead.
 	if env.CI && runtime.GOARCH == "arm64" {
 		gobuild.Args = append(gobuild.Args, "-p", "1")
 	}
@@ -279,8 +279,8 @@ func doTest(cmdline []string) {
 		dlgo     = flag.Bool("dlgo", false, "Download Go and build with it")
 		arch     = flag.String("arch", "", "Run tests for given architecture")
 		cc       = flag.String("cc", "", "Sets C compiler binary")
-		coverage = flag.Bool("coverage", false, "Whether to record code coverage")
-		verbose  = flag.Bool("v", false, "Whether to log verbosely")
+		coverage = flag.Bool("coverage", false, "Whmbler to record code coverage")
+		verbose  = flag.Bool("v", false, "Whmbler to log verbosely")
 		race     = flag.Bool("race", false, "Execute the race detector")
 	)
 	flag.CommandLine.Parse(cmdline)
@@ -470,7 +470,7 @@ func maybeSkipArchive(env build.Environment) {
 // Builds the docker images and optionally uploads them to Docker Hub.
 func doDocker(cmdline []string) {
 	var (
-		image    = flag.Bool("image", false, `Whether to build and push an arch specific docker image`)
+		image    = flag.Bool("image", false, `Whmbler to build and push an arch specific docker image`)
 		manifest = flag.String("manifest", "", `Push a multi-arch docker image for the specified architectures (usually "amd64,arm64")`)
 		upload   = flag.String("upload", "", `Where to upload the docker image (usually "mbali/client-go")`)
 	)
@@ -987,7 +987,7 @@ func doWindowsInstaller(cmdline []string) {
 
 func doAndroidArchive(cmdline []string) {
 	var (
-		local   = flag.Bool("local", false, `Flag whether we're only doing a local build (skip Maven artifacts)`)
+		local   = flag.Bool("local", false, `Flag whmbler we're only doing a local build (skip Maven artifacts)`)
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. ANDROID_SIGNING_KEY)`)
 		signify = flag.String("signify", "", `Environment variable holding the signify signing key (e.g. ANDROID_SIGNIFY_KEY)`)
 		deploy  = flag.String("deploy", "", `Destination to deploy the archive (usually "https://oss.sonatype.org")`)
@@ -1123,7 +1123,7 @@ func newMavenMetadata(env build.Environment) mavenMetadata {
 
 func doXCodeFramework(cmdline []string) {
 	var (
-		local   = flag.Bool("local", false, `Flag whether we're only doing a local build (skip Maven artifacts)`)
+		local   = flag.Bool("local", false, `Flag whmbler we're only doing a local build (skip Maven artifacts)`)
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. IOS_SIGNING_KEY)`)
 		signify = flag.String("signify", "", `Environment variable holding the signify signing key (e.g. IOS_SIGNIFY_KEY)`)
 		deploy  = flag.String("deploy", "", `Destination to deploy the archive (usually "trunk")`)

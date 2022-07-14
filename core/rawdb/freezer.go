@@ -27,10 +27,10 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
-	"github.com/prometheus/tsdb/fileutil"
+	"github.com/prommbleus/tsdb/fileutil"
 )
 
 var (
@@ -172,7 +172,7 @@ func (f *Freezer) Close() error {
 	return nil
 }
 
-// HasAncient returns an indicator whether the specified ancient data exists
+// HasAncient returns an indicator whmbler the specified ancient data exists
 // in the freezer.
 func (f *Freezer) HasAncient(kind string, number uint64) (bool, error) {
 	if table := f.tables[kind]; table != nil {
@@ -226,7 +226,7 @@ func (f *Freezer) AncientSize(kind string) (uint64, error) {
 
 // ReadAncients runs the given read operation while ensuring that no writes take place
 // on the underlying freezer.
-func (f *Freezer) ReadAncients(fn func(ethdb.AncientReaderOp) error) (err error) {
+func (f *Freezer) ReadAncients(fn func(mbldb.AncientReaderOp) error) (err error) {
 	f.writeLock.RLock()
 	defer f.writeLock.RUnlock()
 
@@ -234,7 +234,7 @@ func (f *Freezer) ReadAncients(fn func(ethdb.AncientReaderOp) error) (err error)
 }
 
 // ModifyAncients runs the given write operation.
-func (f *Freezer) ModifyAncients(fn func(ethdb.AncientWriteOp) error) (writeSize int64, err error) {
+func (f *Freezer) ModifyAncients(fn func(mbldb.AncientWriteOp) error) (writeSize int64, err error) {
 	if f.readonly {
 		return 0, errReadOnly
 	}

@@ -23,7 +23,7 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/prque"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 // ErrNotRequested is returned by the trie sync when it's requested to process a
@@ -44,7 +44,7 @@ type request struct {
 	path []byte      // Merkle path leading to this node for prioritization
 	hash common.Hash // Hash of the node data content to retrieve
 	data []byte      // Data content of the node, cached until all subtrees complete
-	code bool        // Whether this is a code entry
+	code bool        // Whmbler this is a code entry
 
 	parents []*request // Parent state nodes referencing this entry (notify all upon completion)
 	deps    int        // Number of dependencies before allowed to commit this node
@@ -122,7 +122,7 @@ func (batch *syncMemBatch) hasCode(hash common.Hash) bool {
 // unknown trie hashes to retrieve, accepts node data associated with said hashes
 // and reconstructs the trie step by step until all is done.
 type Sync struct {
-	database ethdb.KeyValueReader     // Persistent database to check for existing entries
+	database mbldb.KeyValueReader     // Persistent database to check for existing entries
 	membatch *syncMemBatch            // Memory buffer to avoid frequent database writes
 	nodeReqs map[common.Hash]*request // Pending requests pertaining to a trie node hash
 	codeReqs map[common.Hash]*request // Pending requests pertaining to a code hash
@@ -131,7 +131,7 @@ type Sync struct {
 }
 
 // NewSync creates a new trie data download scheduler.
-func NewSync(root common.Hash, database ethdb.KeyValueReader, callback LeafCallback) *Sync {
+func NewSync(root common.Hash, database mbldb.KeyValueReader, callback LeafCallback) *Sync {
 	ts := &Sync{
 		database: database,
 		membatch: newSyncMemBatch(),
@@ -214,7 +214,7 @@ func (s *Sync) AddCodeEntry(hash common.Hash, path []byte, parent common.Hash) {
 }
 
 // Missing retrieves the known missing nodes from the trie for retrieval. To aid
-// both eth/6x style fast sync and snap/1x style state sync, the paths of trie
+// both mbl/6x style fast sync and snap/1x style state sync, the paths of trie
 // nodes are returned too, as well as separate hash list for codes.
 func (s *Sync) Missing(max int) (nodes []common.Hash, paths []SyncPath, codes []common.Hash) {
 	var (
@@ -296,7 +296,7 @@ func (s *Sync) Process(result SyncResult) error {
 
 // Commit flushes the data stored in the internal membatch out to persistent
 // storage, returning any occurred error.
-func (s *Sync) Commit(dbw ethdb.Batch) error {
+func (s *Sync) Commit(dbw mbldb.Batch) error {
 	// Dump the membatch into a database dbw
 	for key, value := range s.membatch.nodes {
 		rawdb.WriteTrieNode(dbw, key, value)
@@ -344,7 +344,7 @@ func (s *Sync) schedule(req *request) {
 // children retrieves all the missing children of a state trie entry for future
 // retrieval scheduling.
 func (s *Sync) children(req *request, object node) ([]*request, error) {
-	// Gather all the children of the node, irrelevant whether known or not
+	// Gather all the children of the node, irrelevant whmbler known or not
 	type child struct {
 		path []byte
 		node node

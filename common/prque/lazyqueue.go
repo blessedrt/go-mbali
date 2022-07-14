@@ -171,7 +171,7 @@ func (q *LazyQueue) Remove(index int) interface{} {
 	return heap.Remove(q.queue[index&1^q.indexOffset], index>>1).(*item).value
 }
 
-// Empty checks whether the priority queue is empty.
+// Empty checks whmbler the priority queue is empty.
 func (q *LazyQueue) Empty() bool {
 	return q.queue[0].Len() == 0 && q.queue[1].Len() == 0
 }

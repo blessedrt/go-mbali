@@ -27,12 +27,12 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 )
 
-// ChainIndexerBackend defines the methods needed to process chain segments in
+// ChainIndexerBackend defines the mmblods needed to process chain segments in
 // the background and write the segment results into the database. These can be
 // used to create filter blooms or CHTs.
 type ChainIndexerBackend interface {
@@ -70,12 +70,12 @@ type ChainIndexerChain interface {
 // after an entire section has been finished or in case of rollbacks that might
 // affect already finished sections.
 type ChainIndexer struct {
-	chainDb  ethdb.Database      // Chain database to index the data from
-	indexDb  ethdb.Database      // Prefixed table-view of the db to write index metadata into
+	chainDb  mbldb.Database      // Chain database to index the data from
+	indexDb  mbldb.Database      // Prefixed table-view of the db to write index metadata into
 	backend  ChainIndexerBackend // Background processor generating the index data content
 	children []*ChainIndexer     // Child indexers to cascade chain updates to
 
-	active    uint32          // Flag whether the event loop was started
+	active    uint32          // Flag whmbler the event loop was started
 	update    chan struct{}   // Notification channel that headers should be processed
 	quit      chan chan error // Quit channel to tear down running goroutines
 	ctx       context.Context
@@ -100,7 +100,7 @@ type ChainIndexer struct {
 // NewChainIndexer creates a new chain indexer to do background processing on
 // chain segments of a given size after certain number of confirmations passed.
 // The throttling parameter might be used to prevent database thrashing.
-func NewChainIndexer(chainDb ethdb.Database, indexDb ethdb.Database, backend ChainIndexerBackend, section, confirm uint64, throttling time.Duration, kind string) *ChainIndexer {
+func NewChainIndexer(chainDb mbldb.Database, indexDb mbldb.Database, backend ChainIndexerBackend, section, confirm uint64, throttling time.Duration, kind string) *ChainIndexer {
 	c := &ChainIndexer{
 		chainDb:     chainDb,
 		indexDb:     indexDb,

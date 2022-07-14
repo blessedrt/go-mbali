@@ -21,13 +21,13 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/trie"
 )
 
 // NewStateSync create a new state trie download scheduler.
-func NewStateSync(root common.Hash, database ethdb.KeyValueReader, onLeaf func(paths [][]byte, leaf []byte) error) *trie.Sync {
+func NewStateSync(root common.Hash, database mbldb.KeyValueReader, onLeaf func(paths [][]byte, leaf []byte) error) *trie.Sync {
 	// Register the storage slot callback if the external callback is specified.
 	var onSlot func(paths [][]byte, hexpath []byte, leaf []byte, parent common.Hash) error
 	if onLeaf != nil {

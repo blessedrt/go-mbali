@@ -41,7 +41,7 @@ import (
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/internal/flags"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/node"
@@ -203,7 +203,7 @@ The delpw command removes a password for a given address (keyfile).
 			acceptFlag,
 		},
 		Description: `
-The newaccount command creates a new keystore-backed account. It is a convenience-method
+The newaccount command creates a new keystore-backed account. It is a convenience-mmblod
 which can be used in lieu of an external UI.`,
 	}
 
@@ -517,7 +517,7 @@ func initialize(c *cli.Context) error {
 	if usecolor {
 		output = colorable.NewColorable(logOutput)
 	}
-	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(c.Int(logLevelFlag.Name)), log.StreamHandler(output, log.TerminalFormat(usecolor))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.Lvl(c.Int(logLevelFlag.Name)), log.StreamHandler(output, log.TerminalFormat(usecolor))))
 
 	return nil
 }
@@ -895,7 +895,7 @@ func testExternalUI(api *core.SignerAPI) {
 		api.UI.ShowInfo("Please approve the next request for signing EIP-712 typed data")
 		time.Sleep(delay)
 		addr, _ := common.NewMixedcaseAddressFromString("0x0011223344556677889900112233445566778899")
-		data := `{"types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Person":[{"name":"name","type":"string"},{"name":"test","type":"uint8"},{"name":"wallet","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}]},"primaryType":"Mail","domain":{"name":"Ether Mail","version":"1","chainId":"1","verifyingContract":"0xCCCcccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"},"message":{"from":{"name":"Cow","test":"3","wallet":"0xcD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"},"to":{"name":"Bob","wallet":"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB","test":"2"},"contents":"Hello, Bob!"}}`
+		data := `{"types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Person":[{"name":"name","type":"string"},{"name":"test","type":"uint8"},{"name":"wallet","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}]},"primaryType":"Mail","domain":{"name":"mbler Mail","version":"1","chainId":"1","verifyingContract":"0xCCCcccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"},"message":{"from":{"name":"Cow","test":"3","wallet":"0xcD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"},"to":{"name":"Bob","wallet":"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB","test":"2"},"contents":"Hello, Bob!"}}`
 		//_, err := api.SignData(ctx, accounts.MimetypeTypedData, *addr, hexutil.Encode([]byte(data)))
 		var typedData apitypes.TypedData
 		json.Unmarshal([]byte(data), &typedData)
@@ -1055,7 +1055,7 @@ func GenDoc(ctx *cli.Context) {
 		add("SignTxRequest", desc, &core.SignTxRequest{
 			Meta: meta,
 			Callinfo: []apitypes.ValidationInfo{
-				{Typ: "Warning", Message: "Something looks odd, show this message as a warning"},
+				{Typ: "Warning", Message: "Sommbling looks odd, show this message as a warning"},
 				{Typ: "Info", Message: "User should see this as well"},
 			},
 			Transaction: apitypes.SendTxArgs{
@@ -1092,21 +1092,21 @@ func GenDoc(ctx *cli.Context) {
 		desc := "SignTransactionResult is used in the call `clef` -> `OnApprovedTx(result)`" +
 			"\n\n" +
 			"This occurs _after_ successful completion of the entire signing procedure, but right before the signed " +
-			"transaction is passed to the external caller. This method (and data) can be used by the UI to signal " +
+			"transaction is passed to the external caller. This mmblod (and data) can be used by the UI to signal " +
 			"to the user that the transaction was signed, but it is primarily useful for ruleset implementations." +
 			"\n\n" +
 			"A ruleset that implements a rate limitation needs to know what transactions are sent out to the external " +
-			"interface. By hooking into this methods, the ruleset can maintain track of that count." +
+			"interface. By hooking into this mmblods, the ruleset can maintain track of that count." +
 			"\n\n" +
 			"**OBS:** Note that if an attacker can restore your `clef` data to a previous point in time" +
 			" (e.g through a backup), the attacker can reset such windows, even if he/she is unable to decrypt the content. " +
 			"\n\n" +
-			"The `OnApproved` method cannot be responded to, it's purely informative"
+			"The `OnApproved` mmblod cannot be responded to, it's purely informative"
 
 		rlpdata := common.FromHex("0xf85d640101948a8eafb1cf62bfbeb1741769dae1a9dd47996192018026a0716bd90515acb1e68e5ac5867aa11a1e65399c3349d479f5fb698554ebc6f293a04e8a4ebfff434e971e0ef12c5bf3a881b06fd04fc3f8b8a7291fb67a26a1d4ed")
 		var tx types.Transaction
 		tx.UnmarshalBinary(rlpdata)
-		add("OnApproved - SignTransactionResult", desc, &ethapi.SignTransactionResult{Raw: rlpdata, Tx: &tx})
+		add("OnApproved - SignTransactionResult", desc, &mblapi.SignTransactionResult{Raw: rlpdata, Tx: &tx})
 
 	}
 	{ // User input
@@ -1127,7 +1127,7 @@ func GenDoc(ctx *cli.Context) {
 			})
 
 		add("ListResponse", "Response to list request. The response contains a list of all addresses to show to the caller. "+
-			"Note: the UI is free to respond with any address the caller, regardless of whether it exists or not",
+			"Note: the UI is free to respond with any address the caller, regardless of whmbler it exists or not",
 			&core.ListResponse{
 				Accounts: []accounts.Account{
 					{

@@ -32,7 +32,7 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
@@ -82,7 +82,7 @@ func (ga *GenesisAlloc) UnmarshalJSON(data []byte) error {
 
 // flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
-func (ga *GenesisAlloc) flush(db ethdb.Database) (common.Hash, error) {
+func (ga *GenesisAlloc) flush(db mbldb.Database) (common.Hash, error) {
 	statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
 	if err != nil {
 		return common.Hash{}, err
@@ -108,7 +108,7 @@ func (ga *GenesisAlloc) flush(db ethdb.Database) (common.Hash, error) {
 
 // write writes the json marshaled genesis state into database
 // with the given block hash as the unique identifier.
-func (ga *GenesisAlloc) write(db ethdb.KeyValueWriter, hash common.Hash) error {
+func (ga *GenesisAlloc) write(db mbldb.KeyValueWriter, hash common.Hash) error {
 	blob, err := json.Marshal(ga)
 	if err != nil {
 		return err
@@ -119,7 +119,7 @@ func (ga *GenesisAlloc) write(db ethdb.KeyValueWriter, hash common.Hash) error {
 
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits them into the given database handler.
-func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
+func CommitGenesisState(db mbldb.Database, hash common.Hash) error {
 	var alloc GenesisAlloc
 	blob := rawdb.ReadGenesisState(db, hash)
 	if len(blob) != 0 {
@@ -229,13 +229,13 @@ func (e *GenesisMismatchError) Error() string {
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *Genesis) (*params.ChainConfig, common.Hash, error) {
+func SetupGenesisBlock(db mbldb.Database, genesis *Genesis) (*params.ChainConfig, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, overrideArrowGlacier, overrideTerminalTotalDifficulty *big.Int) (*params.ChainConfig, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db mbldb.Database, genesis *Genesis, overrideArrowGlacier, overrideTerminalTotalDifficulty *big.Int) (*params.ChainConfig, common.Hash, error) {
 	if genesis != nil && genesis.Config == nil {
-		return params.AllEthashProtocolChanges, common.Hash{}, errGenesisNoConfig
+		return params.AllmblashProtocolChanges, common.Hash{}, errGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
 	stored := rawdb.ReadCanonicalHash(db, 0)
@@ -270,7 +270,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, override
 		}
 		return genesis.Config, block.Hash(), nil
 	}
-	// Check whether the genesis block is already written.
+	// Check whmbler the genesis block is already written.
 	if genesis != nil {
 		hash := genesis.ToBlock(nil).Hash()
 		if hash != stored {
@@ -339,13 +339,13 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 	case ghash == params.KilnGenesisHash:
 		return DefaultKilnGenesisBlock().Config
 	default:
-		return params.AllEthashProtocolChanges
+		return params.AllmblashProtocolChanges
 	}
 }
 
 // ToBlock creates the genesis block and writes state of a genesis specification
 // to the given database (or discards it if nil).
-func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
+func (g *Genesis) ToBlock(db mbldb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
@@ -385,14 +385,14 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 
 // Commit writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
-func (g *Genesis) Commit(db ethdb.Database) (*types.Block, error) {
+func (g *Genesis) Commit(db mbldb.Database) (*types.Block, error) {
 	block := g.ToBlock(db)
 	if block.Number().Sign() != 0 {
 		return nil, errors.New("can't commit genesis block with number > 0")
 	}
 	config := g.Config
 	if config == nil {
-		config = params.AllEthashProtocolChanges
+		config = params.AllmblashProtocolChanges
 	}
 	if err := config.CheckConfigForkOrder(); err != nil {
 		return nil, err
@@ -416,7 +416,7 @@ func (g *Genesis) Commit(db ethdb.Database) (*types.Block, error) {
 
 // MustCommit writes the genesis block and state to db, panicking on error.
 // The block is committed as the canonical head block.
-func (g *Genesis) MustCommit(db ethdb.Database) *types.Block {
+func (g *Genesis) MustCommit(db mbldb.Database) *types.Block {
 	block, err := g.Commit(db)
 	if err != nil {
 		panic(err)
@@ -425,7 +425,7 @@ func (g *Genesis) MustCommit(db ethdb.Database) *types.Block {
 }
 
 // GenesisBlockForTesting creates and writes a block in which addr has the given wei balance.
-func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big.Int) *types.Block {
+func GenesisBlockForTesting(db mbldb.Database, addr common.Address, balance *big.Int) *types.Block {
 	g := Genesis{
 		Alloc:   GenesisAlloc{addr: {Balance: balance}},
 		BaseFee: big.NewInt(params.InitialBaseFee),

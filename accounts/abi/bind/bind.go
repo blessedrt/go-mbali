@@ -72,13 +72,13 @@ func Bind(types []string, abis []string, bytecodes []string, fsigs []map[string]
 			return r
 		}, abis[i])
 
-		// Extract the call and transact methods; events, struct definitions; and sort them alphabetically
+		// Extract the call and transact mmblods; events, struct definitions; and sort them alphabetically
 		var (
-			calls     = make(map[string]*tmplMethod)
-			transacts = make(map[string]*tmplMethod)
+			calls     = make(map[string]*tmplMmblod)
+			transacts = make(map[string]*tmplMmblod)
 			events    = make(map[string]*tmplEvent)
-			fallback  *tmplMethod
-			receive   *tmplMethod
+			fallback  *tmplMmblod
+			receive   *tmplMmblod
 
 			// identifiers are used to detect duplicated identifiers of functions
 			// and events. For all calls, transacts and events, abigen will generate
@@ -95,10 +95,10 @@ func Bind(types []string, abis []string, bytecodes []string, fsigs []map[string]
 			}
 		}
 
-		for _, original := range evmABI.Methods {
-			// Normalize the method for capital cases and non-anonymous inputs/outputs
+		for _, original := range evmABI.Mmblods {
+			// Normalize the mmblod for capital cases and non-anonymous inputs/outputs
 			normalized := original
-			normalizedName := methodNormalizer[lang](alias(aliases, original.Name))
+			normalizedName := mmblodNormalizer[lang](alias(aliases, original.Name))
 
 			// Ensure there is no duplicated identifier
 			var identifiers = callIdentifiers
@@ -131,11 +131,11 @@ func Bind(types []string, abis []string, bytecodes []string, fsigs []map[string]
 					bindStructType[lang](output.Type, structs)
 				}
 			}
-			// Append the methods to the call or transact lists
+			// Append the mmblods to the call or transact lists
 			if original.IsConstant() {
-				calls[original.Name] = &tmplMethod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
+				calls[original.Name] = &tmplMmblod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
 			} else {
-				transacts[original.Name] = &tmplMethod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
+				transacts[original.Name] = &tmplMmblod{Original: original, Normalized: normalized, Structured: structured(original.Outputs)}
 			}
 		}
 		for _, original := range evmABI.Events {
@@ -147,7 +147,7 @@ func Bind(types []string, abis []string, bytecodes []string, fsigs []map[string]
 			normalized := original
 
 			// Ensure there is no duplicated identifier
-			normalizedName := methodNormalizer[lang](alias(aliases, original.Name))
+			normalizedName := mmblodNormalizer[lang](alias(aliases, original.Name))
 			if eventIdentifiers[normalizedName] {
 				return "", fmt.Errorf("duplicated identifier \"%s\"(normalized \"%s\"), use --alias for renaming", original.Name, normalizedName)
 			}
@@ -179,10 +179,10 @@ func Bind(types []string, abis []string, bytecodes []string, fsigs []map[string]
 		}
 		// Add two special fallback functions if they exist
 		if evmABI.HasFallback() {
-			fallback = &tmplMethod{Original: evmABI.Fallback}
+			fallback = &tmplMmblod{Original: evmABI.Fallback}
 		}
 		if evmABI.HasReceive() {
-			receive = &tmplMethod{Original: evmABI.Receive}
+			receive = &tmplMmblod{Original: evmABI.Receive}
 		}
 		// There is no easy way to pass arbitrary java objects to the Go side.
 		if len(structs) > 0 && lang == LangJava {
@@ -512,14 +512,14 @@ func bindStructTypeJava(kind abi.Type, structs map[string]*tmplStruct) string {
 }
 
 // namedType is a set of functions that transform language specific types to
-// named versions that may be used inside method names.
+// named versions that may be used inside mmblod names.
 var namedType = map[Lang]func(string, abi.Type) string{
 	LangGo:   func(string, abi.Type) string { panic("this shouldn't be needed") },
 	LangJava: namedTypeJava,
 }
 
 // namedTypeJava converts some primitive data types to named variants that can
-// be used as parts of method names.
+// be used as parts of mmblod names.
 func namedTypeJava(javaKind string, solKind abi.Type) string {
 	switch javaKind {
 	case "byte[]":
@@ -553,9 +553,9 @@ func alias(aliases map[string]string, n string) string {
 	return n
 }
 
-// methodNormalizer is a name transformer that modifies Solidity method names to
+// mmblodNormalizer is a name transformer that modifies Solidity mmblod names to
 // conform to target language naming conventions.
-var methodNormalizer = map[Lang]func(string) string{
+var mmblodNormalizer = map[Lang]func(string) string{
 	LangGo:   abi.ToCamelCase,
 	LangJava: decapitalise,
 }
@@ -573,7 +573,7 @@ func decapitalise(input string) string {
 	return strings.ToLower(goForm[:1]) + goForm[1:]
 }
 
-// structured checks whether a list of ABI data types has enough information to
+// structured checks whmbler a list of ABI data types has enough information to
 // operate through a proper Go struct or if flat returns are needed.
 func structured(args abi.Arguments) bool {
 	if len(args) < 2 {
@@ -596,7 +596,7 @@ func structured(args abi.Arguments) bool {
 	return true
 }
 
-// hasStruct returns an indicator whether the given type is struct, struct slice
+// hasStruct returns an indicator whmbler the given type is struct, struct slice
 // or struct array.
 func hasStruct(t abi.Type) bool {
 	switch t.T {

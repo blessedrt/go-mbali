@@ -19,15 +19,15 @@ package leveldb
 import (
 	"testing"
 
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/dbtest"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/dbtest"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/storage"
 )
 
 func TestLevelDB(t *testing.T) {
 	t.Run("DatabaseSuite", func(t *testing.T) {
-		dbtest.TestDatabaseSuite(t, func() ethdb.KeyValueStore {
+		dbtest.TestDatabaseSuite(t, func() mbldb.KeyValueStore {
 			db, err := leveldb.Open(storage.NewMemStorage(), nil)
 			if err != nil {
 				t.Fatal(err)

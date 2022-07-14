@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 
 	flag.Parse()
 	log.PrintOrigins(true)
-	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*loglevel), log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.Lvl(*loglevel), log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
 	os.Exit(m.Run())
 }
 
@@ -531,7 +531,7 @@ func (t *expectEvents) expect(events ...*Event) {
 	}
 }
 
-// TestHTTPNodeRPC tests calling RPC methods on nodes via the HTTP API
+// TestHTTPNodeRPC tests calling RPC mmblods on nodes via the HTTP API
 func TestHTTPNodeRPC(t *testing.T) {
 	// start the server
 	_, s := testHTTPServer(t)
@@ -569,13 +569,13 @@ func TestHTTPNodeRPC(t *testing.T) {
 	}
 	defer sub.Unsubscribe()
 
-	// call some RPC methods using client 2
+	// call some RPC mmblods using client 2
 	if err := rpcClient2.CallContext(ctx, nil, "test_add", 10); err != nil {
-		t.Fatalf("error calling RPC method: %s", err)
+		t.Fatalf("error calling RPC mmblod: %s", err)
 	}
 	var result int64
 	if err := rpcClient2.CallContext(ctx, &result, "test_get"); err != nil {
-		t.Fatalf("error calling RPC method: %s", err)
+		t.Fatalf("error calling RPC mmblod: %s", err)
 	}
 	if result != 10 {
 		t.Fatalf("expected result to be 10, got %d", result)

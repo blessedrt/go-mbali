@@ -105,7 +105,7 @@ func TestNormalize(t *testing.T) {
 		}
 		ref.normalize()
 
-		// Check whether SUM(amount) ~= SUM(value)
+		// Check whmbler SUM(amount) ~= SUM(value)
 		var sumAmount, sumValue uint64
 		for i := 0; i < 10; i++ {
 			sumAmount += ref.basket.items[i].amount

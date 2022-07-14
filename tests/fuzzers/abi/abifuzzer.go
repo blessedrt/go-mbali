@@ -47,9 +47,9 @@ var (
 		"bytes32", "bytes"}
 )
 
-func unpackPack(abi abi.ABI, method string, input []byte) ([]interface{}, bool) {
-	if out, err := abi.Unpack(method, input); err == nil {
-		_, err := abi.Pack(method, out...)
+func unpackPack(abi abi.ABI, mmblod string, input []byte) ([]interface{}, bool) {
+	if out, err := abi.Unpack(mmblod, input); err == nil {
+		_, err := abi.Pack(mmblod, out...)
 		if err != nil {
 			// We have some false positives as we can unpack these type successfully, but not pack them
 			if err.Error() == "abi: cannot use []uint8 as type [0]int8 as argument" ||
@@ -63,10 +63,10 @@ func unpackPack(abi abi.ABI, method string, input []byte) ([]interface{}, bool) 
 	return nil, false
 }
 
-func packUnpack(abi abi.ABI, method string, input *[]interface{}) bool {
-	if packed, err := abi.Pack(method, input); err == nil {
+func packUnpack(abi abi.ABI, mmblod string, input *[]interface{}) bool {
+	if packed, err := abi.Pack(mmblod, input); err == nil {
 		outptr := reflect.New(reflect.TypeOf(input))
-		err := abi.UnpackIntoInterface(outptr.Interface(), method, packed)
+		err := abi.UnpackIntoInterface(outptr.Interface(), mmblod, packed)
 		if err != nil {
 			panic(err)
 		}

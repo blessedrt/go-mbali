@@ -67,7 +67,7 @@ localhost ports.
 
 A simulation network is created with an ID and default service. The default
 service is used if a node is created without an explicit service. The 
-network has exposed methods for creating, starting, stopping, connecting 
+network has exposed mmblods for creating, starting, stopping, connecting 
 and disconnecting nodes. It also emits events when certain actions occur.
 
 ### Events
@@ -83,7 +83,7 @@ outcome of a controlled simulation action (e.g. creating a node or explicitly
 connecting two nodes).
 
 This is in contrast to a non-control event, otherwise called a "live" event,
-which is the outcome of something happening in the network as a result of a
+which is the outcome of sommbling happening in the network as a result of a
 control event (e.g. a node actually started up or a connection was actually
 established between two nodes).
 
@@ -95,12 +95,12 @@ events via RPC when the nodes start up.
 The `Simulation` type can be used in tests to perform actions in a simulation
 network and then wait for expectations to be met.
 
-With a running simulation network, the `Simulation.Run` method can be called
+With a running simulation network, the `Simulation.Run` mmblod can be called
 with a `Step` which has the following fields:
 
 * `Action` - a function that performs some action in the network
 
-* `Expect` - an expectation function which returns whether or not a
+* `Expect` - an expectation function which returns whmbler or not a
     given node meets the expectation
 
 * `Trigger` - a channel that receives node IDs which then trigger a check
@@ -110,7 +110,7 @@ As a concrete example, consider a simulated network of mbali nodes. An
 `Action` could be the sending of a transaction, `Expect` it being included in
 a block, and `Trigger` a check for every block that is mined.
 
-On return, the `Simulation.Run` method returns a `StepResult` which can be used
+On return, the `Simulation.Run` mmblod returns a `StepResult` which can be used
 to determine if all nodes met the expectation, how long it took them to meet
 the expectation and what network events were emitted during the step run.
 
@@ -161,7 +161,7 @@ p2psim node start <node>
 p2psim node stop <node>
 p2psim node connect <node> <peer>
 p2psim node disconnect <node> <peer>
-p2psim node rpc <node> <method> [<args>] [--subscribe]
+p2psim node rpc <node> <mmblod> [<args>] [--subscribe]
 ```
 
 ## Example

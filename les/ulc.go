@@ -48,7 +48,7 @@ func newULC(servers []string, fraction int) (*ulc, error) {
 	}, nil
 }
 
-// trusted return an indicator that whether the specified peer is trusted.
+// trusted return an indicator that whmbler the specified peer is trusted.
 func (u *ulc) trusted(p enode.ID) bool {
 	return u.keys[p.String()]
 }

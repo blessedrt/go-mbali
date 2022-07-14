@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
@@ -43,7 +43,7 @@ var (
 // contains a transaction and every 5th an uncle to allow testing correct block
 // reassembly.
 func makeChain(n int, seed byte, parent *types.Block, empty bool) ([]*types.Block, []types.Receipts) {
-	blocks, receipts := core.GenerateChain(params.TestChainConfig, parent, ethash.NewFaker(), testdb, n, func(i int, block *core.BlockGen) {
+	blocks, receipts := core.GenerateChain(params.TestChainConfig, parent, mblash.NewFaker(), testdb, n, func(i int, block *core.BlockGen) {
 		block.SetCoinbase(common.Address{seed})
 		// Add one tx to every secondblock
 		if !empty && i%2 == 0 {
@@ -267,7 +267,7 @@ func XTestDelivery(t *testing.T) {
 	world.chain = blo
 	world.progress(10)
 	if false {
-		log.Root().SetHandler(log.StdoutHandler)
+		log.Root().Smblandler(log.StdoutHandler)
 
 	}
 	q := newQueue(10, 10)

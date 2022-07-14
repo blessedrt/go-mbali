@@ -26,13 +26,13 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/node"
 	"github.com/mbali/go-mbali/params"
 
@@ -234,14 +234,14 @@ func createNode(t *testing.T, gqlEnabled bool, txEnabled bool) *node.Node {
 
 func createGQLService(t *testing.T, stack *node.Node) {
 	// create backend
-	ethConf := &ethconfig.Config{
+	mblConf := &mblconfig.Config{
 		Genesis: &core.Genesis{
-			Config:     params.AllEthashProtocolChanges,
+			Config:     params.AllmblashProtocolChanges,
 			GasLimit:   11500000,
 			Difficulty: big.NewInt(1048576),
 		},
-		Ethash: ethash.Config{
-			PowMode: ethash.ModeFake,
+		mblash: mblash.Config{
+			PowMode: mblash.ModeFake,
 		},
 		NetworkId:               1337,
 		TrieCleanCache:          5,
@@ -251,19 +251,19 @@ func createGQLService(t *testing.T, stack *node.Node) {
 		TrieTimeout:             60 * time.Minute,
 		SnapshotCache:           5,
 	}
-	ethBackend, err := eth.New(stack, ethConf)
+	mblBackend, err := mbl.New(stack, mblConf)
 	if err != nil {
-		t.Fatalf("could not create eth backend: %v", err)
+		t.Fatalf("could not create mbl backend: %v", err)
 	}
 	// Create some blocks and import them
-	chain, _ := core.GenerateChain(params.AllEthashProtocolChanges, ethBackend.BlockChain().Genesis(),
-		ethash.NewFaker(), ethBackend.ChainDb(), 10, func(i int, gen *core.BlockGen) {})
-	_, err = ethBackend.BlockChain().InsertChain(chain)
+	chain, _ := core.GenerateChain(params.AllmblashProtocolChanges, mblBackend.BlockChain().Genesis(),
+		mblash.NewFaker(), mblBackend.ChainDb(), 10, func(i int, gen *core.BlockGen) {})
+	_, err = mblBackend.BlockChain().InsertChain(chain)
 	if err != nil {
 		t.Fatalf("could not create import blocks: %v", err)
 	}
 	// create gql service
-	err = New(stack, ethBackend.APIBackend, []string{}, []string{})
+	err = New(stack, mblBackend.APIBackend, []string{}, []string{})
 	if err != nil {
 		t.Fatalf("could not create graphql service: %v", err)
 	}
@@ -276,9 +276,9 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 	funds := big.NewInt(1000000000000000)
 	dad := common.HexToAddress("0x0000000000000000000000000000000000000dad")
 
-	ethConf := &ethconfig.Config{
+	mblConf := &mblconfig.Config{
 		Genesis: &core.Genesis{
-			Config:     params.AllEthashProtocolChanges,
+			Config:     params.AllmblashProtocolChanges,
 			GasLimit:   11500000,
 			Difficulty: big.NewInt(1048576),
 			Alloc: core.GenesisAlloc{
@@ -297,8 +297,8 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 			},
 			BaseFee: big.NewInt(params.InitialBaseFee),
 		},
-		Ethash: ethash.Config{
-			PowMode: ethash.ModeFake,
+		mblash: mblash.Config{
+			PowMode: mblash.ModeFake,
 		},
 		NetworkId:               1337,
 		TrieCleanCache:          5,
@@ -309,11 +309,11 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 		SnapshotCache:           5,
 	}
 
-	ethBackend, err := eth.New(stack, ethConf)
+	mblBackend, err := mbl.New(stack, mblConf)
 	if err != nil {
-		t.Fatalf("could not create eth backend: %v", err)
+		t.Fatalf("could not create mbl backend: %v", err)
 	}
-	signer := types.LatestSigner(ethConf.Genesis.Config)
+	signer := types.LatestSigner(mblConf.Genesis.Config)
 
 	legacyTx, _ := types.SignNewTx(key, signer, &types.LegacyTx{
 		Nonce:    uint64(0),
@@ -323,7 +323,7 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 		GasPrice: big.NewInt(params.InitialBaseFee),
 	})
 	envelopTx, _ := types.SignNewTx(key, signer, &types.AccessListTx{
-		ChainID:  ethConf.Genesis.Config.ChainID,
+		ChainID:  mblConf.Genesis.Config.ChainID,
 		Nonce:    uint64(1),
 		To:       &dad,
 		Gas:      30000,
@@ -336,19 +336,19 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 	})
 
 	// Create some blocks and import them
-	chain, _ := core.GenerateChain(params.AllEthashProtocolChanges, ethBackend.BlockChain().Genesis(),
-		ethash.NewFaker(), ethBackend.ChainDb(), 1, func(i int, b *core.BlockGen) {
+	chain, _ := core.GenerateChain(params.AllmblashProtocolChanges, mblBackend.BlockChain().Genesis(),
+		mblash.NewFaker(), mblBackend.ChainDb(), 1, func(i int, b *core.BlockGen) {
 			b.SetCoinbase(common.Address{1})
 			b.AddTx(legacyTx)
 			b.AddTx(envelopTx)
 		})
 
-	_, err = ethBackend.BlockChain().InsertChain(chain)
+	_, err = mblBackend.BlockChain().InsertChain(chain)
 	if err != nil {
 		t.Fatalf("could not create import blocks: %v", err)
 	}
 	// create gql service
-	err = New(stack, ethBackend.APIBackend, []string{}, []string{})
+	err = New(stack, mblBackend.APIBackend, []string{}, []string{})
 	if err != nil {
 		t.Fatalf("could not create graphql service: %v", err)
 	}

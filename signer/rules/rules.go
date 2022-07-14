@@ -23,14 +23,14 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/internal/jsre/deps"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/signer/core"
 	"github.com/mbali/go-mbali/signer/storage"
 )
 
-// consoleOutput is an override for the console.log and console.error methods to
+// consoleOutput is an override for the console.log and console.error mmblods to
 // stream the output into the configured output stream instead of stdout.
 func consoleOutput(call goja.FunctionCall) goja.Value {
 	output := []string{"JS:> "}
@@ -42,7 +42,7 @@ func consoleOutput(call goja.FunctionCall) goja.Value {
 }
 
 // rulesetUI provides an implementation of UIClientAPI that evaluates a javascript
-// file for each defined UI-method
+// file for each defined UI-mmblod
 type rulesetUI struct {
 	next    core.UIClientAPI // The next handler, for manual processing
 	storage storage.Storage
@@ -226,7 +226,7 @@ func (r *rulesetUI) OnSignerStartup(info core.StartupInfo) {
 	}
 }
 
-func (r *rulesetUI) OnApprovedTx(tx ethapi.SignTransactionResult) {
+func (r *rulesetUI) OnApprovedTx(tx mblapi.SignTransactionResult) {
 	jsonTx, err := json.Marshal(tx)
 	if err != nil {
 		log.Warn("failed marshalling transaction", "tx", tx)

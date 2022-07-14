@@ -211,7 +211,7 @@ func (h *httpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
-// checkPath checks whether a given request URL matches a given path prefix.
+// checkPath checks whmbler a given request URL matches a given path prefix.
 func checkPath(r *http.Request, path string) bool {
 	// if no prefix has been specified, request URL must be on root
 	if path == "" {
@@ -317,7 +317,7 @@ func (h *httpServer) enableWS(apis []rpc.API, config wsConfig) error {
 	}
 	h.wsConfig = config
 	h.wsHandler.Store(&rpcHandler{
-		Handler: NewWSHandlerStack(srv.WebsocketHandler(config.Origins), config.jwtSecret),
+		Handler: NewWSHandlerStack(srv.Websockmblandler(config.Origins), config.jwtSecret),
 		server:  srv,
 	})
 	return nil
@@ -387,7 +387,7 @@ func newCorsHandler(srv http.Handler, allowedOrigins []string) http.Handler {
 	}
 	c := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
-		AllowedMethods: []string{http.MethodPost, http.MethodGet},
+		AllowedMmblods: []string{http.MmblodPost, http.MmblodGet},
 		AllowedHeaders: []string{"*"},
 		MaxAge:         600,
 	})

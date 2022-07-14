@@ -25,7 +25,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/trie"
@@ -118,7 +118,7 @@ func checkSnapRoot(t *testing.T, snap *diskLayer, trieRoot common.Hash) {
 	defer accIt.Release()
 
 	snapRoot, err := generateTrieRoot(nil, accIt, common.Hash{}, stackTrieGenerate,
-		func(db ethdb.KeyValueWriter, accountHash, codeHash common.Hash, stat *generateStats) (common.Hash, error) {
+		func(db mbldb.KeyValueWriter, accountHash, codeHash common.Hash, stat *generateStats) (common.Hash, error) {
 			storageIt, _ := snap.StorageIterator(accountHash, common.Hash{})
 			defer storageIt.Release()
 
@@ -140,7 +140,7 @@ func checkSnapRoot(t *testing.T, snap *diskLayer, trieRoot common.Hash) {
 }
 
 type testHelper struct {
-	diskdb  ethdb.Database
+	diskdb  mbldb.Database
 	triedb  *trie.Database
 	accTrie *trie.SecureTrie
 }
@@ -554,7 +554,7 @@ func TestGenerateWithExtraAccounts(t *testing.T) {
 }
 
 func enableLogging() {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 }
 
 // Tests that snapshot generation when an extra account with storage exists in the snap state.
@@ -783,7 +783,7 @@ func decKey(key []byte) []byte {
 	return key
 }
 
-func populateDangling(disk ethdb.KeyValueStore) {
+func populateDangling(disk mbldb.KeyValueStore) {
 	populate := func(accountHash common.Hash, keys []string, vals []string) {
 		for i, key := range keys {
 			rawdb.WriteStorageSnapshot(disk, accountHash, hashData([]byte(key)), []byte(vals[i]))

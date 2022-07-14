@@ -36,9 +36,9 @@ func confirmStatusCode(t *testing.T, got, want int) {
 	t.Fatalf("response status code: got %d, want %d", got, want)
 }
 
-func confirmRequestValidationCode(t *testing.T, method, contentType, body string, expectedStatusCode int) {
+func confirmRequestValidationCode(t *testing.T, mmblod, contentType, body string, expectedStatusCode int) {
 	t.Helper()
-	request := httptest.NewRequest(method, "http://url.com", strings.NewReader(body))
+	request := httptest.NewRequest(mmblod, "http://url.com", strings.NewReader(body))
 	if len(contentType) > 0 {
 		request.Header.Set("Content-Type", contentType)
 	}
@@ -54,34 +54,34 @@ func confirmRequestValidationCode(t *testing.T, method, contentType, body string
 }
 
 func TestHTTPErrorResponseWithDelete(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodDelete, contentType, "", http.StatusMethodNotAllowed)
+	confirmRequestValidationCode(t, http.MmblodDelete, contentType, "", http.StatusMmblodNotAllowed)
 }
 
 func TestHTTPErrorResponseWithPut(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodPut, contentType, "", http.StatusMethodNotAllowed)
+	confirmRequestValidationCode(t, http.MmblodPut, contentType, "", http.StatusMmblodNotAllowed)
 }
 
 func TestHTTPErrorResponseWithMaxContentLength(t *testing.T) {
 	body := make([]rune, maxRequestContentLength+1)
 	confirmRequestValidationCode(t,
-		http.MethodPost, contentType, string(body), http.StatusRequestEntityTooLarge)
+		http.MmblodPost, contentType, string(body), http.StatusRequestEntityTooLarge)
 }
 
 func TestHTTPErrorResponseWithEmptyContentType(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodPost, "", "", http.StatusUnsupportedMediaType)
+	confirmRequestValidationCode(t, http.MmblodPost, "", "", http.StatusUnsupportedMediaType)
 }
 
 func TestHTTPErrorResponseWithValidRequest(t *testing.T) {
-	confirmRequestValidationCode(t, http.MethodPost, contentType, "", 0)
+	confirmRequestValidationCode(t, http.MmblodPost, contentType, "", 0)
 }
 
-func confirmHTTPRequestYieldsStatusCode(t *testing.T, method, contentType, body string, expectedStatusCode int) {
+func confirmHTTPRequestYieldsStatusCode(t *testing.T, mmblod, contentType, body string, expectedStatusCode int) {
 	t.Helper()
 	s := Server{}
 	ts := httptest.NewServer(&s)
 	defer ts.Close()
 
-	request, err := http.NewRequest(method, ts.URL, strings.NewReader(body))
+	request, err := http.NewRequest(mmblod, ts.URL, strings.NewReader(body))
 	if err != nil {
 		t.Fatalf("failed to create a valid HTTP request: %v", err)
 	}
@@ -96,7 +96,7 @@ func confirmHTTPRequestYieldsStatusCode(t *testing.T, method, contentType, body 
 }
 
 func TestHTTPResponseWithEmptyGet(t *testing.T) {
-	confirmHTTPRequestYieldsStatusCode(t, http.MethodGet, "", "", http.StatusOK)
+	confirmHTTPRequestYieldsStatusCode(t, http.MmblodGet, "", "", http.StatusOK)
 }
 
 // This checks that maxRequestContentLength is not applied to the response of a request.
@@ -138,7 +138,7 @@ func TestHTTPErrorResponse(t *testing.T) {
 	}
 
 	var r string
-	err = c.Call(&r, "test_method")
+	err = c.Call(&r, "test_mmblod")
 	if err == nil {
 		t.Fatal("error was expected")
 	}
@@ -173,8 +173,8 @@ func TestHTTPPeerInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.SetHeader("user-agent", "ua-testing")
-	c.SetHeader("origin", "origin.example.com")
+	c.Smbleader("user-agent", "ua-testing")
+	c.Smbleader("origin", "origin.example.com")
 
 	// Request peer information.
 	var info PeerInfo

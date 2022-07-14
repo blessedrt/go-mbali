@@ -26,11 +26,11 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/console/prompt"
 	"github.com/mbali/go-mbali/core"
-	"github.com/mbali/go-mbali/eth"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/internal/jsre"
 	"github.com/mbali/go-mbali/miner"
 	"github.com/mbali/go-mbali/node"
@@ -68,7 +68,7 @@ func (p *hookedPrompter) PromptPassword(prompt string) (string, error) {
 func (p *hookedPrompter) PromptConfirm(prompt string) (bool, error) {
 	return false, errors.New("not implemented")
 }
-func (p *hookedPrompter) SetHistory(history []string)                     {}
+func (p *hookedPrompter) Smblistory(history []string)                     {}
 func (p *hookedPrompter) AppendHistory(command string)                    {}
 func (p *hookedPrompter) ClearHistory()                                   {}
 func (p *hookedPrompter) SetWordCompleter(completer prompt.WordCompleter) {}
@@ -77,7 +77,7 @@ func (p *hookedPrompter) SetWordCompleter(completer prompt.WordCompleter) {}
 type tester struct {
 	workspace string
 	stack     *node.Node
-	mbali  *eth.mbali
+	mbali  *mbl.mbali
 	console   *Console
 	input     *hookedPrompter
 	output    *bytes.Buffer
@@ -85,7 +85,7 @@ type tester struct {
 
 // newTester creates a test environment based on which the console can operate.
 // Please ensure you call Close() on the returned tester to avoid leaks.
-func newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {
+func newTester(t *testing.T, confOverride func(*mblconfig.Config)) *tester {
 	// Create a temporary storage for the node keys and initialize it
 	workspace := t.TempDir()
 
@@ -94,19 +94,19 @@ func newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {
 	if err != nil {
 		t.Fatalf("failed to create node: %v", err)
 	}
-	ethConf := &ethconfig.Config{
+	mblConf := &mblconfig.Config{
 		Genesis: core.DeveloperGenesisBlock(15, 11_500_000, common.Address{}),
 		Miner: miner.Config{
-			Etherbase: common.HexToAddress(testAddress),
+			mblerbase: common.HexToAddress(testAddress),
 		},
-		Ethash: ethash.Config{
-			PowMode: ethash.ModeTest,
+		mblash: mblash.Config{
+			PowMode: mblash.ModeTest,
 		},
 	}
 	if confOverride != nil {
-		confOverride(ethConf)
+		confOverride(mblConf)
 	}
-	ethBackend, err := eth.New(stack, ethConf)
+	mblBackend, err := mbl.New(stack, mblConf)
 	if err != nil {
 		t.Fatalf("failed to register mbali protocol: %v", err)
 	}
@@ -136,7 +136,7 @@ func newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {
 	return &tester{
 		workspace: workspace,
 		stack:     stack,
-		mbali:  ethBackend,
+		mbali:  mblBackend,
 		console:   console,
 		input:     prompter,
 		output:    printer,

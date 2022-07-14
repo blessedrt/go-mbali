@@ -25,15 +25,15 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
 	math2 "github.com/mbali/go-mbali/common/math"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/params"
 )
 
-// alethGenesisSpec represents the genesis specification format used by the
+// almblGenesisSpec represents the genesis specification format used by the
 // C++ mbali implementation.
-type alethGenesisSpec struct {
+type almblGenesisSpec struct {
 	SealEngine string `json:"sealEngine"`
 	Params     struct {
 		AccountStartNonce          math2.HexOrDecimal64   `json:"accountStartNonce"`
@@ -70,39 +70,39 @@ type alethGenesisSpec struct {
 		GasLimit   hexutil.Uint64   `json:"gasLimit"`
 	} `json:"genesis"`
 
-	Accounts map[common.UnprefixedAddress]*alethGenesisSpecAccount `json:"accounts"`
+	Accounts map[common.UnprefixedAddress]*almblGenesisSpecAccount `json:"accounts"`
 }
 
-// alethGenesisSpecAccount is the prefunded genesis account and/or precompiled
+// almblGenesisSpecAccount is the prefunded genesis account and/or precompiled
 // contract definition.
-type alethGenesisSpecAccount struct {
+type almblGenesisSpecAccount struct {
 	Balance     *math2.HexOrDecimal256   `json:"balance,omitempty"`
 	Nonce       uint64                   `json:"nonce,omitempty"`
-	Precompiled *alethGenesisSpecBuiltin `json:"precompiled,omitempty"`
+	Precompiled *almblGenesisSpecBuiltin `json:"precompiled,omitempty"`
 }
 
-// alethGenesisSpecBuiltin is the precompiled contract definition.
-type alethGenesisSpecBuiltin struct {
+// almblGenesisSpecBuiltin is the precompiled contract definition.
+type almblGenesisSpecBuiltin struct {
 	Name          string                         `json:"name,omitempty"`
 	StartingBlock *hexutil.Big                   `json:"startingBlock,omitempty"`
-	Linear        *alethGenesisSpecLinearPricing `json:"linear,omitempty"`
+	Linear        *almblGenesisSpecLinearPricing `json:"linear,omitempty"`
 }
 
-type alethGenesisSpecLinearPricing struct {
+type almblGenesisSpecLinearPricing struct {
 	Base uint64 `json:"base"`
 	Word uint64 `json:"word"`
 }
 
-// newAlethGenesisSpec converts a go-mbali genesis block into a Aleth-specific
+// newAlmblGenesisSpec converts a go-mbali genesis block into a Almbl-specific
 // chain specification format.
-func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSpec, error) {
-	// Only ethash is currently supported between go-mbali and aleth
-	if genesis.Config.Ethash == nil {
+func newAlmblGenesisSpec(network string, genesis *core.Genesis) (*almblGenesisSpec, error) {
+	// Only mblash is currently supported between go-mbali and almbl
+	if genesis.Config.mblash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
-	// Reconstruct the chain spec in Aleth format
-	spec := &alethGenesisSpec{
-		SealEngine: "Ethash",
+	// Reconstruct the chain spec in Almbl format
+	spec := &almblGenesisSpec{
+		SealEngine: "mblash",
 	}
 	// Some defaults
 	spec.Params.AccountStartNonce = 0
@@ -110,7 +110,7 @@ func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSp
 	spec.Params.AllowFutureBlocks = false
 
 	// Dao hardfork block is a special one. The fork block is listed as 0 in the
-	// config but aleth will sync with ETC clients up until the actual dao hard
+	// config but almbl will sync with ETC clients up until the actual dao hard
 	// fork block.
 	spec.Params.DaoHardforkBlock = 0
 
@@ -144,7 +144,7 @@ func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSp
 	spec.Params.DifficultyBoundDivisor = (*math2.HexOrDecimal256)(params.DifficultyBoundDivisor)
 	spec.Params.GasLimitBoundDivisor = (math2.HexOrDecimal64)(params.GasLimitBoundDivisor)
 	spec.Params.DurationLimit = (*math2.HexOrDecimal256)(params.DurationLimit)
-	spec.Params.BlockReward = (*hexutil.Big)(ethash.FrontierBlockReward)
+	spec.Params.BlockReward = (*hexutil.Big)(mblash.FrontierBlockReward)
 
 	spec.Genesis.Nonce = types.EncodeNonce(genesis.Nonce)
 	spec.Genesis.MixHash = genesis.Mixhash
@@ -159,39 +159,39 @@ func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSp
 		spec.setAccount(address, account)
 	}
 
-	spec.setPrecompile(1, &alethGenesisSpecBuiltin{Name: "ecrecover",
-		Linear: &alethGenesisSpecLinearPricing{Base: 3000}})
-	spec.setPrecompile(2, &alethGenesisSpecBuiltin{Name: "sha256",
-		Linear: &alethGenesisSpecLinearPricing{Base: 60, Word: 12}})
-	spec.setPrecompile(3, &alethGenesisSpecBuiltin{Name: "ripemd160",
-		Linear: &alethGenesisSpecLinearPricing{Base: 600, Word: 120}})
-	spec.setPrecompile(4, &alethGenesisSpecBuiltin{Name: "identity",
-		Linear: &alethGenesisSpecLinearPricing{Base: 15, Word: 3}})
+	spec.setPrecompile(1, &almblGenesisSpecBuiltin{Name: "ecrecover",
+		Linear: &almblGenesisSpecLinearPricing{Base: 3000}})
+	spec.setPrecompile(2, &almblGenesisSpecBuiltin{Name: "sha256",
+		Linear: &almblGenesisSpecLinearPricing{Base: 60, Word: 12}})
+	spec.setPrecompile(3, &almblGenesisSpecBuiltin{Name: "ripemd160",
+		Linear: &almblGenesisSpecLinearPricing{Base: 600, Word: 120}})
+	spec.setPrecompile(4, &almblGenesisSpecBuiltin{Name: "identity",
+		Linear: &almblGenesisSpecLinearPricing{Base: 15, Word: 3}})
 	if genesis.Config.ByzantiumBlock != nil {
-		spec.setPrecompile(5, &alethGenesisSpecBuiltin{Name: "modexp",
+		spec.setPrecompile(5, &almblGenesisSpecBuiltin{Name: "modexp",
 			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock)})
-		spec.setPrecompile(6, &alethGenesisSpecBuiltin{Name: "alt_bn128_G1_add",
+		spec.setPrecompile(6, &almblGenesisSpecBuiltin{Name: "alt_bn128_G1_add",
 			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
-			Linear:        &alethGenesisSpecLinearPricing{Base: 500}})
-		spec.setPrecompile(7, &alethGenesisSpecBuiltin{Name: "alt_bn128_G1_mul",
+			Linear:        &almblGenesisSpecLinearPricing{Base: 500}})
+		spec.setPrecompile(7, &almblGenesisSpecBuiltin{Name: "alt_bn128_G1_mul",
 			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
-			Linear:        &alethGenesisSpecLinearPricing{Base: 40000}})
-		spec.setPrecompile(8, &alethGenesisSpecBuiltin{Name: "alt_bn128_pairing_product",
+			Linear:        &almblGenesisSpecLinearPricing{Base: 40000}})
+		spec.setPrecompile(8, &almblGenesisSpecBuiltin{Name: "alt_bn128_pairing_product",
 			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock)})
 	}
 	if genesis.Config.IstanbulBlock != nil {
 		if genesis.Config.ByzantiumBlock == nil {
 			return nil, errors.New("invalid genesis, istanbul fork is enabled while byzantium is not")
 		}
-		spec.setPrecompile(6, &alethGenesisSpecBuiltin{
+		spec.setPrecompile(6, &almblGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_add",
 			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
-		}) // Aleth hardcoded the gas policy
-		spec.setPrecompile(7, &alethGenesisSpecBuiltin{
+		}) // Almbl hardcoded the gas policy
+		spec.setPrecompile(7, &almblGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_mul",
 			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
-		}) // Aleth hardcoded the gas policy
-		spec.setPrecompile(9, &alethGenesisSpecBuiltin{
+		}) // Almbl hardcoded the gas policy
+		spec.setPrecompile(9, &almblGenesisSpecBuiltin{
 			Name:          "blake2_compression",
 			StartingBlock: (*hexutil.Big)(genesis.Config.IstanbulBlock),
 		})
@@ -199,25 +199,25 @@ func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSp
 	return spec, nil
 }
 
-func (spec *alethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpecBuiltin) {
+func (spec *almblGenesisSpec) setPrecompile(address byte, data *almblGenesisSpecBuiltin) {
 	if spec.Accounts == nil {
-		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
+		spec.Accounts = make(map[common.UnprefixedAddress]*almblGenesisSpecAccount)
 	}
 	addr := common.UnprefixedAddress(common.BytesToAddress([]byte{address}))
 	if _, exist := spec.Accounts[addr]; !exist {
-		spec.Accounts[addr] = &alethGenesisSpecAccount{}
+		spec.Accounts[addr] = &almblGenesisSpecAccount{}
 	}
 	spec.Accounts[addr].Precompiled = data
 }
 
-func (spec *alethGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
+func (spec *almblGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
 	if spec.Accounts == nil {
-		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
+		spec.Accounts = make(map[common.UnprefixedAddress]*almblGenesisSpecAccount)
 	}
 
 	a, exist := spec.Accounts[common.UnprefixedAddress(address)]
 	if !exist {
-		a = &alethGenesisSpecAccount{}
+		a = &almblGenesisSpecAccount{}
 		spec.Accounts[common.UnprefixedAddress(address)] = a
 	}
 	a.Balance = (*math2.HexOrDecimal256)(account.Balance)
@@ -230,7 +230,7 @@ type parityChainSpec struct {
 	Name    string `json:"name"`
 	Datadir string `json:"dataDir"`
 	Engine  struct {
-		Ethash struct {
+		mblash struct {
 			Params struct {
 				MinimumDifficulty      *hexutil.Big      `json:"minimumDifficulty"`
 				DifficultyBoundDivisor *hexutil.Big      `json:"difficultyBoundDivisor"`
@@ -240,7 +240,7 @@ type parityChainSpec struct {
 				HomesteadTransition    hexutil.Uint64    `json:"homesteadTransition"`
 				EIP100bTransition      hexutil.Uint64    `json:"eip100bTransition"`
 			} `json:"params"`
-		} `json:"Ethash"`
+		} `json:"mblash"`
 	} `json:"engine"`
 
 	Params struct {
@@ -364,8 +364,8 @@ type parityChainSpecVersionedPricing struct {
 // newParityChainSpec converts a go-mbali genesis block into a Parity specific
 // chain specification format.
 func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*parityChainSpec, error) {
-	// Only ethash is currently supported between go-mbali and Parity
-	if genesis.Config.Ethash == nil {
+	// Only mblash is currently supported between go-mbali and Parity
+	if genesis.Config.mblash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Parity's format
@@ -374,16 +374,16 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		Nodes:   bootnodes,
 		Datadir: strings.ToLower(network),
 	}
-	spec.Engine.Ethash.Params.BlockReward = make(map[string]string)
-	spec.Engine.Ethash.Params.DifficultyBombDelays = make(map[string]string)
+	spec.Engine.mblash.Params.BlockReward = make(map[string]string)
+	spec.Engine.mblash.Params.DifficultyBombDelays = make(map[string]string)
 	// Frontier
-	spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
-	spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
-	spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
-	spec.Engine.Ethash.Params.BlockReward["0x0"] = hexutil.EncodeBig(ethash.FrontierBlockReward)
+	spec.Engine.mblash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
+	spec.Engine.mblash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
+	spec.Engine.mblash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
+	spec.Engine.mblash.Params.BlockReward["0x0"] = hexutil.EncodeBig(mblash.FrontierBlockReward)
 
 	// Homestead
-	spec.Engine.Ethash.Params.HomesteadTransition = hexutil.Uint64(genesis.Config.HomesteadBlock.Uint64())
+	spec.Engine.mblash.Params.HomesteadTransition = hexutil.Uint64(genesis.Config.HomesteadBlock.Uint64())
 
 	// Tangerine Whistle : 150
 	// https://github.com/mbali/EIPs/blob/master/EIPS/eip-608.md
@@ -559,10 +559,10 @@ func (spec *parityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 }
 
 func (spec *parityChainSpec) setByzantium(num *big.Int) {
-	spec.Engine.Ethash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.ByzantiumBlockReward)
-	spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(3000000)
+	spec.Engine.mblash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(mblash.ByzantiumBlockReward)
+	spec.Engine.mblash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(3000000)
 	n := hexutil.Uint64(num.Uint64())
-	spec.Engine.Ethash.Params.EIP100bTransition = n
+	spec.Engine.mblash.Params.EIP100bTransition = n
 	spec.Params.EIP140Transition = n
 	spec.Params.EIP211Transition = n
 	spec.Params.EIP214Transition = n
@@ -570,8 +570,8 @@ func (spec *parityChainSpec) setByzantium(num *big.Int) {
 }
 
 func (spec *parityChainSpec) setConstantinople(num *big.Int) {
-	spec.Engine.Ethash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.ConstantinopleBlockReward)
-	spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(2000000)
+	spec.Engine.mblash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(mblash.ConstantinopleBlockReward)
+	spec.Engine.mblash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(2000000)
 	n := hexutil.Uint64(num.Uint64())
 	spec.Params.EIP145Transition = n
 	spec.Params.EIP1014Transition = n
@@ -607,8 +607,8 @@ type pymbaliGenesisSpec struct {
 // newPymbaliGenesisSpec converts a go-mbali genesis block into a Parity specific
 // chain specification format.
 func newPymbaliGenesisSpec(network string, genesis *core.Genesis) (*pymbaliGenesisSpec, error) {
-	// Only ethash is currently supported between go-mbali and pymbali
-	if genesis.Config.Ethash == nil {
+	// Only mblash is currently supported between go-mbali and pymbali
+	if genesis.Config.mblash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	spec := &pymbaliGenesisSpec{

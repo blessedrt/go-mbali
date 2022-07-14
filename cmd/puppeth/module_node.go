@@ -42,7 +42,7 @@ ADD genesis.json /genesis.json
 RUN \
   echo 'gombl --cache 512 init /genesis.json' > gombl.sh && \{{if .Unlock}}
 	echo 'mkdir -p /root/.mbali/keystore/ && cp /signer.json /root/.mbali/keystore/' >> gombl.sh && \{{end}}
-	echo $'exec gombl --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --nat extip:{{.IP}} --maxpeers {{.Peers}} {{.LightFlag}} --ethstats \'{{.Ethstats}}\' {{if .Bootnodes}}--bootnodes {{.Bootnodes}}{{end}} {{if .Etherbase}}--miner.etherbase {{.Etherbase}} --mine --miner.threads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --miner.gastarget {{.GasTarget}} --miner.gaslimit {{.GasLimit}} --miner.gasprice {{.GasPrice}}' >> gombl.sh
+	echo $'exec gombl --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --nat extip:{{.IP}} --maxpeers {{.Peers}} {{.LightFlag}} --mblstats \'{{.mblstats}}\' {{if .Bootnodes}}--bootnodes {{.Bootnodes}}{{end}} {{if .mblerbase}}--miner.mblerbase {{.mblerbase}} --mine --miner.threads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --miner.gastarget {{.GasTarget}} --miner.gaslimit {{.GasLimit}} --miner.gasprice {{.GasPrice}}' >> gombl.sh
 
 ENTRYPOINT ["/bin/sh", "gombl.sh"]
 `
@@ -60,14 +60,14 @@ services:
       - "{{.Port}}:{{.Port}}"
       - "{{.Port}}:{{.Port}}/udp"
     volumes:
-      - {{.Datadir}}:/root/.mbali{{if .Ethashdir}}
-      - {{.Ethashdir}}:/root/.ethash{{end}}
+      - {{.Datadir}}:/root/.mbali{{if .mblashdir}}
+      - {{.mblashdir}}:/root/.mblash{{end}}
     environment:
       - PORT={{.Port}}/tcp
       - TOTAL_PEERS={{.TotalPeers}}
       - LIGHT_PEERS={{.LightPeers}}
-      - STATS_NAME={{.Ethstats}}
-      - MINER_NAME={{.Etherbase}}
+      - STATS_NAME={{.mblstats}}
+      - MINER_NAME={{.mblerbase}}
       - GAS_TARGET={{.GasTarget}}
       - GAS_LIMIT={{.GasLimit}}
       - GAS_PRICE={{.GasPrice}}
@@ -84,7 +84,7 @@ services:
 // already exists there, it will be overwritten!
 func deployNode(client *sshClient, network string, bootnodes []string, config *nodeInfos, nocache bool) ([]byte, error) {
 	kind := "sealnode"
-	if config.keyJSON == "" && config.etherbase == "" {
+	if config.keyJSON == "" && config.mblerbase == "" {
 		kind = "bootnode"
 		bootnodes = make([]string, 0)
 	}
@@ -104,8 +104,8 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 		"Peers":     config.peersTotal,
 		"LightFlag": lightFlag,
 		"Bootnodes": strings.Join(bootnodes, ","),
-		"Ethstats":  config.ethstats,
-		"Etherbase": config.etherbase,
+		"mblstats":  config.mblstats,
+		"mblerbase": config.mblerbase,
 		"GasTarget": uint64(1000000 * config.gasTarget),
 		"GasLimit":  uint64(1000000 * config.gasLimit),
 		"GasPrice":  uint64(1000000000 * config.gasPrice),
@@ -117,14 +117,14 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 	template.Must(template.New("").Parse(nodeComposefile)).Execute(composefile, map[string]interface{}{
 		"Type":       kind,
 		"Datadir":    config.datadir,
-		"Ethashdir":  config.ethashdir,
+		"mblashdir":  config.mblashdir,
 		"Network":    network,
 		"Port":       config.port,
 		"TotalPeers": config.peersTotal,
 		"Light":      config.peersLight > 0,
 		"LightPeers": config.peersLight,
-		"Ethstats":   config.ethstats[:strings.Index(config.ethstats, ":")],
-		"Etherbase":  config.etherbase,
+		"mblstats":   config.mblstats[:strings.Index(config.mblstats, ":")],
+		"mblerbase":  config.mblerbase,
 		"GasTarget":  config.gasTarget,
 		"GasLimit":   config.gasLimit,
 		"GasPrice":   config.gasPrice,
@@ -155,13 +155,13 @@ type nodeInfos struct {
 	genesis    []byte
 	network    int64
 	datadir    string
-	ethashdir  string
-	ethstats   string
+	mblashdir  string
+	mblstats   string
 	port       int
 	enode      string
 	peersTotal int
 	peersLight int
-	etherbase  string
+	mblerbase  string
 	keyJSON    string
 	keyPass    string
 	gasTarget  float64
@@ -177,7 +177,7 @@ func (info *nodeInfos) Report() map[string]string {
 		"Listener port":            strconv.Itoa(info.port),
 		"Peer count (all total)":   strconv.Itoa(info.peersTotal),
 		"Peer count (light nodes)": strconv.Itoa(info.peersLight),
-		"Ethstats username":        info.ethstats,
+		"mblstats username":        info.mblstats,
 	}
 	if info.gasTarget > 0 {
 		// Miner or signer node
@@ -185,10 +185,10 @@ func (info *nodeInfos) Report() map[string]string {
 		report["Gas floor (baseline target)"] = fmt.Sprintf("%0.3f MGas", info.gasTarget)
 		report["Gas ceil  (target maximum)"] = fmt.Sprintf("%0.3f MGas", info.gasLimit)
 
-		if info.etherbase != "" {
-			// Ethash proof-of-work miner
-			report["Ethash directory"] = info.ethashdir
-			report["Miner account"] = info.etherbase
+		if info.mblerbase != "" {
+			// mblash proof-of-work miner
+			report["mblash directory"] = info.mblashdir
+			report["Miner account"] = info.mblerbase
 		}
 		if info.keyJSON != "" {
 			// Clique proof-of-authority signer
@@ -206,7 +206,7 @@ func (info *nodeInfos) Report() map[string]string {
 }
 
 // checkNode does a health-check against a boot or seal node server to verify
-// whether it's running, and if yes, whether it's responsive.
+// whmbler it's running, and if yes, whmbler it's responsive.
 func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error) {
 	kind := "bootnode"
 	if !boot {
@@ -255,12 +255,12 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 	stats := &nodeInfos{
 		genesis:    genesis,
 		datadir:    infos.volumes["/root/.mbali"],
-		ethashdir:  infos.volumes["/root/.ethash"],
+		mblashdir:  infos.volumes["/root/.mblash"],
 		port:       port,
 		peersTotal: totalPeers,
 		peersLight: lightPeers,
-		ethstats:   infos.envvars["STATS_NAME"],
-		etherbase:  infos.envvars["MINER_NAME"],
+		mblstats:   infos.envvars["STATS_NAME"],
+		mblerbase:  infos.envvars["MINER_NAME"],
 		keyJSON:    keyJSON,
 		keyPass:    keyPass,
 		gasTarget:  gasTarget,

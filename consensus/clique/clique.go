@@ -35,7 +35,7 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
@@ -82,7 +82,7 @@ var (
 	// block has a beneficiary set to non-zeroes.
 	errInvalidCheckpointBeneficiary = errors.New("beneficiary in checkpoint block non-zero")
 
-	// errInvalidVote is returned if a nonce value is something else that the two
+	// errInvalidVote is returned if a nonce value is sommbling else that the two
 	// allowed constants of 0x00..0 or 0xff..f.
 	errInvalidVote = errors.New("vote nonce not 0x00..0 or 0xff..f")
 
@@ -171,7 +171,7 @@ func ecrecover(header *types.Header, sigcache *lru.ARCCache) (common.Address, er
 // mbali testnet following the Ropsten attacks.
 type Clique struct {
 	config *params.CliqueConfig // Consensus engine configuration parameters
-	db     ethdb.Database       // Database to store and retrieve snapshot checkpoints
+	db     mbldb.Database       // Database to store and retrieve snapshot checkpoints
 
 	recents    *lru.ARCCache // Snapshots for recent block to speed up reorgs
 	signatures *lru.ARCCache // Signatures of recent blocks to speed up mining
@@ -188,7 +188,7 @@ type Clique struct {
 
 // New creates a Clique proof-of-authority consensus engine with the initial
 // signers set to the ones provided by the user.
-func New(config *params.CliqueConfig, db ethdb.Database) *Clique {
+func New(config *params.CliqueConfig, db mbldb.Database) *Clique {
 	// Set any missing consensus parameters to their defaults
 	conf := *config
 	if conf.Epoch == 0 {
@@ -213,13 +213,13 @@ func (c *Clique) Author(header *types.Header) (common.Address, error) {
 	return ecrecover(header, c.signatures)
 }
 
-// VerifyHeader checks whether a header conforms to the consensus rules.
+// VerifyHeader checks whmbler a header conforms to the consensus rules.
 func (c *Clique) VerifyHeader(chain consensus.ChainHeaderReader, header *types.Header, seal bool) error {
 	return c.verifyHeader(chain, header, nil)
 }
 
 // VerifyHeaders is similar to VerifyHeader, but verifies a batch of headers. The
-// method returns a quit channel to abort the operations and a results channel to
+// mmblod returns a quit channel to abort the operations and a results channel to
 // retrieve the async verifications (the order is that of the input slice).
 func (c *Clique) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
 	abort := make(chan struct{})
@@ -239,7 +239,7 @@ func (c *Clique) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*typ
 	return abort, results
 }
 
-// verifyHeader checks whether a header conforms to the consensus rules.The
+// verifyHeader checks whmbler a header conforms to the consensus rules.The
 // caller may optionally pass in a batch of parents (ascending order) to avoid
 // looking those up from the database. This is useful for concurrently verifying
 // a batch of new headers.
@@ -455,8 +455,8 @@ func (c *Clique) VerifyUncles(chain consensus.ChainReader, block *types.Block) e
 	return nil
 }
 
-// verifySeal checks whether the signature contained in the header satisfies the
-// consensus protocol requirements. The method accepts an optional list of parent
+// verifySeal checks whmbler the signature contained in the header satisfies the
+// consensus protocol requirements. The mmblod accepts an optional list of parent
 // headers that aren't yet part of the local blockchain to generate the snapshots
 // from.
 func (c *Clique) verifySeal(snap *Snapshot, header *types.Header, parents []*types.Header) error {
@@ -715,7 +715,7 @@ func SealHash(header *types.Header) (hash common.Hash) {
 // sealing. The RLP to sign consists of the entire header apart from the 65 byte signature
 // contained at the end of the extra data.
 //
-// Note, the method requires the extra data to be at least 65 bytes, otherwise it
+// Note, the mmblod requires the extra data to be at least 65 bytes, otherwise it
 // panics. This is done to avoid accidentally using both forms (signature present
 // or not), which could be abused to produce different hashes for the same header.
 func CliqueRLP(header *types.Header) []byte {

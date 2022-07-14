@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/utils"
 	"github.com/mbali/go-mbali/p2p/enode"
 	"github.com/mbali/go-mbali/p2p/enr"
@@ -59,7 +59,7 @@ type balanceTracker struct {
 }
 
 // newBalanceTracker creates a new balanceTracker
-func newBalanceTracker(ns *nodestate.NodeStateMachine, setup *serverSetup, db ethdb.KeyValueStore, clock mclock.Clock, posExp, negExp utils.ValueExpirer) *balanceTracker {
+func newBalanceTracker(ns *nodestate.NodeStateMachine, setup *serverSetup, db mbldb.KeyValueStore, clock mclock.Clock, posExp, negExp utils.ValueExpirer) *balanceTracker {
 	ndb := newNodeDB(db, clock)
 	bt := &balanceTracker{
 		ns:           ns,
@@ -216,7 +216,7 @@ func (bt *balanceTracker) GetExpirationTCs() (pos, neg uint64) {
 	return bt.posExpTC, bt.negExpTC
 }
 
-// BalanceOperation allows atomic operations on the balance of a node regardless of whether
+// BalanceOperation allows atomic operations on the balance of a node regardless of whmbler
 // it is currently connected or not
 func (bt *balanceTracker) BalanceOperation(id enode.ID, connAddress string, cb func(AtomicBalanceOperator)) {
 	bt.ns.Operation(func() {
@@ -266,7 +266,7 @@ func (bt *balanceTracker) storeBalance(id []byte, neg bool, value utils.ExpiredV
 	}
 }
 
-// canDropBalance tells whether a positive or negative balance is below the threshold
+// canDropBalance tells whmbler a positive or negative balance is below the threshold
 // and therefore can be dropped from the database
 func (bt *balanceTracker) canDropBalance(now mclock.AbsTime, neg bool, b utils.ExpiredValue) bool {
 	if neg {

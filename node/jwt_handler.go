@@ -56,7 +56,7 @@ func (handler *jwtHandler) ServeHTTP(out http.ResponseWriter, r *http.Request) {
 	// claim-check: the RegisteredClaims internally requires 'iat' to
 	// be no later than 'now', but we allow for a bit of drift.
 	token, err := jwt.ParseWithClaims(strToken, &claims, handler.keyFunc,
-		jwt.WithValidMethods([]string{"HS256"}),
+		jwt.WithValidMmblods([]string{"HS256"}),
 		jwt.WithoutClaimsValidation())
 
 	switch {

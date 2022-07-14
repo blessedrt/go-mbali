@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 )
 
 // Tests that the trie database returns a missing trie node error if attempting

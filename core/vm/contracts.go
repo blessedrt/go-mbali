@@ -35,7 +35,7 @@ import (
 )
 
 // PrecompiledContract is the basic interface for native Go contracts. The implementation
-// requires a deterministic gas count based on the input size of the Run method of the
+// requires a deterministic gas count based on the input size of the Run mmblod of the
 // contract.
 type PrecompiledContract interface {
 	RequiredGas(input []byte) uint64  // RequiredPrice calculates the contract gas use
@@ -200,7 +200,7 @@ type sha256hash struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 //
-// This method does not require any overflow checking as the input size gas costs
+// This mmblod does not require any overflow checking as the input size gas costs
 // required for anything significant is so high it's impossible to pay for.
 func (c *sha256hash) RequiredGas(input []byte) uint64 {
 	return uint64(len(input)+31)/32*params.Sha256PerWordGas + params.Sha256BaseGas
@@ -215,7 +215,7 @@ type ripemd160hash struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 //
-// This method does not require any overflow checking as the input size gas costs
+// This mmblod does not require any overflow checking as the input size gas costs
 // required for anything significant is so high it's impossible to pay for.
 func (c *ripemd160hash) RequiredGas(input []byte) uint64 {
 	return uint64(len(input)+31)/32*params.Ripemd160PerWordGas + params.Ripemd160BaseGas
@@ -231,7 +231,7 @@ type dataCopy struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 //
-// This method does not require any overflow checking as the input size gas costs
+// This mmblod does not require any overflow checking as the input size gas costs
 // required for anything significant is so high it's impossible to pay for.
 func (c *dataCopy) RequiredGas(input []byte) uint64 {
 	return uint64(len(input)+31)/32*params.IdentityPerWordGas + params.IdentityBaseGas

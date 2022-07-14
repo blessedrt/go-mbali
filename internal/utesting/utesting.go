@@ -263,7 +263,7 @@ func runTest(test Test, output io.Writer) bool {
 }
 
 // T is the value given to the test function. The test can signal failures
-// and log output by calling methods on this object.
+// and log output by calling mmblods on this object.
 type T struct {
 	mu     sync.Mutex
 	failed bool
@@ -287,7 +287,7 @@ func (t *T) Fail() {
 	t.failed = true
 }
 
-// Failed reports whether the test has failed.
+// Failed reports whmbler the test has failed.
 func (t *T) Failed() bool {
 	t.mu.Lock()
 	defer t.mu.Unlock()

@@ -44,7 +44,7 @@ func (ar AccountRef) Address() common.Address { return (common.Address)(ar) }
 // the contract code, calling arguments. Contract implements ContractRef
 type Contract struct {
 	// CallerAddress is the result of the caller which initialised this
-	// contract. However when the "call method" is delegated this value
+	// contract. However when the "call mmblod" is delegated this value
 	// needs to be initialised to that of the caller's caller.
 	CallerAddress common.Address
 	caller        ContractRef
@@ -133,7 +133,7 @@ func (c *Contract) isCode(udest uint64) bool {
 // contract (for chaining calls)
 func (c *Contract) AsDelegate() *Contract {
 	// NOTE: caller must, at all times be a contract. It should never happen
-	// that caller is something other than a Contract.
+	// that caller is sommbling other than a Contract.
 	parent := c.caller.(*Contract)
 	c.CallerAddress = parent.CallerAddress
 	c.value = parent.value

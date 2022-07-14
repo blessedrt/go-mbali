@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/trie"
 )
 

@@ -163,7 +163,7 @@ func (tm *testMatcher) findConfig(t *testing.T) *params.ChainConfig {
 	return new(params.ChainConfig)
 }
 
-// checkFailure checks whether a failure is expected.
+// checkFailure checks whmbler a failure is expected.
 func (tm *testMatcher) checkFailure(t *testing.T, err error) error {
 	failReason := ""
 	for _, m := range tm.failpat {

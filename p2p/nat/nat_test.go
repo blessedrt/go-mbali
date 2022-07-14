@@ -23,7 +23,7 @@ import (
 )
 
 // This test checks that autodisc doesn't hang and returns
-// consistent results when multiple goroutines call its methods
+// consistent results when multiple goroutines call its mmblods
 // concurrently.
 func TestAutoDiscRace(t *testing.T) {
 	ad := startautodisc("thing", func() Interface {

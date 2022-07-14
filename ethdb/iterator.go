@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethdb
+package mbldb
 
 // Iterator iterates over a database's key/value pairs in ascending key order.
 //
 // When it encounters an error any seek will return false and will yield no key/
-// value pairs. The error can be queried by calling the Error method. Calling
+// value pairs. The error can be queried by calling the Error mmblod. Calling
 // Release is still necessary.
 //
 // An iterator must be released after use, but it is not necessary to read an
 // iterator until exhaustion. An iterator is not safe for concurrent use, but it
 // is safe to use multiple iterators concurrently.
 type Iterator interface {
-	// Next moves the iterator to the next key/value pair. It returns whether the
+	// Next moves the iterator to the next key/value pair. It returns whmbler the
 	// iterator is exhausted.
 	Next() bool
 
@@ -49,13 +49,13 @@ type Iterator interface {
 	Release()
 }
 
-// Iteratee wraps the NewIterator methods of a backing data store.
+// Iteratee wraps the NewIterator mmblods of a backing data store.
 type Iteratee interface {
 	// NewIterator creates a binary-alphabetical iterator over a subset
 	// of database content with a particular key prefix, starting at a particular
 	// initial key (or after, if it does not exist).
 	//
-	// Note: This method assumes that the prefix is NOT part of the start, so there's
+	// Note: This mmblod assumes that the prefix is NOT part of the start, so there's
 	// no need for the caller to prepend the prefix to the start
 	NewIterator(prefix []byte, start []byte) Iterator
 }

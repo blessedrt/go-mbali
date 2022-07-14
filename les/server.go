@@ -22,8 +22,8 @@ import (
 
 	"github.com/mbali/go-mbali/common/mclock"
 	"github.com/mbali/go-mbali/core"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/flowcontrol"
 	vfs "github.com/mbali/go-mbali/les/vflux/server"
 	"github.com/mbali/go-mbali/light"
@@ -43,11 +43,11 @@ var (
 
 const defaultConnectedBias = time.Minute * 3
 
-type ethBackend interface {
+type mblBackend interface {
 	ArchiveMode() bool
 	BlockChain() *core.BlockChain
 	BloomIndexer() *core.ChainIndexer
-	ChainDb() ethdb.Database
+	ChainDb() mbldb.Database
 	Synced() bool
 	TxPool() *core.TxPool
 }
@@ -55,7 +55,7 @@ type ethBackend interface {
 type LesServer struct {
 	lesCommons
 
-	archiveMode bool // Flag whether the mbali node runs in archive mode.
+	archiveMode bool // Flag whmbler the mbali node runs in archive mode.
 	handler     *serverHandler
 	peers       *clientPeerSet
 	serverset   *serverSet
@@ -76,8 +76,8 @@ type LesServer struct {
 	p2pSrv *p2p.Server
 }
 
-func NewLesServer(node *node.Node, e ethBackend, config *ethconfig.Config) (*LesServer, error) {
-	lesDb, err := node.OpenDatabase("les.server", 0, 0, "eth/db/lesserver/", false)
+func NewLesServer(node *node.Node, e mblBackend, config *mblconfig.Config) (*LesServer, error) {
+	lesDb, err := node.OpenDatabase("les.server", 0, 0, "mbl/db/lesserver/", false)
 	if err != nil {
 		return nil, err
 	}

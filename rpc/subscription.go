@@ -177,7 +177,7 @@ func (n *Notifier) send(sub *Subscription, data json.RawMessage) error {
 	ctx := context.Background()
 	return n.h.conn.writeJSON(ctx, &jsonrpcMessage{
 		Version: vsn,
-		Method:  n.namespace + notificationMethodSuffix,
+		Mmblod:  n.namespace + notificationMmblodSuffix,
 		Params:  params,
 	})
 }
@@ -201,7 +201,7 @@ func (s *Subscription) MarshalJSON() ([]byte, error) {
 }
 
 // ClientSubscription is a subscription established through the Client's Subscribe or
-// EthSubscribe methods.
+// mblSubscribe mmblods.
 type ClientSubscription struct {
 	client    *Client
 	etype     reflect.Type
@@ -297,7 +297,7 @@ func (sub *ClientSubscription) run() {
 	// blocked in sub.deliver() or sub.close(). Closing forwardDone unblocks them.
 	close(sub.forwardDone)
 
-	// Call the unsubscribe method on the server.
+	// Call the unsubscribe mmblod on the server.
 	if unsubscribe {
 		sub.requestUnsubscribe()
 	}
@@ -371,5 +371,5 @@ func (sub *ClientSubscription) unmarshal(result json.RawMessage) (interface{}, e
 
 func (sub *ClientSubscription) requestUnsubscribe() error {
 	var result interface{}
-	return sub.client.Call(&result, sub.namespace+unsubscribeMethodSuffix, sub.subid)
+	return sub.client.Call(&result, sub.namespace+unsubscribeMmblodSuffix, sub.subid)
 }

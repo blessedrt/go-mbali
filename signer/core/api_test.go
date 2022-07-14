@@ -31,7 +31,7 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/signer/core"
 	"github.com/mbali/go-mbali/signer/core/apitypes"
@@ -52,7 +52,7 @@ func (ui *headlessUi) OnInputRequired(info core.UserInputRequest) (core.UserInpu
 
 func (ui *headlessUi) OnSignerStartup(info core.StartupInfo)        {}
 func (ui *headlessUi) RegisterUIServer(api *core.UIServerAPI)       {}
-func (ui *headlessUi) OnApprovedTx(tx ethapi.SignTransactionResult) {}
+func (ui *headlessUi) OnApprovedTx(tx mblapi.SignTransactionResult) {}
 
 func (ui *headlessUi) ApproveTx(request *core.SignTxRequest) (core.SignTxResponse, error) {
 
@@ -241,7 +241,7 @@ func mkTestTx(from common.MixedcaseAddress) apitypes.SendTxArgs {
 func TestSignTx(t *testing.T) {
 	var (
 		list      []common.Address
-		res, res2 *ethapi.SignTransactionResult
+		res, res2 *mblapi.SignTransactionResult
 		err       error
 	)
 
@@ -257,12 +257,12 @@ func TestSignTx(t *testing.T) {
 	}
 	a := common.NewMixedcaseAddress(list[0])
 
-	methodSig := "test(uint)"
+	mmblodSig := "test(uint)"
 	tx := mkTestTx(a)
 
 	control.approveCh <- "Y"
 	control.inputCh <- "wrongpassword"
-	res, err = api.SignTransaction(context.Background(), tx, &methodSig)
+	res, err = api.SignTransaction(context.Background(), tx, &mmblodSig)
 	if res != nil {
 		t.Errorf("Expected nil-response, got %v", res)
 	}
@@ -270,7 +270,7 @@ func TestSignTx(t *testing.T) {
 		t.Errorf("Expected ErrLocked! %v", err)
 	}
 	control.approveCh <- "No way"
-	res, err = api.SignTransaction(context.Background(), tx, &methodSig)
+	res, err = api.SignTransaction(context.Background(), tx, &mmblodSig)
 	if res != nil {
 		t.Errorf("Expected nil-response, got %v", res)
 	}
@@ -280,7 +280,7 @@ func TestSignTx(t *testing.T) {
 	// Sign with correct password
 	control.approveCh <- "Y"
 	control.inputCh <- "a_long_password"
-	res, err = api.SignTransaction(context.Background(), tx, &methodSig)
+	res, err = api.SignTransaction(context.Background(), tx, &mmblodSig)
 
 	if err != nil {
 		t.Fatal(err)
@@ -295,7 +295,7 @@ func TestSignTx(t *testing.T) {
 	control.approveCh <- "Y"
 	control.inputCh <- "a_long_password"
 
-	res2, err = api.SignTransaction(context.Background(), tx, &methodSig)
+	res2, err = api.SignTransaction(context.Background(), tx, &mmblodSig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -307,7 +307,7 @@ func TestSignTx(t *testing.T) {
 	control.approveCh <- "M"
 	control.inputCh <- "a_long_password"
 
-	res2, err = api.SignTransaction(context.Background(), tx, &methodSig)
+	res2, err = api.SignTransaction(context.Background(), tx, &mmblodSig)
 	if err != nil {
 		t.Fatal(err)
 	}

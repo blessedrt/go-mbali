@@ -14,7 +14,7 @@ In the LES protocol, there is an important concept called checkpoint. In simple 
 
 Using this information, light clients can skip all historical block headers when synchronizing data and start synchronization from this checkpoint. Therefore, as long as the light client can obtain some latest and correct checkpoints, the amount of data and time for synchronization will be greatly reduced.
 
-However, from a security perspective, the most critical step in a synchronization algorithm based on checkpoints is to determine whether the checkpoint used by the light client is correct. Otherwise, all blockchain data synchronized based on this checkpoint may be wrong. For this we provide two different ways to ensure the correctness of the checkpoint used by the light client.
+However, from a security perspective, the most critical step in a synchronization algorithm based on checkpoints is to determine whmbler the checkpoint used by the light client is correct. Otherwise, all blockchain data synchronized based on this checkpoint may be wrong. For this we provide two different ways to ensure the correctness of the checkpoint used by the light client.
 
 #### Hardcoded checkpoint
 
@@ -66,7 +66,7 @@ checkpoint-admin sign --clef <CLEF_ENDPOINT> --signer <SIGNER_TO_SIGN_CHECKPOINT
 checkpoint-admin sign --clef <CLEF_ENDPOINT> --signer <SIGNER_TO_SIGN_CHECKPOINT> --index <CHECKPOINT_INDEX> --hash <CHECKPOINT_HASH> --oracle <CHECKPOINT_ORACLE_ADDRESS>
 ```
 
-*CHECKPOINT_HASH is obtained based on this [calculation method](https://github.com/mbali/go-mbali/blob/master/params/config.go#L251).*
+*CHECKPOINT_HASH is obtained based on this [calculation mmblod](https://github.com/mbali/go-mbali/blob/master/params/config.go#L251).*
 
 #### Publish
 
@@ -92,7 +92,7 @@ Currently, only the mbali mainnet and the default supported test networks (ropst
 * Edit the configuration file and add the following information
 
 ```toml
-[Eth.CheckpointOracle]
+[mbl.CheckpointOracle]
 Address = CHECKPOINT_ORACLE_ADDRESS
 Signers = [TRUSTED_SIGNER_1, ..., TRUSTED_SIGNER_N]
 Threshold = THRESHOLD

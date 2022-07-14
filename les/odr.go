@@ -24,13 +24,13 @@ import (
 
 	"github.com/mbali/go-mbali/common/mclock"
 	"github.com/mbali/go-mbali/core"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/light"
 )
 
 // LesOdr implements light.OdrBackend
 type LesOdr struct {
-	db                                         ethdb.Database
+	db                                         mbldb.Database
 	indexerConfig                              *light.IndexerConfig
 	chtIndexer, bloomTrieIndexer, bloomIndexer *core.ChainIndexer
 	peers                                      *serverPeerSet
@@ -38,7 +38,7 @@ type LesOdr struct {
 	stop                                       chan struct{}
 }
 
-func NewLesOdr(db ethdb.Database, config *light.IndexerConfig, peers *serverPeerSet, retriever *retrieveManager) *LesOdr {
+func NewLesOdr(db mbldb.Database, config *light.IndexerConfig, peers *serverPeerSet, retriever *retrieveManager) *LesOdr {
 	return &LesOdr{
 		db:            db,
 		indexerConfig: config,
@@ -54,7 +54,7 @@ func (odr *LesOdr) Stop() {
 }
 
 // Database returns the backing database
-func (odr *LesOdr) Database() ethdb.Database {
+func (odr *LesOdr) Database() mbldb.Database {
 	return odr.db
 }
 

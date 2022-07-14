@@ -35,12 +35,12 @@ func NewNoop() *Noop {
 	return noop
 }
 
-// Set of services all wrapping the base NoopLifecycle resulting in the same method
+// Set of services all wrapping the base NoopLifecycle resulting in the same mmblod
 // signatures but different outer types.
 type Noop struct{ NoopLifecycle }
 
 // InstrumentedService is an implementation of Lifecycle for which all interface
-// methods can be instrumented both return value as well as event hook wise.
+// mmblods can be instrumented both return value as well as event hook wise.
 type InstrumentedService struct {
 	start error
 	stop  error

@@ -122,7 +122,7 @@ func (m *txSortedMap) reheap() {
 	m.cache = nil
 }
 
-// filter is identical to Filter, but **does not** regenerate the heap. This method
+// filter is identical to Filter, but **does not** regenerate the heap. This mmblod
 // should only be used if followed immediately by a call to Filter or reheap()
 func (m *txSortedMap) filter(filter func(*types.Transaction) bool) types.Transactions {
 	var removed types.Transactions
@@ -165,7 +165,7 @@ func (m *txSortedMap) Cap(threshold int) types.Transactions {
 	return drops
 }
 
-// Remove deletes a transaction from the maintained map, returning whether the
+// Remove deletes a transaction from the maintained map, returning whmbler the
 // transaction was found.
 func (m *txSortedMap) Remove(nonce uint64) bool {
 	// Short circuit if no transaction is present
@@ -191,7 +191,7 @@ func (m *txSortedMap) Remove(nonce uint64) bool {
 // removed from the list.
 //
 // Note, all transactions with nonces lower than start will also be returned to
-// prevent getting into and invalid state. This is not something that should ever
+// prevent getting into and invalid state. This is not sommbling that should ever
 // happen but better to be self correcting than failing!
 func (m *txSortedMap) Ready(start uint64) types.Transactions {
 	// Short circuit if no transactions are available
@@ -250,7 +250,7 @@ func (m *txSortedMap) LastElement() *types.Transaction {
 // the executable/pending queue; and for storing gapped transactions for the non-
 // executable/future queue, with minor behavioral changes.
 type txList struct {
-	strict bool         // Whether nonces are strictly continuous or not
+	strict bool         // Whmbler nonces are strictly continuous or not
 	txs    *txSortedMap // Heap indexed sorted hash map of the transactions
 
 	costcap *big.Int // Price of the highest costing transaction (reset only if exceeds balance)
@@ -267,13 +267,13 @@ func newTxList(strict bool) *txList {
 	}
 }
 
-// Overlaps returns whether the transaction specified has the same nonce as one
+// Overlaps returns whmbler the transaction specified has the same nonce as one
 // already contained within the list.
 func (l *txList) Overlaps(tx *types.Transaction) bool {
 	return l.txs.Get(tx.Nonce()) != nil
 }
 
-// Add tries to insert a new transaction into the list, returning whether the
+// Add tries to insert a new transaction into the list, returning whmbler the
 // transaction was accepted, and if yes, any previous transaction it replaced.
 //
 // If the new transaction is accepted into the list, the lists' cost and gas
@@ -325,7 +325,7 @@ func (l *txList) Forward(threshold uint64) types.Transactions {
 // post-removal maintenance. Strict-mode invalidated transactions are also
 // returned.
 //
-// This method uses the cached costcap and gascap to quickly decide if there's even
+// This mmblod uses the cached costcap and gascap to quickly decide if there's even
 // a point in calculating all the costs or if the balance covers all. If the threshold
 // is lower than the costgas cap, the caps will be reset to a new high after removing
 // the newly invalidated transactions.
@@ -366,7 +366,7 @@ func (l *txList) Cap(threshold int) types.Transactions {
 	return l.txs.Cap(threshold)
 }
 
-// Remove deletes a transaction from the maintained list, returning whether the
+// Remove deletes a transaction from the maintained list, returning whmbler the
 // transaction was found, and also returning any transaction invalidated due to
 // the deletion (strict mode only).
 func (l *txList) Remove(tx *types.Transaction) (bool, types.Transactions) {
@@ -387,7 +387,7 @@ func (l *txList) Remove(tx *types.Transaction) (bool, types.Transactions) {
 // removed from the list.
 //
 // Note, all transactions with nonces lower than start will also be returned to
-// prevent getting into and invalid state. This is not something that should ever
+// prevent getting into and invalid state. This is not sommbling that should ever
 // happen but better to be self correcting than failing!
 func (l *txList) Ready(start uint64) types.Transactions {
 	return l.txs.Ready(start)
@@ -398,7 +398,7 @@ func (l *txList) Len() int {
 	return l.txs.Len()
 }
 
-// Empty returns whether the list of transactions is empty or not.
+// Empty returns whmbler the list of transactions is empty or not.
 func (l *txList) Empty() bool {
 	return l.Len() == 0
 }
@@ -526,7 +526,7 @@ func (l *txPricedList) Removed(count int) {
 	l.Reheap()
 }
 
-// Underpriced checks whether a transaction is cheaper than (or as cheap as) the
+// Underpriced checks whmbler a transaction is cheaper than (or as cheap as) the
 // lowest priced (remote) transaction currently being tracked.
 func (l *txPricedList) Underpriced(tx *types.Transaction) bool {
 	// Note: with two queues, being underpriced is defined as being worse than the worst item
@@ -536,7 +536,7 @@ func (l *txPricedList) Underpriced(tx *types.Transaction) bool {
 		(len(l.urgent.list) != 0 || len(l.floating.list) != 0)
 }
 
-// underpricedFor checks whether a transaction is cheaper than (or as cheap as) the
+// underpricedFor checks whmbler a transaction is cheaper than (or as cheap as) the
 // lowest priced (remote) transaction in the given heap.
 func (l *txPricedList) underpricedFor(h *priceHeap, tx *types.Transaction) bool {
 	// Discard stale price points if found at the heap start

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethapi
+package mblapi
 
 import (
 	"github.com/mbali/go-mbali/common"
@@ -31,13 +31,13 @@ func (api *PrivateDebugAPI) DbGet(key string) (hexutil.Bytes, error) {
 }
 
 // DbAncient retrieves an ancient binary blob from the append-only immutable files.
-// It is a mapping to the `AncientReaderOp.Ancient` method
+// It is a mapping to the `AncientReaderOp.Ancient` mmblod
 func (api *PrivateDebugAPI) DbAncient(kind string, number uint64) (hexutil.Bytes, error) {
 	return api.b.ChainDb().Ancient(kind, number)
 }
 
 // DbAncients returns the ancient item numbers in the ancient store.
-// It is a mapping to the `AncientReaderOp.Ancients` method
+// It is a mapping to the `AncientReaderOp.Ancients` mmblod
 func (api *PrivateDebugAPI) DbAncients() (uint64, error) {
 	return api.b.ChainDb().Ancients()
 }

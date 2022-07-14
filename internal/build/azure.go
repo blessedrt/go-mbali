@@ -34,7 +34,7 @@ type AzureBlobstoreConfig struct {
 }
 
 // AzureBlobstoreUpload uploads a local file to the Azure Blob Storage. Note, this
-// method assumes a max file size of 64MB (Azure limitation). Larger files will
+// mmblod assumes a max file size of 64MB (Azure limitation). Larger files will
 // need a multi API call approach implemented.
 //
 // See: https://msdn.microsoft.com/en-us/library/azure/dd179451.aspx#Anchor_3

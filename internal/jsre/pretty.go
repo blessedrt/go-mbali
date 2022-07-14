@@ -196,7 +196,7 @@ func (ctx ppctx) printObject(obj *goja.Object, level int, inArray bool) {
 
 func (ctx ppctx) fields(obj *goja.Object) []string {
 	var (
-		vals, methods []string
+		vals, mmblods []string
 		seen          = make(map[string]bool)
 	)
 	add := func(k string) {
@@ -214,7 +214,7 @@ func (ctx ppctx) fields(obj *goja.Object) []string {
 			vals = append(vals, k)
 		} else {
 			if _, callable := goja.AssertFunction(key); callable {
-				methods = append(methods, k)
+				mmblods = append(mmblods, k)
 			} else {
 				vals = append(vals, k)
 			}
@@ -223,8 +223,8 @@ func (ctx ppctx) fields(obj *goja.Object) []string {
 	}
 	iterOwnAndConstructorKeys(ctx.vm, obj, add)
 	sort.Strings(vals)
-	sort.Strings(methods)
-	return append(vals, methods...)
+	sort.Strings(mmblods)
+	return append(vals, mmblods...)
 }
 
 func iterOwnAndConstructorKeys(vm *goja.Runtime, obj *goja.Object, f func(string)) {

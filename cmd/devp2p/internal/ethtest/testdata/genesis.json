@@ -6,7 +6,7 @@
         "eip155Block": 0,
         "eip158Block": 0,
         "byzantiumBlock": 0,
-        "ethash": {}
+        "mblash": {}
     },
     "nonce": "0xdeadbeefdeadbeef",
     "timestamp": "0x0",

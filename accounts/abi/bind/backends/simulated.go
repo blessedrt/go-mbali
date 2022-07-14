@@ -30,15 +30,15 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/common/math"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/bloombits"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/eth/filters"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/filters"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
@@ -60,7 +60,7 @@ var (
 // ChainReader, ChainStateReader, ContractBackend, ContractCaller, ContractFilterer, ContractTransactor,
 // DeployBackend, GasEstimator, GasPricer, LogFilterer, PendingContractCaller, TransactionReader, and TransactionSender
 type SimulatedBackend struct {
-	database   ethdb.Database   // In memory database to store our testing data
+	database   mbldb.Database   // In memory database to store our testing data
 	blockchain *core.BlockChain // mbali blockchain to handle the consensus
 
 	mu              sync.Mutex
@@ -76,10 +76,10 @@ type SimulatedBackend struct {
 // NewSimulatedBackendWithDatabase creates a new binding backend based on the given database
 // and uses a simulated blockchain for testing purposes.
 // A simulated backend always uses chainID 1337.
-func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc core.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
-	genesis := core.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
+func NewSimulatedBackendWithDatabase(database mbldb.Database, alloc core.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+	genesis := core.Genesis{Config: params.AllmblashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
 	genesis.MustCommit(database)
-	blockchain, _ := core.NewBlockChain(database, nil, genesis.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
+	blockchain, _ := core.NewBlockChain(database, nil, genesis.Config, mblash.NewFaker(), vm.Config{}, nil, nil)
 
 	backend := &SimulatedBackend{
 		database:   database,
@@ -127,7 +127,7 @@ func (b *SimulatedBackend) Rollback() {
 }
 
 func (b *SimulatedBackend) rollback(parent *types.Block) {
-	blocks, _ := core.GenerateChain(b.config, parent, ethash.NewFaker(), b.database, 1, func(int, *core.BlockGen) {})
+	blocks, _ := core.GenerateChain(b.config, parent, mblash.NewFaker(), b.database, 1, func(int, *core.BlockGen) {})
 
 	b.pendingBlock = blocks[0]
 	b.pendingState, _ = state.New(b.pendingBlock.Root(), b.blockchain.StateCache(), nil)
@@ -238,7 +238,7 @@ func (b *SimulatedBackend) TransactionReceipt(ctx context.Context, txHash common
 }
 
 // TransactionByHash checks the pool of pending transactions in addition to the
-// blockchain. The isPending return value indicates whether the transaction has been
+// blockchain. The isPending return value indicates whmbler the transaction has been
 // mined yet. Note that the transaction may not be part of the canonical chain even if
 // it's not pending.
 func (b *SimulatedBackend) TransactionByHash(ctx context.Context, txHash common.Hash) (*types.Transaction, bool, error) {
@@ -663,7 +663,7 @@ func (b *SimulatedBackend) SendTransaction(ctx context.Context, tx *types.Transa
 		return fmt.Errorf("invalid transaction nonce: got %d, want %d", tx.Nonce(), nonce)
 	}
 	// Include tx in chain
-	blocks, receipts := core.GenerateChain(b.config, block, ethash.NewFaker(), b.database, 1, func(number int, block *core.BlockGen) {
+	blocks, receipts := core.GenerateChain(b.config, block, mblash.NewFaker(), b.database, 1, func(number int, block *core.BlockGen) {
 		for _, tx := range b.pendingBlock.Transactions() {
 			block.AddTxWithChain(b.blockchain, tx)
 		}
@@ -782,7 +782,7 @@ func (b *SimulatedBackend) AdjustTime(adjustment time.Duration) error {
 		return errors.New("Could not adjust time on non-empty block")
 	}
 
-	blocks, _ := core.GenerateChain(b.config, b.blockchain.CurrentBlock(), ethash.NewFaker(), b.database, 1, func(number int, block *core.BlockGen) {
+	blocks, _ := core.GenerateChain(b.config, b.blockchain.CurrentBlock(), mblash.NewFaker(), b.database, 1, func(number int, block *core.BlockGen) {
 		block.OffsetTime(int64(adjustment.Seconds()))
 	})
 	stateDB, _ := b.blockchain.State()
@@ -818,12 +818,12 @@ func (m callMsg) AccessList() types.AccessList { return m.CallMsg.AccessList }
 // filterBackend implements filters.Backend to support filtering for logs without
 // taking bloom-bits acceleration structures into account.
 type filterBackend struct {
-	db      ethdb.Database
+	db      mbldb.Database
 	bc      *core.BlockChain
 	backend *SimulatedBackend
 }
 
-func (fb *filterBackend) ChainDb() ethdb.Database  { return fb.db }
+func (fb *filterBackend) ChainDb() mbldb.Database  { return fb.db }
 func (fb *filterBackend) EventMux() *event.TypeMux { panic("not supported") }
 
 func (fb *filterBackend) HeaderByNumber(ctx context.Context, block rpc.BlockNumber) (*types.Header, error) {

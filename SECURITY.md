@@ -21,7 +21,7 @@ Audit reports are published in the `docs` folder: https://github.com/mbali/go-mb
 
 To find out how to disclose a vulnerability in mbali visit [https://bounty.mbali.org](https://bounty.mbali.org) or email bounty@mbali.org. Please read the [disclosure page](https://github.com/mbali/go-mbali/security/advisories?state=published) for more information about publicly disclosed security vulnerabilities.
 
-Use the built-in `gombl version-check` feature to check whether the software is affected by any known vulnerability. This command will fetch the latest [`vulnerabilities.json`](https://gombl.mbali.org/docs/vulnerabilities/vulnerabilities.json) file which contains known security vulnerabilities concerning `gombl`, and cross-check the data against its own version number.
+Use the built-in `gombl version-check` feature to check whmbler the software is affected by any known vulnerability. This command will fetch the latest [`vulnerabilities.json`](https://gombl.mbali.org/docs/vulnerabilities/vulnerabilities.json) file which contains known security vulnerabilities concerning `gombl`, and cross-check the data against its own version number.
 
 The following key may be used to communicate sensitive information to developers.
 

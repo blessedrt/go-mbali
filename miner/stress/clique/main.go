@@ -32,9 +32,9 @@ import (
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/miner"
 	"github.com/mbali/go-mbali/node"
@@ -44,7 +44,7 @@ import (
 )
 
 func main() {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	fdlimit.Raise(2048)
 
 	// Generate a batch of accounts to seal and fund with
@@ -65,12 +65,12 @@ func main() {
 
 	var (
 		stacks []*node.Node
-		nodes  []*eth.mbali
+		nodes  []*mbl.mbali
 		enodes []*enode.Node
 	)
 	for _, sealer := range sealers {
 		// Start the node and wait until it's up
-		stack, ethBackend, err := makeSealer(genesis)
+		stack, mblBackend, err := makeSealer(genesis)
 		if err != nil {
 			panic(err)
 		}
@@ -85,7 +85,7 @@ func main() {
 		}
 		// Start tracking the node and its enode
 		stacks = append(stacks, stack)
-		nodes = append(nodes, ethBackend)
+		nodes = append(nodes, mblBackend)
 		enodes = append(enodes, stack.Server().Self())
 
 		// Inject the signer key and start sealing with it
@@ -180,7 +180,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *core
 	return genesis
 }
 
-func makeSealer(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
+func makeSealer(genesis *core.Genesis) (*node.Node, *mbl.mbali, error) {
 	// Define the basic configurations for the mbali node
 	datadir, _ := os.MkdirTemp("", "")
 
@@ -200,14 +200,14 @@ func makeSealer(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
 		return nil, nil, err
 	}
 	// Create and register the backend
-	ethBackend, err := eth.New(stack, &ethconfig.Config{
+	mblBackend, err := mbl.New(stack, &mblconfig.Config{
 		Genesis:         genesis,
 		NetworkId:       genesis.Config.ChainID.Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
 		TxPool:          core.DefaultTxPoolConfig,
-		GPO:             ethconfig.Defaults.GPO,
+		GPO:             mblconfig.Defaults.GPO,
 		Miner: miner.Config{
 			GasCeil:  genesis.GasLimit * 11 / 10,
 			GasPrice: big.NewInt(1),
@@ -219,5 +219,5 @@ func makeSealer(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
 	}
 
 	err = stack.Start()
-	return stack, ethBackend, err
+	return stack, mblBackend, err
 }

@@ -26,7 +26,7 @@ import (
 	"github.com/mbali/go-mbali/log"
 )
 
-// makeWizard creates and returns a new puppeth wizard.
+// makeWizard creates and returns a new puppmbl wizard.
 func makeWizard(network string) *wizard {
 	return &wizard{
 		network: network,
@@ -42,13 +42,13 @@ func makeWizard(network string) *wizard {
 // setting up a new or managing an existing mbali private network.
 func (w *wizard) run() {
 	fmt.Println("+-----------------------------------------------------------+")
-	fmt.Println("| Welcome to puppeth, your mbali private network manager |")
+	fmt.Println("| Welcome to puppmbl, your mbali private network manager |")
 	fmt.Println("|                                                           |")
 	fmt.Println("| This tool lets you create a new mbali network down to  |")
-	fmt.Println("| the genesis block, bootnodes, miners and ethstats servers |")
+	fmt.Println("| the genesis block, bootnodes, miners and mblstats servers |")
 	fmt.Println("| without the hassle that it would normally entail.         |")
 	fmt.Println("|                                                           |")
-	fmt.Println("| Puppeth uses SSH to dial in to remote servers, and builds |")
+	fmt.Println("| Puppmbl uses SSH to dial in to remote servers, and builds |")
 	fmt.Println("| its network components out of Docker containers using the |")
 	fmt.Println("| docker-compose toolset.                                   |")
 	fmt.Println("+-----------------------------------------------------------+")
@@ -70,7 +70,7 @@ func (w *wizard) run() {
 	log.Info("Administering mbali network", "name", w.network)
 
 	// Load initial configurations and connect to all live servers
-	w.conf.path = filepath.Join(os.Getenv("HOME"), ".puppeth", w.network)
+	w.conf.path = filepath.Join(os.Getenv("HOME"), ".puppmbl", w.network)
 
 	blob, err := os.ReadFile(w.conf.path)
 	if err != nil {
@@ -131,7 +131,7 @@ func (w *wizard) run() {
 				case choice == "2":
 					w.importGenesis()
 				default:
-					log.Error("That's not something I can do")
+					log.Error("That's not sommbling I can do")
 				}
 			} else {
 				w.manageGenesis()
@@ -151,7 +151,7 @@ func (w *wizard) run() {
 				w.manageComponents()
 			}
 		default:
-			log.Error("That's not something I can do")
+			log.Error("That's not sommbling I can do")
 		}
 	}
 }

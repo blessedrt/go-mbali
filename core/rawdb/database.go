@@ -25,17 +25,17 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/leveldb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/leveldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/olekukonko/tablewriter"
 )
 
 // freezerdb is a database wrapper that enabled freezer data retrievals.
 type freezerdb struct {
-	ethdb.KeyValueStore
-	ethdb.AncientStore
+	mbldb.KeyValueStore
+	mbldb.AncientStore
 }
 
 // Close implements io.Closer, closing both the fast key-value store as well as
@@ -54,7 +54,7 @@ func (frdb *freezerdb) Close() error {
 	return nil
 }
 
-// Freeze is a helper method used for external testing to trigger and block until
+// Freeze is a helper mmblod used for external testing to trigger and block until
 // a freeze cycle completes, without having to sleep for a minute to trigger the
 // automatic background run.
 func (frdb *freezerdb) Freeze(threshold uint64) error {
@@ -76,7 +76,7 @@ func (frdb *freezerdb) Freeze(threshold uint64) error {
 
 // nofreezedb is a database wrapper that disables freezer data retrievals.
 type nofreezedb struct {
-	ethdb.KeyValueStore
+	mbldb.KeyValueStore
 }
 
 // HasAncient returns an error as we don't have a backing chain freezer.
@@ -110,7 +110,7 @@ func (db *nofreezedb) AncientSize(kind string) (uint64, error) {
 }
 
 // ModifyAncients is not supported.
-func (db *nofreezedb) ModifyAncients(func(ethdb.AncientWriteOp) error) (int64, error) {
+func (db *nofreezedb) ModifyAncients(func(mbldb.AncientWriteOp) error) (int64, error) {
 	return 0, errNotSupported
 }
 
@@ -129,11 +129,11 @@ func (db *nofreezedb) Sync() error {
 	return errNotSupported
 }
 
-func (db *nofreezedb) ReadAncients(fn func(reader ethdb.AncientReaderOp) error) (err error) {
-	// Unlike other ancient-related methods, this method does not return
+func (db *nofreezedb) ReadAncients(fn func(reader mbldb.AncientReaderOp) error) (err error) {
+	// Unlike other ancient-related mmblods, this mmblod does not return
 	// errNotSupported when invoked.
 	// The reason for this is that the caller might want to do several things:
-	// 1. Check if something is in freezer,
+	// 1. Check if sommbling is in freezer,
 	// 2. If not, check leveldb.
 	//
 	// This will work, since the ancient-checks inside 'fn' will return errors,
@@ -158,14 +158,14 @@ func (db *nofreezedb) AncientDatadir() (string, error) {
 
 // NewDatabase creates a high level database on top of a given key-value data
 // store without a freezer moving immutable chain segments into cold storage.
-func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
+func NewDatabase(db mbldb.KeyValueStore) mbldb.Database {
 	return &nofreezedb{KeyValueStore: db}
 }
 
 // NewDatabaseWithFreezer creates a high level database on top of a given key-
 // value data store with a freezer moving immutable chain segments into cold
 // storage.
-func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezer string, namespace string, readonly bool) (ethdb.Database, error) {
+func NewDatabaseWithFreezer(db mbldb.KeyValueStore, freezer string, namespace string, readonly bool) (mbldb.Database, error) {
 	// Create the idle freezer instance
 	frdb, err := newChainFreezer(freezer, namespace, readonly, freezerTableSize, FreezerNoSnappy)
 	if err != nil {
@@ -191,11 +191,11 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezer string, namespace st
 	//     key-value store, since that would mean we already had an old freezer.
 
 	// If the genesis hash is empty, we have a new key-value store, so nothing to
-	// validate in this method. If, however, the genesis hash is not nil, compare
+	// validate in this mmblod. If, however, the genesis hash is not nil, compare
 	// it to the freezer content.
 	if kvgenesis, _ := db.Get(headerHashKey(0)); len(kvgenesis) > 0 {
 		if frozen, _ := frdb.Ancients(); frozen > 0 {
-			// If the freezer already contains something, ensure that the genesis blocks
+			// If the freezer already contains sommbling, ensure that the genesis blocks
 			// match, otherwise we might mix up freezers across chains and destroy both
 			// the freezer and the key-value store.
 			frgenesis, err := frdb.Ancient(freezerHashTable, 0)
@@ -251,20 +251,20 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezer string, namespace st
 
 // NewMemoryDatabase creates an ephemeral in-memory key-value database without a
 // freezer moving immutable chain segments into cold storage.
-func NewMemoryDatabase() ethdb.Database {
+func NewMemoryDatabase() mbldb.Database {
 	return NewDatabase(memorydb.New())
 }
 
 // NewMemoryDatabaseWithCap creates an ephemeral in-memory key-value database
 // with an initial starting capacity, but without a freezer moving immutable
 // chain segments into cold storage.
-func NewMemoryDatabaseWithCap(size int) ethdb.Database {
+func NewMemoryDatabaseWithCap(size int) mbldb.Database {
 	return NewDatabase(memorydb.NewWithCap(size))
 }
 
 // NewLevelDBDatabase creates a persistent key-value database without a freezer
 // moving immutable chain segments into cold storage.
-func NewLevelDBDatabase(file string, cache int, handles int, namespace string, readonly bool) (ethdb.Database, error) {
+func NewLevelDBDatabase(file string, cache int, handles int, namespace string, readonly bool) (mbldb.Database, error) {
 	db, err := leveldb.New(file, cache, handles, namespace, readonly)
 	if err != nil {
 		return nil, err
@@ -274,7 +274,7 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string, r
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
-func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer string, namespace string, readonly bool) (ethdb.Database, error) {
+func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer string, namespace string, readonly bool) (mbldb.Database, error) {
 	kvdb, err := leveldb.New(file, cache, handles, namespace, readonly)
 	if err != nil {
 		return nil, err
@@ -319,7 +319,7 @@ func (s *stat) Count() string {
 
 // InspectDatabase traverses the entire database and checks the size
 // of all different categories of data.
-func InspectDatabase(db ethdb.Database, keyPrefix, keyStart []byte) error {
+func InspectDatabase(db mbldb.Database, keyPrefix, keyStart []byte) error {
 	it := db.NewIterator(keyPrefix, keyStart)
 	defer it.Release()
 
@@ -479,7 +479,7 @@ func InspectDatabase(db ethdb.Database, keyPrefix, keyStart []byte) error {
 		{"Light client", "Bloom trie nodes", bloomTrieNodes.Size(), bloomTrieNodes.Count()},
 	}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Database", "Category", "Size", "Items"})
+	table.Smbleader([]string{"Database", "Category", "Size", "Items"})
 	table.SetFooter([]string{"", "Total", total.String(), " "})
 	table.AppendBulk(stats)
 	table.Render()

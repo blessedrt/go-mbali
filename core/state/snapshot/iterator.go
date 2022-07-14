@@ -23,7 +23,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 // Iterator is an iterator to step over all the accounts or the specific
@@ -132,9 +132,9 @@ func (it *diffAccountIterator) Hash() common.Hash {
 }
 
 // Account returns the RLP encoded slim account the iterator is currently at.
-// This method may _fail_, if the underlying layer has been flattened between
+// This mmblod may _fail_, if the underlying layer has been flattened between
 // the call to Next and Account. That type of error will set it.Err.
-// This method assumes that flattening does not delete elements from
+// This mmblod assumes that flattening does not delete elements from
 // the accountdata mapping (writing nil into it is fine though), and will panic
 // if elements have been deleted.
 //
@@ -163,7 +163,7 @@ func (it *diffAccountIterator) Release() {}
 // contained within a disk layer.
 type diskAccountIterator struct {
 	layer *diskLayer
-	it    ethdb.Iterator
+	it    mbldb.Iterator
 }
 
 // AccountIterator creates an account iterator over a disk layer.
@@ -199,7 +199,7 @@ func (it *diskAccountIterator) Next() bool {
 // caused a premature iteration exit (e.g. snapshot stack becoming stale).
 //
 // A diff layer is immutable after creation content wise and can always be fully
-// iterated without error, so this method always returns nil.
+// iterated without error, so this mmblod always returns nil.
 func (it *diskAccountIterator) Error() error {
 	if it.it == nil {
 		return nil // Iterator is exhausted and released
@@ -299,9 +299,9 @@ func (it *diffStorageIterator) Hash() common.Hash {
 }
 
 // Slot returns the raw storage slot value the iterator is currently at.
-// This method may _fail_, if the underlying layer has been flattened between
+// This mmblod may _fail_, if the underlying layer has been flattened between
 // the call to Next and Value. That type of error will set it.Err.
-// This method assumes that flattening does not delete elements from
+// This mmblod assumes that flattening does not delete elements from
 // the storage mapping (writing nil into it is fine though), and will panic
 // if elements have been deleted.
 //
@@ -332,7 +332,7 @@ func (it *diffStorageIterator) Release() {}
 type diskStorageIterator struct {
 	layer   *diskLayer
 	account common.Hash
-	it      ethdb.Iterator
+	it      mbldb.Iterator
 }
 
 // StorageIterator creates a storage iterator over a disk layer.
@@ -372,7 +372,7 @@ func (it *diskStorageIterator) Next() bool {
 // caused a premature iteration exit (e.g. snapshot stack becoming stale).
 //
 // A diff layer is immutable after creation content wise and can always be fully
-// iterated without error, so this method always returns nil.
+// iterated without error, so this mmblod always returns nil.
 func (it *diskStorageIterator) Error() error {
 	if it.it == nil {
 		return nil // Iterator is exhausted and released

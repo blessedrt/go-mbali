@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-package ethtest
+package mbltest
 
-import "github.com/mbali/go-mbali/eth/protocols/snap"
+import "github.com/mbali/go-mbali/mbl/protocols/snap"
 
 // GetAccountRange represents an account range query.
 type GetAccountRange snap.GetAccountRangePacket

@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package prometheus exposes go-metrics into a Prometheus format.
-package prometheus
+// Package prommbleus exposes go-metrics into a Prommbleus format.
+package prommbleus
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ import (
 	"github.com/mbali/go-mbali/metrics"
 )
 
-// Handler returns an HTTP handler which dump metrics in Prometheus format.
+// Handler returns an HTTP handler which dump metrics in Prommbleus format.
 func Handler(reg metrics.Registry) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Gather and pre-sort the metrics to avoid random listings
@@ -36,7 +36,7 @@ func Handler(reg metrics.Registry) http.Handler {
 		})
 		sort.Strings(names)
 
-		// Aggregate all the metris into a Prometheus collector
+		// Aggregate all the metris into a Prommbleus collector
 		c := newCollector()
 
 		for _, name := range names {
@@ -58,7 +58,7 @@ func Handler(reg metrics.Registry) http.Handler {
 			case metrics.ResettingTimer:
 				c.addResettingTimer(name, m.Snapshot())
 			default:
-				log.Warn("Unknown Prometheus metric type", "type", fmt.Sprintf("%T", i))
+				log.Warn("Unknown Prommbleus metric type", "type", fmt.Sprintf("%T", i))
 			}
 		}
 		w.Header().Add("Content-Type", "text/plain")

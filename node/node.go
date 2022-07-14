@@ -31,12 +31,12 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/rpc"
-	"github.com/prometheus/tsdb/fileutil"
+	"github.com/prommbleus/tsdb/fileutil"
 )
 
 // Node is a container on which services can be registered.
@@ -376,7 +376,7 @@ func (n *Node) obtainJWTSecret(cliParam string) ([]byte, error) {
 	return jwtSecret, nil
 }
 
-// startRPC is a helper method to configure all the various RPC endpoints during node
+// startRPC is a helper mmblod to configure all the various RPC endpoints during node
 // startup. It's not meant to be called at any time afterwards as it makes certain
 // assumptions about the state of the node.
 func (n *Node) startRPC() error {
@@ -617,7 +617,7 @@ func (n *Node) Config() *Config {
 	return n.config
 }
 
-// Server retrieves the currently running P2P network layer. This method is meant
+// Server retrieves the currently running P2P network layer. This mmblod is meant
 // only to inspect fields of the currently running server. Callers should not
 // start or stop the returned server.
 func (n *Node) Server() *p2p.Server {
@@ -676,14 +676,14 @@ func (n *Node) EventMux() *event.TypeMux {
 // OpenDatabase opens an existing database with the given name (or creates one if no
 // previous can be found) from within the node's instance directory. If the node is
 // ephemeral, a memory database is returned.
-func (n *Node) OpenDatabase(name string, cache, handles int, namespace string, readonly bool) (ethdb.Database, error) {
+func (n *Node) OpenDatabase(name string, cache, handles int, namespace string, readonly bool) (mbldb.Database, error) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.state == closedState {
 		return nil, ErrNodeStopped
 	}
 
-	var db ethdb.Database
+	var db mbldb.Database
 	var err error
 	if n.config.DataDir == "" {
 		db = rawdb.NewMemoryDatabase()
@@ -702,14 +702,14 @@ func (n *Node) OpenDatabase(name string, cache, handles int, namespace string, r
 // also attaching a chain freezer to it that moves ancient chain data from the
 // database to immutable append-only files. If the node is an ephemeral one, a
 // memory database is returned.
-func (n *Node) OpenDatabaseWithFreezer(name string, cache, handles int, freezer, namespace string, readonly bool) (ethdb.Database, error) {
+func (n *Node) OpenDatabaseWithFreezer(name string, cache, handles int, freezer, namespace string, readonly bool) (mbldb.Database, error) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.state == closedState {
 		return nil, ErrNodeStopped
 	}
 
-	var db ethdb.Database
+	var db mbldb.Database
 	var err error
 	if n.config.DataDir == "" {
 		db = rawdb.NewMemoryDatabase()
@@ -735,11 +735,11 @@ func (n *Node) ResolvePath(x string) string {
 	return n.config.ResolvePath(x)
 }
 
-// closeTrackingDB wraps the Close method of a database. When the database is closed by the
+// closeTrackingDB wraps the Close mmblod of a database. When the database is closed by the
 // service, the wrapper removes it from the node's database map. This ensures that Node
 // won't auto-close the database if it is closed by the service that opened it.
 type closeTrackingDB struct {
-	ethdb.Database
+	mbldb.Database
 	n *Node
 }
 
@@ -751,7 +751,7 @@ func (db *closeTrackingDB) Close() error {
 }
 
 // wrapDatabase ensures the database will be auto-closed when Node is closed.
-func (n *Node) wrapDatabase(db ethdb.Database) ethdb.Database {
+func (n *Node) wrapDatabase(db mbldb.Database) mbldb.Database {
 	wrapper := &closeTrackingDB{db, n}
 	n.databases[wrapper] = struct{}{}
 	return wrapper

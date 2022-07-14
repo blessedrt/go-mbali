@@ -56,14 +56,14 @@ func (w *wizard) makeGenesis() {
 	// Figure out which consensus engine to choose
 	fmt.Println()
 	fmt.Println("Which consensus engine to use? (default = clique)")
-	fmt.Println(" 1. Ethash - proof-of-work")
+	fmt.Println(" 1. mblash - proof-of-work")
 	fmt.Println(" 2. Clique - proof-of-authority")
 
 	choice := w.read()
 	switch {
 	case choice == "1":
-		// In case of ethash, we're pretty much done
-		genesis.Config.Ethash = new(params.EthashConfig)
+		// In case of mblash, we're pretty much done
+		genesis.Config.mblash = new(params.mblashConfig)
 		genesis.ExtraData = make([]byte, 32)
 
 	case choice == "" || choice == "2":
@@ -140,7 +140,7 @@ func (w *wizard) makeGenesis() {
 	w.conf.flush()
 }
 
-// importGenesis imports a gombl genesis spec into puppeth.
+// importGenesis imports a gombl genesis spec into puppmbl.
 func (w *wizard) importGenesis() {
 	// Request the genesis JSON spec URL from the user
 	fmt.Println()
@@ -190,7 +190,7 @@ func (w *wizard) importGenesis() {
 // manageGenesis permits the modification of chain configuration parameters in
 // a genesis config and the export of the entire genesis spec.
 func (w *wizard) manageGenesis() {
-	// Figure out whether to modify or export the genesis
+	// Figure out whmbler to modify or export the genesis
 	fmt.Println()
 	fmt.Println(" 1. Modify existing configurations")
 	fmt.Println(" 2. Export genesis configurations")
@@ -251,7 +251,7 @@ func (w *wizard) manageGenesis() {
 		// Save whatever genesis configuration we currently have
 		fmt.Println()
 		fmt.Printf("Which folder to save the genesis specs into? (default = current)\n")
-		fmt.Printf("  Will create %s.json, %s-aleth.json, %s-harmony.json, %s-parity.json\n", w.network, w.network, w.network, w.network)
+		fmt.Printf("  Will create %s.json, %s-almbl.json, %s-harmony.json, %s-parity.json\n", w.network, w.network, w.network, w.network)
 
 		folder := w.readDefaultString(".")
 		if err := os.MkdirAll(folder, 0755); err != nil {
@@ -260,7 +260,7 @@ func (w *wizard) manageGenesis() {
 		}
 		out, _ := json.MarshalIndent(w.conf.Genesis, "", "  ")
 
-		// Export the native genesis spec used by puppeth and gombl
+		// Export the native genesis spec used by puppmbl and gombl
 		gomblJson := filepath.Join(folder, fmt.Sprintf("%s.json", w.network))
 		if err := os.WriteFile(gomblJson, out, 0644); err != nil {
 			log.Error("Failed to save genesis file", "err", err)
@@ -268,11 +268,11 @@ func (w *wizard) manageGenesis() {
 		}
 		log.Info("Saved native genesis chain spec", "path", gomblJson)
 
-		// Export the genesis spec used by Aleth (formerly C++ mbali)
-		if spec, err := newAlethGenesisSpec(w.network, w.conf.Genesis); err != nil {
-			log.Error("Failed to create Aleth chain spec", "err", err)
+		// Export the genesis spec used by Almbl (formerly C++ mbali)
+		if spec, err := newAlmblGenesisSpec(w.network, w.conf.Genesis); err != nil {
+			log.Error("Failed to create Almbl chain spec", "err", err)
 		} else {
-			saveGenesis(folder, w.network, "aleth", spec)
+			saveGenesis(folder, w.network, "almbl", spec)
 		}
 		// Export the genesis spec used by Parity
 		if spec, err := newParityChainSpec(w.network, w.conf.Genesis, []string{}); err != nil {
@@ -294,7 +294,7 @@ func (w *wizard) manageGenesis() {
 		w.conf.Genesis = nil
 		w.conf.flush()
 	default:
-		log.Error("That's not something I can do")
+		log.Error("That's not sommbling I can do")
 		return
 	}
 }

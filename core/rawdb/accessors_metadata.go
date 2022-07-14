@@ -21,14 +21,14 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
 )
 
 // ReadDatabaseVersion retrieves the version number of the database.
-func ReadDatabaseVersion(db ethdb.KeyValueReader) *uint64 {
+func ReadDatabaseVersion(db mbldb.KeyValueReader) *uint64 {
 	var version uint64
 
 	enc, _ := db.Get(databaseVersionKey)
@@ -43,7 +43,7 @@ func ReadDatabaseVersion(db ethdb.KeyValueReader) *uint64 {
 }
 
 // WriteDatabaseVersion stores the version number of the database
-func WriteDatabaseVersion(db ethdb.KeyValueWriter, version uint64) {
+func WriteDatabaseVersion(db mbldb.KeyValueWriter, version uint64) {
 	enc, err := rlp.EncodeToBytes(version)
 	if err != nil {
 		log.Crit("Failed to encode database version", "err", err)
@@ -54,7 +54,7 @@ func WriteDatabaseVersion(db ethdb.KeyValueWriter, version uint64) {
 }
 
 // ReadChainConfig retrieves the consensus settings based on the given genesis hash.
-func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *params.ChainConfig {
+func ReadChainConfig(db mbldb.KeyValueReader, hash common.Hash) *params.ChainConfig {
 	data, _ := db.Get(configKey(hash))
 	if len(data) == 0 {
 		return nil
@@ -68,7 +68,7 @@ func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *params.ChainCon
 }
 
 // WriteChainConfig writes the chain config settings to the database.
-func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg *params.ChainConfig) {
+func WriteChainConfig(db mbldb.KeyValueWriter, hash common.Hash, cfg *params.ChainConfig) {
 	if cfg == nil {
 		return
 	}
@@ -82,13 +82,13 @@ func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg *params.Cha
 }
 
 // ReadGenesisState retrieves the genesis state based on the given genesis hash.
-func ReadGenesisState(db ethdb.KeyValueReader, hash common.Hash) []byte {
+func ReadGenesisState(db mbldb.KeyValueReader, hash common.Hash) []byte {
 	data, _ := db.Get(genesisKey(hash))
 	return data
 }
 
 // WriteGenesisState writes the genesis state into the disk.
-func WriteGenesisState(db ethdb.KeyValueWriter, hash common.Hash, data []byte) {
+func WriteGenesisState(db mbldb.KeyValueWriter, hash common.Hash, data []byte) {
 	if err := db.Put(genesisKey(hash), data); err != nil {
 		log.Crit("Failed to store genesis state", "err", err)
 	}
@@ -107,7 +107,7 @@ const crashesToKeep = 10
 // the previous data
 // - a list of timestamps
 // - a count of how many old unclean-shutdowns have been discarded
-func PushUncleanShutdownMarker(db ethdb.KeyValueStore) ([]uint64, uint64, error) {
+func PushUncleanShutdownMarker(db mbldb.KeyValueStore) ([]uint64, uint64, error) {
 	var uncleanShutdowns crashList
 	// Read old data
 	if data, err := db.Get(uncleanShutdownKey); err != nil {
@@ -135,7 +135,7 @@ func PushUncleanShutdownMarker(db ethdb.KeyValueStore) ([]uint64, uint64, error)
 }
 
 // PopUncleanShutdownMarker removes the last unclean shutdown marker
-func PopUncleanShutdownMarker(db ethdb.KeyValueStore) {
+func PopUncleanShutdownMarker(db mbldb.KeyValueStore) {
 	var uncleanShutdowns crashList
 	// Read old data
 	if data, err := db.Get(uncleanShutdownKey); err != nil {
@@ -153,7 +153,7 @@ func PopUncleanShutdownMarker(db ethdb.KeyValueStore) {
 }
 
 // UpdateUncleanShutdownMarker updates the last marker's timestamp to now.
-func UpdateUncleanShutdownMarker(db ethdb.KeyValueStore) {
+func UpdateUncleanShutdownMarker(db mbldb.KeyValueStore) {
 	var uncleanShutdowns crashList
 	// Read old data
 	if data, err := db.Get(uncleanShutdownKey); err != nil {
@@ -174,15 +174,15 @@ func UpdateUncleanShutdownMarker(db ethdb.KeyValueStore) {
 	}
 }
 
-// ReadTransitionStatus retrieves the eth2 transition status from the database
-func ReadTransitionStatus(db ethdb.KeyValueReader) []byte {
+// ReadTransitionStatus retrieves the mbl2 transition status from the database
+func ReadTransitionStatus(db mbldb.KeyValueReader) []byte {
 	data, _ := db.Get(transitionStatusKey)
 	return data
 }
 
-// WriteTransitionStatus stores the eth2 transition status to the database
-func WriteTransitionStatus(db ethdb.KeyValueWriter, data []byte) {
+// WriteTransitionStatus stores the mbl2 transition status to the database
+func WriteTransitionStatus(db mbldb.KeyValueWriter, data []byte) {
 	if err := db.Put(transitionStatusKey, data); err != nil {
-		log.Crit("Failed to store the eth2 transition status", "err", err)
+		log.Crit("Failed to store the mbl2 transition status", "err", err)
 	}
 }

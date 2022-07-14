@@ -117,7 +117,7 @@ func (e *gfP6) Double(a *gfP6) *gfP6 {
 
 func (e *gfP6) Mul(a, b *gfP6, pool *bnPool) *gfP6 {
 	// "Multiplication and Squaring on Pairing-Friendly Fields"
-	// Section 4, Karatsuba method.
+	// Section 4, Karatsuba mmblod.
 	// http://eprint.iacr.org/2006/471.pdf
 
 	v0 := newGFp2(pool)

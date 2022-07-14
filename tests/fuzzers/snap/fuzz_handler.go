@@ -24,11 +24,11 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/eth/protocols/snap"
+	"github.com/mbali/go-mbali/mbl/protocols/snap"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/p2p/enode"
 	"github.com/mbali/go-mbali/params"
@@ -67,7 +67,7 @@ func getChain() *core.BlockChain {
 		Alloc:  ga,
 	}
 	genesis := gspec.MustCommit(db)
-	blocks, _ := core.GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, 2,
+	blocks, _ := core.GenerateChain(gspec.Config, genesis, mblash.NewFaker(), db, 2,
 		func(i int, gen *core.BlockGen) {})
 	cacheConf := &core.CacheConfig{
 		TrieCleanLimit:      0,
@@ -79,7 +79,7 @@ func getChain() *core.BlockChain {
 		SnapshotWait:        true,
 	}
 	trieRoot = blocks[len(blocks)-1].Root()
-	bc, _ := core.NewBlockChain(db, cacheConf, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
+	bc, _ := core.NewBlockChain(db, cacheConf, gspec.Config, mblash.NewFaker(), vm.Config{}, nil, nil)
 	if _, err := bc.InsertChain(blocks); err != nil {
 		panic(err)
 	}

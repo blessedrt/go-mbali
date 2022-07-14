@@ -240,7 +240,7 @@ func (ac *accountCache) scanAccounts() error {
 	if creates.Cardinality() == 0 && deletes.Cardinality() == 0 && updates.Cardinality() == 0 {
 		return nil
 	}
-	// Create a helper method to scan the contents of the key files
+	// Create a helper mmblod to scan the contents of the key files
 	var (
 		buf = new(bufio.Reader)
 		key struct {

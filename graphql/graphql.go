@@ -31,8 +31,8 @@ import (
 	"github.com/mbali/go-mbali/consensus/misc"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/filters"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/mbl/filters"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/rpc"
 )
@@ -76,7 +76,7 @@ func (b *Long) UnmarshalGraphQL(input interface{}) error {
 
 // Account represents an mbali account at a particular block.
 type Account struct {
-	backend       ethapi.Backend
+	backend       mblapi.Backend
 	address       common.Address
 	blockNrOrHash rpc.BlockNumberOrHash
 }
@@ -137,7 +137,7 @@ func (a *Account) Storage(ctx context.Context, args struct{ Slot common.Hash }) 
 
 // Log represents an individual log message. All arguments are mandatory.
 type Log struct {
-	backend     ethapi.Backend
+	backend     mblapi.Backend
 	transaction *Transaction
 	log         *types.Log
 }
@@ -183,7 +183,7 @@ func (at *AccessTuple) StorageKeys(ctx context.Context) []common.Hash {
 // Transaction represents an mbali transaction.
 // backend and hash are mandatory; all others will be fetched when required.
 type Transaction struct {
-	backend ethapi.Backend
+	backend mblapi.Backend
 	hash    common.Hash
 	tx      *types.Transaction
 	block   *Block
@@ -539,7 +539,7 @@ type BlockType int
 // backend, and numberOrHash are mandatory. All other fields are lazily fetched
 // when required.
 type Block struct {
-	backend      ethapi.Backend
+	backend      mblapi.Backend
 	numberOrHash *rpc.BlockNumberOrHash
 	hash         common.Hash
 	header       *types.Header
@@ -944,7 +944,7 @@ type BlockFilterCriteria struct {
 
 // runFilter accepts a filter and executes it, returning all its results as
 // `Log` objects.
-func runFilter(ctx context.Context, be ethapi.Backend, filter *filters.Filter) ([]*Log, error) {
+func runFilter(ctx context.Context, be mblapi.Backend, filter *filters.Filter) ([]*Log, error) {
 	logs, err := filter.Logs(ctx)
 	if err != nil || logs == nil {
 		return nil, err
@@ -1033,7 +1033,7 @@ func (c *CallResult) Status() Long {
 }
 
 func (b *Block) Call(ctx context.Context, args struct {
-	Data ethapi.TransactionArgs
+	Data mblapi.TransactionArgs
 }) (*CallResult, error) {
 	if b.numberOrHash == nil {
 		_, err := b.resolve(ctx)
@@ -1041,7 +1041,7 @@ func (b *Block) Call(ctx context.Context, args struct {
 			return nil, err
 		}
 	}
-	result, err := ethapi.DoCall(ctx, b.backend, args.Data, *b.numberOrHash, nil, b.backend.RPCEVMTimeout(), b.backend.RPCGasCap())
+	result, err := mblapi.DoCall(ctx, b.backend, args.Data, *b.numberOrHash, nil, b.backend.RPCEVMTimeout(), b.backend.RPCGasCap())
 	if err != nil {
 		return nil, err
 	}
@@ -1058,7 +1058,7 @@ func (b *Block) Call(ctx context.Context, args struct {
 }
 
 func (b *Block) EstimateGas(ctx context.Context, args struct {
-	Data ethapi.TransactionArgs
+	Data mblapi.TransactionArgs
 }) (Long, error) {
 	if b.numberOrHash == nil {
 		_, err := b.resolveHeader(ctx)
@@ -1066,12 +1066,12 @@ func (b *Block) EstimateGas(ctx context.Context, args struct {
 			return 0, err
 		}
 	}
-	gas, err := ethapi.DoEstimateGas(ctx, b.backend, args.Data, *b.numberOrHash, b.backend.RPCGasCap())
+	gas, err := mblapi.DoEstimateGas(ctx, b.backend, args.Data, *b.numberOrHash, b.backend.RPCGasCap())
 	return Long(gas), err
 }
 
 type Pending struct {
-	backend ethapi.Backend
+	backend mblapi.Backend
 }
 
 func (p *Pending) TransactionCount(ctx context.Context) (int32, error) {
@@ -1108,10 +1108,10 @@ func (p *Pending) Account(ctx context.Context, args struct {
 }
 
 func (p *Pending) Call(ctx context.Context, args struct {
-	Data ethapi.TransactionArgs
+	Data mblapi.TransactionArgs
 }) (*CallResult, error) {
 	pendingBlockNr := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
-	result, err := ethapi.DoCall(ctx, p.backend, args.Data, pendingBlockNr, nil, p.backend.RPCEVMTimeout(), p.backend.RPCGasCap())
+	result, err := mblapi.DoCall(ctx, p.backend, args.Data, pendingBlockNr, nil, p.backend.RPCEVMTimeout(), p.backend.RPCGasCap())
 	if err != nil {
 		return nil, err
 	}
@@ -1128,16 +1128,16 @@ func (p *Pending) Call(ctx context.Context, args struct {
 }
 
 func (p *Pending) EstimateGas(ctx context.Context, args struct {
-	Data ethapi.TransactionArgs
+	Data mblapi.TransactionArgs
 }) (Long, error) {
 	pendingBlockNr := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
-	gas, err := ethapi.DoEstimateGas(ctx, p.backend, args.Data, pendingBlockNr, p.backend.RPCGasCap())
+	gas, err := mblapi.DoEstimateGas(ctx, p.backend, args.Data, pendingBlockNr, p.backend.RPCGasCap())
 	return Long(gas), err
 }
 
 // Resolver is the top-level object in the GraphQL hierarchy.
 type Resolver struct {
-	backend ethapi.Backend
+	backend mblapi.Backend
 }
 
 func (r *Resolver) Block(ctx context.Context, args struct {
@@ -1241,7 +1241,7 @@ func (r *Resolver) SendRawTransaction(ctx context.Context, args struct{ Data hex
 	if err := tx.UnmarshalBinary(args.Data); err != nil {
 		return common.Hash{}, err
 	}
-	hash, err := ethapi.SubmitTransaction(ctx, r.backend, tx)
+	hash, err := mblapi.SubmitTransaction(ctx, r.backend, tx)
 	return hash, err
 }
 

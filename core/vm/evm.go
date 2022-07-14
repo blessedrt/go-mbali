@@ -60,10 +60,10 @@ func (evm *EVM) precompile(addr common.Address) (PrecompiledContract, bool) {
 // BlockContext provides the EVM with auxiliary information. Once provided
 // it shouldn't be modified.
 type BlockContext struct {
-	// CanTransfer returns whether the account contains
-	// sufficient ether to transfer the value
+	// CanTransfer returns whmbler the account contains
+	// sufficient mbler to transfer the value
 	CanTransfer CanTransferFunc
-	// Transfer transfers ether from one account to the other
+	// Transfer transfers mbler from one account to the other
 	Transfer TransferFunc
 	// gomblash returns the hash corresponding to n
 	gomblash gomblashFunc
@@ -257,7 +257,7 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 		return nil, gas, ErrDepth
 	}
 	// Fail if we're trying to transfer more than the available balance
-	// Note although it's noop to transfer X ether to caller itself. But
+	// Note although it's noop to transfer X mbler to caller itself. But
 	// if caller doesn't have enough balance, it would be an error to allow
 	// over-charging itself. So the check here is necessary.
 	if !evm.Context.CanTransfer(evm.StateDB, caller.Address(), value) {
@@ -452,7 +452,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 
 	ret, err := evm.interpreter.Run(contract, nil, false)
 
-	// Check whether the max code size has been exceeded, assign err if the case.
+	// Check whmbler the max code size has been exceeded, assign err if the case.
 	if err == nil && evm.chainRules.IsEIP158 && len(ret) > params.MaxCodeSize {
 		err = ErrMaxCodeSizeExceeded
 	}

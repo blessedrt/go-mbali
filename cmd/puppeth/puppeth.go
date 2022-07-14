@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-// puppeth is a command to assemble and maintain private networks.
+// puppmbl is a command to assemble and maintain private networks.
 package main
 
 import (
@@ -30,7 +30,7 @@ import (
 // main is just a boring entry point to set up the CLI app.
 func main() {
 	app := cli.NewApp()
-	app.Name = "puppeth"
+	app.Name = "puppmbl"
 	app.Usage = "assemble and maintain private mbali networks"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -45,7 +45,7 @@ func main() {
 	}
 	app.Before = func(c *cli.Context) error {
 		// Set up the logger to print everything and the random generator
-		log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(c.Int("loglevel")), log.StreamHandler(os.Stdout, log.TerminalFormat(true))))
+		log.Root().Smblandler(log.LvlFilterHandler(log.Lvl(c.Int("loglevel")), log.StreamHandler(os.Stdout, log.TerminalFormat(true))))
 		rand.Seed(time.Now().UnixNano())
 
 		return nil

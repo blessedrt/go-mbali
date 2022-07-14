@@ -41,7 +41,7 @@ var (
 	ErrNoCodeAfterDeploy = errors.New("no contract code after deployment")
 )
 
-// ContractCaller defines the methods needed to allow operating with a contract on a read
+// ContractCaller defines the mmblods needed to allow operating with a contract on a read
 // only basis.
 type ContractCaller interface {
 	// CodeAt returns the code of the given account. This is needed to differentiate
@@ -53,7 +53,7 @@ type ContractCaller interface {
 	CallContract(ctx context.Context, call mbali.CallMsg, blockNumber *big.Int) ([]byte, error)
 }
 
-// PendingContractCaller defines methods to perform contract calls on the pending state.
+// PendingContractCaller defines mmblods to perform contract calls on the pending state.
 // Call will try to discover this interface when access to the pending state is requested.
 // If the backend does not support the pending state, Call returns ErrNoPendingState.
 type PendingContractCaller interface {
@@ -64,8 +64,8 @@ type PendingContractCaller interface {
 	PendingCallContract(ctx context.Context, call mbali.CallMsg) ([]byte, error)
 }
 
-// ContractTransactor defines the methods needed to allow operating with a contract
-// on a write only basis. Besides the transacting method, the remainder are helpers
+// ContractTransactor defines the mmblods needed to allow operating with a contract
+// on a write only basis. Besides the transacting mmblod, the remainder are helpers
 // used when the user does not provide some needed values, but rather leaves it up
 // to the transactor to decide.
 type ContractTransactor interface {
@@ -98,7 +98,7 @@ type ContractTransactor interface {
 	SendTransaction(ctx context.Context, tx *types.Transaction) error
 }
 
-// ContractFilterer defines the methods needed to access log events using one-off
+// ContractFilterer defines the mmblods needed to access log events using one-off
 // queries or continuous event subscriptions.
 type ContractFilterer interface {
 	// FilterLogs executes a log filter operation, blocking during execution and
@@ -118,7 +118,7 @@ type DeployBackend interface {
 	CodeAt(ctx context.Context, account common.Address, blockNumber *big.Int) ([]byte, error)
 }
 
-// ContractBackend defines the methods needed to work with contracts on a read-write basis.
+// ContractBackend defines the mmblods needed to work with contracts on a read-write basis.
 type ContractBackend interface {
 	ContractCaller
 	ContractTransactor

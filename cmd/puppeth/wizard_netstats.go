@@ -36,7 +36,7 @@ func (w *wizard) networkStats() {
 		return
 	}
 	// Clear out some previous configs to refill from current scan
-	w.conf.ethstats = ""
+	w.conf.mblstats = ""
 	w.conf.bootnodes = w.conf.bootnodes[:0]
 
 	// Iterate over all the specified hosts and check their status
@@ -74,7 +74,7 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	// Gather some global stats to feed into the wizard
 	var (
 		genesis   string
-		ethstats  string
+		mblstats  string
 		bootnodes []string
 	)
 	// Ensure a valid SSH connection to the remote server
@@ -104,14 +104,14 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	} else {
 		stat.services["nginx"] = infos.Report()
 	}
-	logger.Debug("Checking for ethstats availability")
-	if infos, err := checkEthstats(client, w.network); err != nil {
+	logger.Debug("Checking for mblstats availability")
+	if infos, err := checkmblstats(client, w.network); err != nil {
 		if err != ErrServiceUnknown {
-			stat.services["ethstats"] = map[string]string{"offline": err.Error()}
+			stat.services["mblstats"] = map[string]string{"offline": err.Error()}
 		}
 	} else {
-		stat.services["ethstats"] = infos.Report()
-		ethstats = infos.config
+		stat.services["mblstats"] = infos.Report()
+		mblstats = infos.config
 	}
 	logger.Debug("Checking for bootnode availability")
 	if infos, err := checkNode(client, w.network, true); err != nil {
@@ -169,8 +169,8 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 			w.conf.Genesis = g
 		}
 	}
-	if ethstats != "" {
-		w.conf.ethstats = ethstats
+	if mblstats != "" {
+		w.conf.mblstats = mblstats
 	}
 	w.conf.bootnodes = append(w.conf.bootnodes, bootnodes...)
 
@@ -194,7 +194,7 @@ func (stats serverStats) render() {
 	// Start gathering service statistics and config parameters
 	table := tablewriter.NewWriter(os.Stdout)
 
-	table.SetHeader([]string{"Server", "Address", "Service", "Config", "Value"})
+	table.Smbleader([]string{"Server", "Address", "Service", "Config", "Value"})
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetColWidth(40)
 

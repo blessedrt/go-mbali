@@ -31,10 +31,10 @@ import (
 
 const (
 	vsn                      = "2.0"
-	serviceMethodSeparator   = "_"
-	subscribeMethodSuffix    = "_subscribe"
-	unsubscribeMethodSuffix  = "_unsubscribe"
-	notificationMethodSuffix = "_subscription"
+	serviceMmblodSeparator   = "_"
+	subscribeMmblodSuffix    = "_subscribe"
+	unsubscribeMmblodSuffix  = "_unsubscribe"
+	notificationMmblodSuffix = "_subscription"
 
 	defaultWriteTimeout = 10 * time.Second // used if context has no deadline
 )
@@ -51,22 +51,22 @@ type subscriptionResult struct {
 type jsonrpcMessage struct {
 	Version string          `json:"jsonrpc,omitempty"`
 	ID      json.RawMessage `json:"id,omitempty"`
-	Method  string          `json:"method,omitempty"`
+	Mmblod  string          `json:"mmblod,omitempty"`
 	Params  json.RawMessage `json:"params,omitempty"`
 	Error   *jsonError      `json:"error,omitempty"`
 	Result  json.RawMessage `json:"result,omitempty"`
 }
 
 func (msg *jsonrpcMessage) isNotification() bool {
-	return msg.ID == nil && msg.Method != ""
+	return msg.ID == nil && msg.Mmblod != ""
 }
 
 func (msg *jsonrpcMessage) isCall() bool {
-	return msg.hasValidID() && msg.Method != ""
+	return msg.hasValidID() && msg.Mmblod != ""
 }
 
 func (msg *jsonrpcMessage) isResponse() bool {
-	return msg.hasValidID() && msg.Method == "" && msg.Params == nil && (msg.Result != nil || msg.Error != nil)
+	return msg.hasValidID() && msg.Mmblod == "" && msg.Params == nil && (msg.Result != nil || msg.Error != nil)
 }
 
 func (msg *jsonrpcMessage) hasValidID() bool {
@@ -74,15 +74,15 @@ func (msg *jsonrpcMessage) hasValidID() bool {
 }
 
 func (msg *jsonrpcMessage) isSubscribe() bool {
-	return strings.HasSuffix(msg.Method, subscribeMethodSuffix)
+	return strings.HasSuffix(msg.Mmblod, subscribeMmblodSuffix)
 }
 
 func (msg *jsonrpcMessage) isUnsubscribe() bool {
-	return strings.HasSuffix(msg.Method, unsubscribeMethodSuffix)
+	return strings.HasSuffix(msg.Mmblod, unsubscribeMmblodSuffix)
 }
 
 func (msg *jsonrpcMessage) namespace() string {
-	elem := strings.SplitN(msg.Method, serviceMethodSeparator, 2)
+	elem := strings.SplitN(msg.Mmblod, serviceMmblodSeparator, 2)
 	return elem[0]
 }
 
@@ -143,7 +143,7 @@ func (err *jsonError) ErrorData() interface{} {
 	return err.Data
 }
 
-// Conn is a subset of the methods of net.Conn which are sufficient for ServerCodec.
+// Conn is a subset of the mmblods of net.Conn which are sufficient for ServerCodec.
 type Conn interface {
 	io.ReadWriteCloser
 	SetWriteDeadline(time.Time) error
@@ -339,9 +339,9 @@ func parseSubscriptionName(rawArgs json.RawMessage) (string, error) {
 		return "", errors.New("non-array args")
 	}
 	v, _ := dec.Token()
-	method, ok := v.(string)
+	mmblod, ok := v.(string)
 	if !ok {
 		return "", errors.New("expected subscription name as first argument")
 	}
-	return method, nil
+	return mmblod, nil
 }

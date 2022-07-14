@@ -25,9 +25,9 @@ import (
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethclient"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mblclient"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/checkpointoracle"
 	"github.com/mbali/go-mbali/light"
 	"github.com/mbali/go-mbali/log"
@@ -48,10 +48,10 @@ type chainReader interface {
 // lesCommons contains fields needed by both server and client.
 type lesCommons struct {
 	genesis                      common.Hash
-	config                       *ethconfig.Config
+	config                       *mblconfig.Config
 	chainConfig                  *params.ChainConfig
 	iConfig                      *light.IndexerConfig
-	chainDb, lesDb               ethdb.Database
+	chainDb, lesDb               mbldb.Database
 	chainReader                  chainReader
 	chtIndexer, bloomTrieIndexer *core.ChainIndexer
 	oracle                       *checkpointoracle.CheckpointOracle
@@ -138,8 +138,8 @@ func (c *lesCommons) localCheckpoint(index uint64) params.TrustedCheckpoint {
 }
 
 // setupOracle sets up the checkpoint oracle contract client.
-func (c *lesCommons) setupOracle(node *node.Node, genesis common.Hash, ethconfig *ethconfig.Config) *checkpointoracle.CheckpointOracle {
-	config := ethconfig.CheckpointOracle
+func (c *lesCommons) setupOracle(node *node.Node, genesis common.Hash, mblconfig *mblconfig.Config) *checkpointoracle.CheckpointOracle {
+	config := mblconfig.CheckpointOracle
 	if config == nil {
 		// Try loading default config.
 		config = params.CheckpointOracles[genesis]
@@ -154,7 +154,7 @@ func (c *lesCommons) setupOracle(node *node.Node, genesis common.Hash, ethconfig
 	}
 	oracle := checkpointoracle.New(config, c.localCheckpoint)
 	rpcClient, _ := node.Attach()
-	client := ethclient.NewClient(rpcClient)
+	client := mblclient.NewClient(rpcClient)
 	oracle.Start(client)
 	log.Info("Configured checkpoint oracle", "address", config.Address, "signers", len(config.Signers), "threshold", config.Threshold)
 	return oracle

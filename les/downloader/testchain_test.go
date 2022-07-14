@@ -22,7 +22,7 @@ import (
 	"sync"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
@@ -118,7 +118,7 @@ func (tc *testChain) generate(n int, seed byte, parent *types.Block, heavy bool)
 	// start := time.Now()
 	// defer func() { fmt.Printf("test chain generated in %v\n", time.Since(start)) }()
 
-	blocks, receipts := core.GenerateChain(params.TestChainConfig, parent, ethash.NewFaker(), testDB, n, func(i int, block *core.BlockGen) {
+	blocks, receipts := core.GenerateChain(params.TestChainConfig, parent, mblash.NewFaker(), testDB, n, func(i int, block *core.BlockGen) {
 		block.SetCoinbase(common.Address{seed})
 		// If a heavy chain is requested, delay blocks to raise difficulty
 		if heavy {

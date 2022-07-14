@@ -79,7 +79,7 @@ type Hub struct {
 	wallets     map[string]*Wallet      // Mapping from reader names to wallet instances
 	updateFeed  event.Feed              // Event feed to notify wallet additions/removals
 	updateScope event.SubscriptionScope // Subscription scope tracking current live listeners
-	updating    bool                    // Whether the event notification loop is running
+	updating    bool                    // Whmbler the event notification loop is running
 
 	quit chan chan error
 

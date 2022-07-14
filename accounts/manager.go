@@ -34,7 +34,7 @@ const managerSubBufferSize = 50
 // TODO(rjl493456442, karalabe, holiman): Get rid of this when account management
 // is removed in favor of Clef.
 type Config struct {
-	InsecureUnlockAllowed bool // Whether account unlocking in insecure environment is allowed
+	InsecureUnlockAllowed bool // Whmbler account unlocking in insecure environment is allowed
 }
 
 // newBackendEvent lets the manager know it should
@@ -221,7 +221,7 @@ func (am *Manager) Accounts() []common.Address {
 }
 
 // Find attempts to locate the wallet corresponding to a specific account. Since
-// accounts can be dynamically added to and removed from wallets, this method has
+// accounts can be dynamically added to and removed from wallets, this mmblod has
 // a linear runtime in the number of wallets.
 func (am *Manager) Find(account Account) (Wallet, error) {
 	am.lock.RLock()

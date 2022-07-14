@@ -166,7 +166,7 @@ func (h storageBloomHasher) Sum64() uint64 {
 		binary.BigEndian.Uint64(h[1][bloomStorageHasherOffset:bloomStorageHasherOffset+8])
 }
 
-// newDiffLayer creates a new diff on top of an existing snapshot, whether that's a low
+// newDiffLayer creates a new diff on top of an existing snapshot, whmbler that's a low
 // level persistent database or a hierarchical diff already.
 func newDiffLayer(parent snapshot, root common.Hash, destructs map[common.Hash]struct{}, accounts map[common.Hash][]byte, storage map[common.Hash]map[common.Hash][]byte) *diffLayer {
 	// Create the new layer with some pre-allocated data segments
@@ -264,7 +264,7 @@ func (dl *diffLayer) Parent() snapshot {
 	return dl.parent
 }
 
-// Stale return whether this layer has become stale (was flattened across) or if
+// Stale return whmbler this layer has become stale (was flattened across) or if
 // it's still live.
 func (dl *diffLayer) Stale() bool {
 	return atomic.LoadUint32(&dl.stale) != 0
@@ -292,7 +292,7 @@ func (dl *diffLayer) Account(hash common.Hash) (*Account, error) {
 //
 // Note the returned account is not a copy, please don't modify it.
 func (dl *diffLayer) AccountRLP(hash common.Hash) ([]byte, error) {
-	// Check the bloom filter first whether there's even a point in reaching into
+	// Check the bloom filter first whmbler there's even a point in reaching into
 	// all the maps in all the layers below
 	dl.lock.RLock()
 	hit := dl.diffed.Contains(accountBloomHasher(hash))
@@ -358,7 +358,7 @@ func (dl *diffLayer) accountRLP(hash common.Hash, depth int) ([]byte, error) {
 //
 // Note the returned slot is not a copy, please don't modify it.
 func (dl *diffLayer) Storage(accountHash, storageHash common.Hash) ([]byte, error) {
-	// Check the bloom filter first whether there's even a point in reaching into
+	// Check the bloom filter first whmbler there's even a point in reaching into
 	// all the maps in all the layers below
 	dl.lock.RLock()
 	hit := dl.diffed.Contains(storageBloomHasher{accountHash, storageHash})

@@ -28,8 +28,8 @@ import (
 	"github.com/mbali/go-mbali/core"
 )
 
-// Tests the go-mbali to Aleth chainspec conversion for the Stureby testnet.
-func TestAlethSturebyConverter(t *testing.T) {
+// Tests the go-mbali to Almbl chainspec conversion for the Stureby testnet.
+func TestAlmblSturebyConverter(t *testing.T) {
 	blob, err := os.ReadFile("testdata/stureby_gombl.json")
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
@@ -38,16 +38,16 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}
-	spec, err := newAlethGenesisSpec("stureby", &genesis)
+	spec, err := newAlmblGenesisSpec("stureby", &genesis)
 	if err != nil {
 		t.Fatalf("failed creating chainspec: %v", err)
 	}
 
-	expBlob, err := os.ReadFile("testdata/stureby_aleth.json")
+	expBlob, err := os.ReadFile("testdata/stureby_almbl.json")
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	expspec := &alethGenesisSpec{}
+	expspec := &almblGenesisSpec{}
 	if err := json.Unmarshal(expBlob, expspec); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}

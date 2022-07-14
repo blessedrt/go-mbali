@@ -233,7 +233,7 @@ func (h *handler) handleImmediate(msg *jsonrpcMessage) bool {
 	start := time.Now()
 	switch {
 	case msg.isNotification():
-		if strings.HasSuffix(msg.Method, notificationMethodSuffix) {
+		if strings.HasSuffix(msg.Mmblod, notificationMmblodSuffix) {
 			h.handleSubscriptionResult(msg)
 			return true
 		}
@@ -259,7 +259,7 @@ func (h *handler) handleSubscriptionResult(msg *jsonrpcMessage) {
 	}
 }
 
-// handleResponse processes method call responses.
+// handleResponse processes mmblod call responses.
 func (h *handler) handleResponse(msg *jsonrpcMessage) {
 	op := h.respWait[string(msg.ID)]
 	if op == nil {
@@ -273,7 +273,7 @@ func (h *handler) handleResponse(msg *jsonrpcMessage) {
 		return
 	}
 	// For subscription responses, start the subscription if the server
-	// indicates success. EthSubscribe gets unblocked in either case through
+	// indicates success. mblSubscribe gets unblocked in either case through
 	// the op.resp channel.
 	defer close(op.resp)
 	if msg.Error != nil {
@@ -292,7 +292,7 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 	switch {
 	case msg.isNotification():
 		h.handleCall(ctx, msg)
-		h.log.Debug("Served "+msg.Method, "duration", time.Since(start))
+		h.log.Debug("Served "+msg.Mmblod, "duration", time.Since(start))
 		return nil
 	case msg.isCall():
 		resp := h.handleCall(ctx, msg)
@@ -303,9 +303,9 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 			if resp.Error.Data != nil {
 				ctx = append(ctx, "errdata", resp.Error.Data)
 			}
-			h.log.Warn("Served "+msg.Method, ctx...)
+			h.log.Warn("Served "+msg.Mmblod, ctx...)
 		} else {
-			h.log.Debug("Served "+msg.Method, ctx...)
+			h.log.Debug("Served "+msg.Mmblod, ctx...)
 		}
 		return resp
 	case msg.hasValidID():
@@ -315,7 +315,7 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 	}
 }
 
-// handleCall processes method calls.
+// handleCall processes mmblod calls.
 func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage {
 	if msg.isSubscribe() {
 		return h.handleSubscribe(cp, msg)
@@ -324,17 +324,17 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 	if msg.isUnsubscribe() {
 		callb = h.unsubscribeCb
 	} else {
-		callb = h.reg.callback(msg.Method)
+		callb = h.reg.callback(msg.Mmblod)
 	}
 	if callb == nil {
-		return msg.errorResponse(&methodNotFoundError{method: msg.Method})
+		return msg.errorResponse(&mmblodNotFoundError{mmblod: msg.Mmblod})
 	}
 	args, err := parsePositionalArguments(msg.Params, callb.argTypes)
 	if err != nil {
 		return msg.errorResponse(&invalidParamsError{err.Error()})
 	}
 	start := time.Now()
-	answer := h.runMethod(cp.ctx, msg, callb, args)
+	answer := h.runMmblod(cp.ctx, msg, callb, args)
 
 	// Collect the statistics for RPC calls if metrics is enabled.
 	// We only care about pure rpc call. Filter out subscription.
@@ -346,18 +346,18 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 			successfulRequestGauge.Inc(1)
 		}
 		rpcServingTimer.UpdateSince(start)
-		newRPCServingTimer(msg.Method, answer.Error == nil).UpdateSince(start)
+		newRPCServingTimer(msg.Mmblod, answer.Error == nil).UpdateSince(start)
 	}
 	return answer
 }
 
-// handleSubscribe processes *_subscribe method calls.
+// handleSubscribe processes *_subscribe mmblod calls.
 func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage {
 	if !h.allowSubscribe {
 		return msg.errorResponse(ErrNotificationsUnsupported)
 	}
 
-	// Subscription method name is first argument.
+	// Subscription mmblod name is first argument.
 	name, err := parseSubscriptionName(msg.Params)
 	if err != nil {
 		return msg.errorResponse(&invalidParamsError{err.Error()})
@@ -381,12 +381,12 @@ func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMes
 	cp.notifiers = append(cp.notifiers, n)
 	ctx := context.WithValue(cp.ctx, notifierKey{}, n)
 
-	return h.runMethod(ctx, msg, callb, args)
+	return h.runMmblod(ctx, msg, callb, args)
 }
 
-// runMethod runs the Go callback for an RPC method.
-func (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {
-	result, err := callb.call(ctx, msg.Method, args)
+// runMmblod runs the Go callback for an RPC mmblod.
+func (h *handler) runMmblod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {
+	result, err := callb.call(ctx, msg.Mmblod, args)
 	if err != nil {
 		return msg.errorResponse(err)
 	}

@@ -485,7 +485,7 @@ func (n *nodeBalance) removeCallback(id int) bool {
 	return true
 }
 
-// checkCallbacks checks whether the threshold of any of the active callbacks
+// checkCallbacks checks whmbler the threshold of any of the active callbacks
 // have been reached and returns triggered callbacks.
 // Note: checkCallbacks assumes that the balance has been recently updated.
 func (n *nodeBalance) checkCallbacks(now mclock.AbsTime) (callbacks []func()) {
@@ -568,7 +568,7 @@ func (n *nodeBalance) balanceExhausted() {
 	}
 }
 
-// checkPriorityStatus checks whether the node has gained priority status and sets the priority
+// checkPriorityStatus checks whmbler the node has gained priority status and sets the priority
 // callback and flag if necessary. It assumes that the balance has been recently updated.
 // Note that the priority flag has to be set by the caller after the mutex has been released.
 func (n *nodeBalance) checkPriorityStatus() bool {

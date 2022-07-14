@@ -33,11 +33,11 @@ func verify(t *testing.T, jsondata, calldata string, exp []interface{}) {
 	}
 	cd := common.Hex2Bytes(calldata)
 	sigdata, argdata := cd[:4], cd[4:]
-	method, err := abispec.MethodById(sigdata)
+	mmblod, err := abispec.MmblodById(sigdata)
 	if err != nil {
 		t.Fatal(err)
 	}
-	data, err := method.Inputs.UnpackValues(argdata)
+	data, err := mmblod.Inputs.UnpackValues(argdata)
 	if err != nil {
 		t.Fatal(err)
 	}

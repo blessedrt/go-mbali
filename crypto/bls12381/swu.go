@@ -16,7 +16,7 @@
 
 package bls12381
 
-// swuMapG1 is implementation of Simplified Shallue-van de Woestijne-Ulas Method
+// swuMapG1 is implementation of Simplified Shallue-van de Woestijne-Ulas Mmblod
 // follows the implementation at draft-irtf-cfrg-hash-to-curve-06.
 func swuMapG1(u *fe) (*fe, *fe) {
 	var params = swuParamsForG1
@@ -64,7 +64,7 @@ func swuMapG1(u *fe) (*fe, *fe) {
 	return x, y
 }
 
-// swuMapG2 is implementation of Simplified Shallue-van de Woestijne-Ulas Method
+// swuMapG2 is implementation of Simplified Shallue-van de Woestijne-Ulas Mmblod
 // defined at draft-irtf-cfrg-hash-to-curve-06.
 func swuMapG2(e *fp2, u *fe2) (*fe2, *fe2) {
 	if e == nil {

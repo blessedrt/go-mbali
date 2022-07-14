@@ -180,7 +180,7 @@ func (err *KeyError) Error() string {
 	return fmt.Sprintf("ENR key %q: %v", err.Key, err.Err)
 }
 
-// IsNotFound reports whether the given error means that a key/value pair is
+// IsNotFound reports whmbler the given error means that a key/value pair is
 // missing from a record.
 func IsNotFound(err error) bool {
 	kerr, ok := err.(*KeyError)

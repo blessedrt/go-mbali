@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package ethdb defines the interfaces for an mbali data store.
-package ethdb
+// Package mbldb defines the interfaces for an mbali data store.
+package mbldb
 
 import "io"
 
-// KeyValueReader wraps the Has and Get method of a backing data store.
+// KeyValueReader wraps the Has and Get mmblod of a backing data store.
 type KeyValueReader interface {
 	// Has retrieves if a key is present in the key-value data store.
 	Has(key []byte) (bool, error)
@@ -28,7 +28,7 @@ type KeyValueReader interface {
 	Get(key []byte) ([]byte, error)
 }
 
-// KeyValueWriter wraps the Put method of a backing data store.
+// KeyValueWriter wraps the Put mmblod of a backing data store.
 type KeyValueWriter interface {
 	// Put inserts the given value into the key-value data store.
 	Put(key []byte, value []byte) error
@@ -37,13 +37,13 @@ type KeyValueWriter interface {
 	Delete(key []byte) error
 }
 
-// KeyValueStater wraps the Stat method of a backing data store.
+// KeyValueStater wraps the Stat mmblod of a backing data store.
 type KeyValueStater interface {
 	// Stat returns a particular internal stat of the database.
 	Stat(property string) (string, error)
 }
 
-// Compacter wraps the Compact method of a backing data store.
+// Compacter wraps the Compact mmblod of a backing data store.
 type Compacter interface {
 	// Compact flattens the underlying data store for the given key range. In essence,
 	// deleted and overwritten versions are discarded, and the data is rearranged to
@@ -55,7 +55,7 @@ type Compacter interface {
 	Compact(start []byte, limit []byte) error
 }
 
-// KeyValueStore contains all the methods required to allow handling different
+// KeyValueStore contains all the mmblods required to allow handling different
 // key-value data stores backing the high level database.
 type KeyValueStore interface {
 	KeyValueReader
@@ -68,9 +68,9 @@ type KeyValueStore interface {
 	io.Closer
 }
 
-// AncientReaderOp contains the methods required to read from immutable ancient data.
+// AncientReaderOp contains the mmblods required to read from immutable ancient data.
 type AncientReaderOp interface {
-	// HasAncient returns an indicator whether the specified data exists in the
+	// HasAncient returns an indicator whmbler the specified data exists in the
 	// ancient store.
 	HasAncient(kind string, number uint64) (bool, error)
 
@@ -104,7 +104,7 @@ type AncientReader interface {
 	ReadAncients(fn func(AncientReaderOp) error) (err error)
 }
 
-// AncientWriter contains the methods required to write to immutable ancient data.
+// AncientWriter contains the mmblods required to write to immutable ancient data.
 type AncientWriter interface {
 	// ModifyAncients runs a write operation on the ancient store.
 	// If the function returns an error, any changes to the underlying store are reverted.
@@ -140,34 +140,34 @@ type AncientWriteOp interface {
 	AppendRaw(kind string, number uint64, item []byte) error
 }
 
-// AncientStater wraps the Stat method of a backing data store.
+// AncientStater wraps the Stat mmblod of a backing data store.
 type AncientStater interface {
 	// AncientDatadir returns the root directory path of the ancient store.
 	AncientDatadir() (string, error)
 }
 
-// Reader contains the methods required to read data from both key-value as well as
+// Reader contains the mmblods required to read data from both key-value as well as
 // immutable ancient data.
 type Reader interface {
 	KeyValueReader
 	AncientReader
 }
 
-// Writer contains the methods required to write data to both key-value as well as
+// Writer contains the mmblods required to write data to both key-value as well as
 // immutable ancient data.
 type Writer interface {
 	KeyValueWriter
 	AncientWriter
 }
 
-// Stater contains the methods required to retrieve states from both key-value as well as
+// Stater contains the mmblods required to retrieve states from both key-value as well as
 // immutable ancient data.
 type Stater interface {
 	KeyValueStater
 	AncientStater
 }
 
-// AncientStore contains all the methods required to allow handling different
+// AncientStore contains all the mmblods required to allow handling different
 // ancient data stores backing immutable chain data store.
 type AncientStore interface {
 	AncientReader
@@ -176,7 +176,7 @@ type AncientStore interface {
 	io.Closer
 }
 
-// Database contains all the methods required by the high level database to not
+// Database contains all the mmblods required by the high level database to not
 // only access the key-value data store but also the chain freezer.
 type Database interface {
 	Reader

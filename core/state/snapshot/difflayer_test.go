@@ -24,7 +24,7 @@ import (
 	"github.com/VictoriaMetrics/fastcache"
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 )
 
 func copyDestructs(destructs map[common.Hash]struct{}) map[common.Hash]struct{} {

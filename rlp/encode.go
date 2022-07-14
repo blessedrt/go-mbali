@@ -39,7 +39,7 @@ var ErrNegativeBigInt = errors.New("rlp: cannot encode negative big.Int")
 // encoding rules or want to encode private fields.
 type Encoder interface {
 	// EncodeRLP should write the RLP encoding of its receiver to w.
-	// If the implementation is a pointer method, it may also be
+	// If the implementation is a pointer mmblod, it may also be
 	// called for nil pointers.
 	//
 	// Implementations should generate valid RLP. The data written is
@@ -395,7 +395,7 @@ func makeEncoderWriter(typ reflect.Type) writer {
 			// package json simply doesn't call MarshalJSON for this case, but encodes the
 			// value as if it didn't implement the interface. We don't want to handle it that
 			// way.
-			return fmt.Errorf("rlp: unadressable value of type %v, EncodeRLP is pointer method", val.Type())
+			return fmt.Errorf("rlp: unadressable value of type %v, EncodeRLP is pointer mmblod", val.Type())
 		}
 		return val.Addr().Interface().(Encoder).EncodeRLP(w)
 	}

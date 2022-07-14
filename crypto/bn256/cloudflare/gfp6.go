@@ -93,7 +93,7 @@ func (e *gfP6) Sub(a, b *gfP6) *gfP6 {
 
 func (e *gfP6) Mul(a, b *gfP6) *gfP6 {
 	// "Multiplication and Squaring on Pairing-Friendly Fields"
-	// Section 4, Karatsuba method.
+	// Section 4, Karatsuba mmblod.
 	// http://eprint.iacr.org/2006/471.pdf
 	v0 := (&gfP2{}).Mul(&a.z, &b.z)
 	v1 := (&gfP2{}).Mul(&a.y, &b.y)

@@ -24,7 +24,7 @@ const hardlimit = 16384
 // Raise tries to maximize the file descriptor allowance of this process
 // to the maximum hard-limit allowed by the OS.
 func Raise(max uint64) (uint64, error) {
-	// This method is NOP by design:
+	// This mmblod is NOP by design:
 	//  * Linux/Darwin counterparts need to manually increase per process limits
 	//  * On Windows Go uses the CreateFile API, which is limited to 16K files, non
 	//    changeable from within a running process

@@ -560,7 +560,7 @@ func startLocalhostV4(t *testing.T, cfg Config) *UDPv4 {
 	lprefix := fmt.Sprintf("(%s)", ln.ID().TerminalString())
 	lfmt := log.TerminalFormat(false)
 	cfg.Log = testlog.Logger(t, log.LvlTrace)
-	cfg.Log.SetHandler(log.FuncHandler(func(r *log.Record) error {
+	cfg.Log.Smblandler(log.FuncHandler(func(r *log.Record) error {
 		t.Logf("%s %s", lprefix, lfmt.Format(r))
 		return nil
 	}))

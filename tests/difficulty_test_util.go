@@ -22,7 +22,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/math"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/params"
 )
@@ -56,7 +56,7 @@ func (test *DifficultyTest) Run(config *params.ChainConfig) error {
 		UncleHash:  test.UncleHash,
 	}
 
-	actual := ethash.CalcDifficulty(config, test.CurrentTimestamp, parent)
+	actual := mblash.CalcDifficulty(config, test.CurrentTimestamp, parent)
 	exp := test.CurrentDifficulty
 
 	if actual.Cmp(exp) != 0 {

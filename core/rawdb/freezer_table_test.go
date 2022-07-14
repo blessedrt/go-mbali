@@ -951,7 +951,7 @@ func TestSequentialRead(t *testing.T) {
 // TestSequentialReadByteLimit does some more advanced tests on batch reads.
 // These tests check that when the byte limit hits, we correctly abort in time,
 // but also properly do all the deferred reads for the previous data, regardless
-// of whether the data crosses a file boundary or not.
+// of whmbler the data crosses a file boundary or not.
 func TestSequentialReadByteLimit(t *testing.T) {
 	rm, wm, sg := metrics.NewMeter(), metrics.NewMeter(), metrics.NewGauge()
 	fname := fmt.Sprintf("batchread-2-%d", rand.Uint64())

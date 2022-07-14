@@ -44,9 +44,9 @@ func (e *testEncoder) EncodeRLP(w io.Writer) error {
 	return nil
 }
 
-type testEncoderValueMethod struct{}
+type testEncoderValueMmblod struct{}
 
-func (e testEncoderValueMethod) EncodeRLP(w io.Writer) error {
+func (e testEncoderValueMmblod) EncodeRLP(w io.Writer) error {
 	w.Write([]byte{0xFA, 0xFE, 0xF0})
 	return nil
 }
@@ -348,19 +348,19 @@ var encTests = []encTest{
 	{val: (*testEncoder)(nil), output: "C0"},
 	{val: &testEncoder{}, output: "00010001000100010001"},
 	{val: &testEncoder{errors.New("test error")}, error: "test error"},
-	{val: struct{ E testEncoderValueMethod }{}, output: "C3FAFEF0"},
-	{val: struct{ E *testEncoderValueMethod }{}, output: "C1C0"},
+	{val: struct{ E testEncoderValueMmblod }{}, output: "C3FAFEF0"},
+	{val: struct{ E *testEncoderValueMmblod }{}, output: "C1C0"},
 
 	// Verify that the Encoder interface works for unsupported types like func().
 	{val: undecodableEncoder(func() {}), output: "F5F5F5"},
 
-	// Verify that pointer method testEncoder.EncodeRLP is called for
+	// Verify that pointer mmblod testEncoder.EncodeRLP is called for
 	// addressable non-pointer values.
 	{val: &struct{ TE testEncoder }{testEncoder{}}, output: "CA00010001000100010001"},
 	{val: &struct{ TE testEncoder }{testEncoder{errors.New("test error")}}, error: "test error"},
 
 	// Verify the error for non-addressable non-pointer Encoder.
-	{val: testEncoder{}, error: "rlp: unadressable value of type rlp.testEncoder, EncodeRLP is pointer method"},
+	{val: testEncoder{}, error: "rlp: unadressable value of type rlp.testEncoder, EncodeRLP is pointer mmblod"},
 
 	// Verify Encoder takes precedence over []byte.
 	{val: []byteEncoder{0, 1, 2, 3, 4}, output: "C5C0C0C0C0C0"},

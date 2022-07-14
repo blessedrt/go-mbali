@@ -41,7 +41,7 @@ var (
 const (
 	// Timeouts
 	defaultDialTimeout = 10 * time.Second // used if context has no deadline
-	subscribeTimeout   = 5 * time.Second  // overall timeout eth_subscribe, rpc_modules calls
+	subscribeTimeout   = 5 * time.Second  // overall timeout mbl_subscribe, rpc_modules calls
 )
 
 const (
@@ -60,7 +60,7 @@ const (
 
 // BatchElem is an element in a batch request.
 type BatchElem struct {
-	Method string
+	Mmblod string
 	Args   []interface{}
 	// The result is unmarshaled into this field. Result must be set to a
 	// non-nil pointer value of the desired type, otherwise the response will be
@@ -130,7 +130,7 @@ type requestOp struct {
 	ids  []json.RawMessage
 	err  error
 	resp chan *jsonrpcMessage // receives up to len(ids) responses
-	sub  *ClientSubscription  // only set for EthSubscribe requests
+	sub  *ClientSubscription  // only set for mblSubscribe requests
 }
 
 func (op *requestOp) wait(ctx context.Context, c *Client) (*jsonrpcMessage, error) {
@@ -187,7 +187,7 @@ func DialContext(ctx context.Context, rawurl string) (*Client, error) {
 }
 
 // ClientFromContext retrieves the client from the context, if any. This can be used to perform
-// 'reverse calls' in a handler method.
+// 'reverse calls' in a handler mmblod.
 func ClientFromContext(ctx context.Context) (*Client, bool) {
 	client, ok := ctx.Value(clientContextKey{}).(*Client)
 	return client, ok
@@ -227,7 +227,7 @@ func initClient(conn ServerCodec, idgen func() ID, services *serviceRegistry) *C
 }
 
 // RegisterName creates a service for the given receiver type under the given name. When no
-// methods on the given receiver match the criteria to be either a RPC method or a
+// mmblods on the given receiver match the criteria to be either a RPC mmblod or a
 // subscription an error is returned. Otherwise a new service is created and added to the
 // service collection this client provides to the server.
 func (c *Client) RegisterName(name string, receiver interface{}) error {
@@ -239,7 +239,7 @@ func (c *Client) nextID() json.RawMessage {
 	return strconv.AppendUint(nil, uint64(id), 10)
 }
 
-// SupportedModules calls the rpc_modules method, retrieving the list of
+// SupportedModules calls the rpc_modules mmblod, retrieving the list of
 // APIs that are available on the server.
 func (c *Client) SupportedModules() (map[string]string, error) {
 	var result map[string]string
@@ -261,10 +261,10 @@ func (c *Client) Close() {
 	}
 }
 
-// SetHeader adds a custom HTTP header to the client's requests.
-// This method only works for clients using HTTP, it doesn't have
+// Smbleader adds a custom HTTP header to the client's requests.
+// This mmblod only works for clients using HTTP, it doesn't have
 // any effect for clients using another transport.
-func (c *Client) SetHeader(key, value string) {
+func (c *Client) Smbleader(key, value string) {
 	if !c.isHTTP {
 		return
 	}
@@ -279,9 +279,9 @@ func (c *Client) SetHeader(key, value string) {
 //
 // The result must be a pointer so that package json can unmarshal into it. You
 // can also pass nil, in which case the result is ignored.
-func (c *Client) Call(result interface{}, method string, args ...interface{}) error {
+func (c *Client) Call(result interface{}, mmblod string, args ...interface{}) error {
 	ctx := context.Background()
-	return c.CallContext(ctx, result, method, args...)
+	return c.CallContext(ctx, result, mmblod, args...)
 }
 
 // CallContext performs a JSON-RPC call with the given arguments. If the context is
@@ -289,11 +289,11 @@ func (c *Client) Call(result interface{}, method string, args ...interface{}) er
 //
 // The result must be a pointer so that package json can unmarshal into it. You
 // can also pass nil, in which case the result is ignored.
-func (c *Client) CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error {
+func (c *Client) CallContext(ctx context.Context, result interface{}, mmblod string, args ...interface{}) error {
 	if result != nil && reflect.TypeOf(result).Kind() != reflect.Ptr {
 		return fmt.Errorf("call result parameter must be pointer or nil interface: %v", result)
 	}
-	msg, err := c.newMessage(method, args...)
+	msg, err := c.newMessage(mmblod, args...)
 	if err != nil {
 		return err
 	}
@@ -352,7 +352,7 @@ func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
 		resp: make(chan *jsonrpcMessage, len(b)),
 	}
 	for i, elem := range b {
-		msg, err := c.newMessage(elem.Method, elem.Args...)
+		msg, err := c.newMessage(elem.Mmblod, elem.Args...)
 		if err != nil {
 			return err
 		}
@@ -392,10 +392,10 @@ func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
 	return err
 }
 
-// Notify sends a notification, i.e. a method call that doesn't expect a response.
-func (c *Client) Notify(ctx context.Context, method string, args ...interface{}) error {
+// Notify sends a notification, i.e. a mmblod call that doesn't expect a response.
+func (c *Client) Notify(ctx context.Context, mmblod string, args ...interface{}) error {
 	op := new(requestOp)
-	msg, err := c.newMessage(method, args...)
+	msg, err := c.newMessage(mmblod, args...)
 	if err != nil {
 		return err
 	}
@@ -407,9 +407,9 @@ func (c *Client) Notify(ctx context.Context, method string, args ...interface{})
 	return c.send(ctx, op, msg)
 }
 
-// EthSubscribe registers a subscription under the "eth" namespace.
-func (c *Client) EthSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
-	return c.Subscribe(ctx, "eth", channel, args...)
+// mblSubscribe registers a subscription under the "mbl" namespace.
+func (c *Client) mblSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+	return c.Subscribe(ctx, "mbl", channel, args...)
 }
 
 // ShhSubscribe registers a subscription under the "shh" namespace.
@@ -418,7 +418,7 @@ func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...
 	return c.Subscribe(ctx, "shh", channel, args...)
 }
 
-// Subscribe calls the "<namespace>_subscribe" method with the given arguments,
+// Subscribe calls the "<namespace>_subscribe" mmblod with the given arguments,
 // registering a subscription. Server notifications for the subscription are
 // sent to the given channel. The element type of the channel must match the
 // expected type of content returned by the subscription.
@@ -443,7 +443,7 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 		return nil, ErrNotificationsUnsupported
 	}
 
-	msg, err := c.newMessage(namespace+subscribeMethodSuffix, args...)
+	msg, err := c.newMessage(namespace+subscribeMmblodSuffix, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -464,8 +464,8 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 	return op.sub, nil
 }
 
-func (c *Client) newMessage(method string, paramsIn ...interface{}) (*jsonrpcMessage, error) {
-	msg := &jsonrpcMessage{Version: vsn, ID: c.nextID(), Method: method}
+func (c *Client) newMessage(mmblod string, paramsIn ...interface{}) (*jsonrpcMessage, error) {
+	msg := &jsonrpcMessage{Version: vsn, ID: c.nextID(), Mmblod: mmblod}
 	if paramsIn != nil { // prevent sending "params":null
 		var err error
 		if msg.Params, err = json.Marshal(paramsIn); err != nil {

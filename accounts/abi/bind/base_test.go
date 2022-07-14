@@ -123,9 +123,9 @@ func TestPassingBlockNumber(t *testing.T) {
 	}
 
 	bc := bind.NewBoundContract(common.HexToAddress("0x0"), abi.ABI{
-		Methods: map[string]abi.Method{
-			"something": {
-				Name:    "something",
+		Mmblods: map[string]abi.Mmblod{
+			"sommbling": {
+				Name:    "sommbling",
 				Outputs: abi.Arguments{},
 			},
 		},
@@ -133,7 +133,7 @@ func TestPassingBlockNumber(t *testing.T) {
 
 	blockNumber := big.NewInt(42)
 
-	bc.Call(&bind.CallOpts{BlockNumber: blockNumber}, nil, "something")
+	bc.Call(&bind.CallOpts{BlockNumber: blockNumber}, nil, "sommbling")
 
 	if mc.callContractBlockNumber != blockNumber {
 		t.Fatalf("CallContract() was not passed the block number")
@@ -143,7 +143,7 @@ func TestPassingBlockNumber(t *testing.T) {
 		t.Fatalf("CodeAt() was not passed the block number")
 	}
 
-	bc.Call(&bind.CallOpts{}, nil, "something")
+	bc.Call(&bind.CallOpts{}, nil, "sommbling")
 
 	if mc.callContractBlockNumber != nil {
 		t.Fatalf("CallContract() was passed a block number when it should not have been")
@@ -153,7 +153,7 @@ func TestPassingBlockNumber(t *testing.T) {
 		t.Fatalf("CodeAt() was passed a block number when it should not have been")
 	}
 
-	bc.Call(&bind.CallOpts{BlockNumber: blockNumber, Pending: true}, nil, "something")
+	bc.Call(&bind.CallOpts{BlockNumber: blockNumber, Pending: true}, nil, "sommbling")
 
 	if !mc.pendingCallContractCalled {
 		t.Fatalf("CallContract() was not passed the block number")
@@ -361,9 +361,9 @@ func newMockLog(topics []common.Hash, txHash common.Hash) types.Log {
 }
 
 func TestCall(t *testing.T) {
-	var method, methodWithArg = "something", "somethingArrrrg"
+	var mmblod, mmblodWithArg = "sommbling", "sommblingArrrrg"
 	tests := []struct {
-		name, method string
+		name, mmblod string
 		opts         *bind.CallOpts
 		mc           bind.ContractCaller
 		results      *[]interface{}
@@ -374,7 +374,7 @@ func TestCall(t *testing.T) {
 		mc: &mockCaller{
 			codeAtBytes: []byte{0},
 		},
-		method: method,
+		mmblod: mmblod,
 	}, {
 		name: "ok pending",
 		mc: &mockPendingCaller{
@@ -383,11 +383,11 @@ func TestCall(t *testing.T) {
 		opts: &bind.CallOpts{
 			Pending: true,
 		},
-		method: method,
+		mmblod: mmblod,
 	}, {
-		name:    "pack error, no method",
+		name:    "pack error, no mmblod",
 		mc:      new(mockCaller),
-		method:  "else",
+		mmblod:  "else",
 		wantErr: true,
 	}, {
 		name: "interface error, pending but not a PendingContractCaller",
@@ -395,7 +395,7 @@ func TestCall(t *testing.T) {
 		opts: &bind.CallOpts{
 			Pending: true,
 		},
-		method:       method,
+		mmblod:       mmblod,
 		wantErrExact: bind.ErrNoPendingState,
 	}, {
 		name: "pending call canceled",
@@ -405,7 +405,7 @@ func TestCall(t *testing.T) {
 		opts: &bind.CallOpts{
 			Pending: true,
 		},
-		method:       method,
+		mmblod:       mmblod,
 		wantErrExact: context.DeadlineExceeded,
 	}, {
 		name: "pending code at error",
@@ -415,7 +415,7 @@ func TestCall(t *testing.T) {
 		opts: &bind.CallOpts{
 			Pending: true,
 		},
-		method:  method,
+		mmblod:  mmblod,
 		wantErr: true,
 	}, {
 		name: "no pending code at",
@@ -423,57 +423,57 @@ func TestCall(t *testing.T) {
 		opts: &bind.CallOpts{
 			Pending: true,
 		},
-		method:       method,
+		mmblod:       mmblod,
 		wantErrExact: bind.ErrNoCode,
 	}, {
 		name: "call contract error",
 		mc: &mockCaller{
 			callContractErr: context.DeadlineExceeded,
 		},
-		method:       method,
+		mmblod:       mmblod,
 		wantErrExact: context.DeadlineExceeded,
 	}, {
 		name: "code at error",
 		mc: &mockCaller{
 			codeAtErr: errors.New(""),
 		},
-		method:  method,
+		mmblod:  mmblod,
 		wantErr: true,
 	}, {
 		name:         "no code at",
 		mc:           new(mockCaller),
-		method:       method,
+		mmblod:       mmblod,
 		wantErrExact: bind.ErrNoCode,
 	}, {
 		name: "unpack error missing arg",
 		mc: &mockCaller{
 			codeAtBytes: []byte{0},
 		},
-		method:  methodWithArg,
+		mmblod:  mmblodWithArg,
 		wantErr: true,
 	}, {
 		name: "interface unpack error",
 		mc: &mockCaller{
 			codeAtBytes: []byte{0},
 		},
-		method:  method,
+		mmblod:  mmblod,
 		results: &[]interface{}{0},
 		wantErr: true,
 	}}
 	for _, test := range tests {
 		bc := bind.NewBoundContract(common.HexToAddress("0x0"), abi.ABI{
-			Methods: map[string]abi.Method{
-				method: {
-					Name:    method,
+			Mmblods: map[string]abi.Mmblod{
+				mmblod: {
+					Name:    mmblod,
 					Outputs: abi.Arguments{},
 				},
-				methodWithArg: {
-					Name:    methodWithArg,
+				mmblodWithArg: {
+					Name:    mmblodWithArg,
 					Outputs: abi.Arguments{abi.Argument{}},
 				},
 			},
 		}, test.mc, nil, nil)
-		err := bc.Call(test.opts, test.results, test.method)
+		err := bc.Call(test.opts, test.results, test.mmblod)
 		if test.wantErr || test.wantErrExact != nil {
 			if err == nil {
 				t.Fatalf("%q expected error", test.name)

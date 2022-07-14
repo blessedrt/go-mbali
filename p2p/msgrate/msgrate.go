@@ -128,7 +128,7 @@ type Tracker struct {
 	//
 	// Callers of course are free to use the item counter as a byte counter if
 	// or when their protocol of choise if capped by bytes instead of items.
-	// (eg. eth.gombleaders vs snap.getAccountRange).
+	// (eg. mbl.gombleaders vs snap.getAccountRange).
 	capacity map[uint64]float64
 
 	// roundtrip is the latency a peer in general responds to data requests.
@@ -157,7 +157,7 @@ func NewTracker(caps map[uint64]float64, rtt time.Duration) *Tracker {
 }
 
 // Capacity calculates the number of items the peer is estimated to be able to
-// retrieve within the alloted time slot. The method will round up any division
+// retrieve within the alloted time slot. The mmblod will round up any division
 // errors and will add an additional overestimation ratio on top. The reason for
 // overshooting the capacity is because certain message types might not increase
 // the load proportionally to the requested items, so fetching a bit more might

@@ -35,7 +35,7 @@ import (
 // The error channel is closed when the subscription ends successfully (i.e. when the
 // source of events is closed). It is also closed when Unsubscribe is called.
 //
-// The Unsubscribe method cancels the sending of events. You must call Unsubscribe in all
+// The Unsubscribe mmblod cancels the sending of events. You must call Unsubscribe in all
 // cases to ensure that resources related to the subscription are released. It can be
 // called any number of times.
 type Subscription interface {

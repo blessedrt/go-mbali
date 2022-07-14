@@ -17,14 +17,14 @@ Added `clef_New` to the internal API callable from a UI.
 > `New` creates a new password protected Account. The private key is protected with
 > the given password. Users are responsible to backup the private key that is stored
 > in the keystore location that was specified when this API was created.
-> This method is the same as New on the external API, the difference being that
+> This mmblod is the same as New on the external API, the difference being that
 > this implementation does not ask for confirmation, since it's initiated by
 > the user
 
 ### 7.0.0
 
-- The `message` field was renamed to `messages` in all data signing request methods to better reflect that it's a list, not a value.
-- The `storage.Put` and `storage.Get` methods in the rule execution engine were lower-cased to `storage.put` and `storage.get` to be consistent with JavaScript call conventions.
+- The `message` field was renamed to `messages` in all data signing request mmblods to better reflect that it's a list, not a value.
+- The `storage.Put` and `storage.Get` mmblods in the rule execution engine were lower-cased to `storage.put` and `storage.get` to be consistent with JavaScript call conventions.
 
 ### 6.0.0
 
@@ -46,7 +46,7 @@ If `clef` requires a password, the `OnInputRequired` will be used to collect it.
 
 ### 5.0.0
 
-Changed the namespace format to adhere to the legacy mbali format: `name_methodName`. Changes:
+Changed the namespace format to adhere to the legacy mbali format: `name_mmblodName`. Changes:
 
 * `ApproveTx` -> `ui_approveTx`
 * `ApproveSignData` -> `ui_approveSignData`
@@ -63,7 +63,7 @@ Changed the namespace format to adhere to the legacy mbali format: `name_methodN
 
 ### 4.0.0
 
-* Bidirectional communication implemented, so the UI can query `clef` via the stdin/stdout RPC channel. Methods implemented are:
+* Bidirectional communication implemented, so the UI can query `clef` via the stdin/stdout RPC channel. Mmblods implemented are:
   - `clef_listWallets`
   - `clef_listAccounts`
   - `clef_listWallets`
@@ -102,7 +102,7 @@ type Account struct {
 
 ### 2.1.0
 
-* Add `OnInputRequired(info UserInputRequest)` to internal API. This method is used when Clef needs user input, e.g. passwords.
+* Add `OnInputRequired(info UserInputRequest)` to internal API. This mmblod is used when Clef needs user input, e.g. passwords.
 
 The following structures are used:
 
@@ -125,7 +125,7 @@ UserInputResponse struct {
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "method": "ApproveTx",
+  "mmblod": "ApproveTx",
   "params": [
     {
       "transaction": {
@@ -160,7 +160,7 @@ UserInputResponse struct {
 
 #### 1.2.0
 
-* Add `OnStartup` method, to provide the UI with information about what API version
+* Add `OnStartup` mmblod, to provide the UI with information about what API version
 the signer uses (both internal and external) as well as build-info and external api.
 
 Example call:
@@ -168,7 +168,7 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "OnSignerStartup",
+  "mmblod": "OnSignerStartup",
   "params": [
     {
       "info": {
@@ -184,7 +184,7 @@ Example call:
 
 #### 1.1.0
 
-* Add `OnApproved` method
+* Add `OnApproved` mmblod
 
 #### 1.0.0
 

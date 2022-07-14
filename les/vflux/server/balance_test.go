@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/les/utils"
 	"github.com/mbali/go-mbali/p2p/enode"
 	"github.com/mbali/go-mbali/p2p/enr"
@@ -44,13 +44,13 @@ func (client balanceTestClient) FreeClientId() string { return "" }
 
 type balanceTestSetup struct {
 	clock *mclock.Simulated
-	db    ethdb.KeyValueStore
+	db    mbldb.KeyValueStore
 	ns    *nodestate.NodeStateMachine
 	setup *serverSetup
 	bt    *balanceTracker
 }
 
-func newBalanceTestSetup(db ethdb.KeyValueStore, posExp, negExp utils.ValueExpirer) *balanceTestSetup {
+func newBalanceTestSetup(db mbldb.KeyValueStore, posExp, negExp utils.ValueExpirer) *balanceTestSetup {
 	// Initialize and customize the setup for the balance testing
 	clock := &mclock.Simulated{}
 	setup := newServerSetup()

@@ -93,7 +93,7 @@ func (b *Bytes) UnmarshalGraphQL(input interface{}) error {
 
 // UnmarshalFixedJSON decodes the input as a string with 0x prefix. The length of out
 // determines the required input length. This function is commonly used to implement the
-// UnmarshalJSON method for fixed-size types.
+// UnmarshalJSON mmblod for fixed-size types.
 func UnmarshalFixedJSON(typ reflect.Type, input, out []byte) error {
 	if !isString(input) {
 		return errNonString(typ)
@@ -103,7 +103,7 @@ func UnmarshalFixedJSON(typ reflect.Type, input, out []byte) error {
 
 // UnmarshalFixedText decodes the input as a string with 0x prefix. The length of out
 // determines the required input length. This function is commonly used to implement the
-// UnmarshalText method for fixed-size types.
+// UnmarshalText mmblod for fixed-size types.
 func UnmarshalFixedText(typname string, input, out []byte) error {
 	raw, err := checkText(input, true)
 	if err != nil {
@@ -124,7 +124,7 @@ func UnmarshalFixedText(typname string, input, out []byte) error {
 
 // UnmarshalFixedUnprefixedText decodes the input as a string with optional 0x prefix. The
 // length of out determines the required input length. This function is commonly used to
-// implement the UnmarshalText method for fixed-size types.
+// implement the UnmarshalText mmblod for fixed-size types.
 func UnmarshalFixedUnprefixedText(typname string, input, out []byte) error {
 	raw, err := checkText(input, false)
 	if err != nil {

@@ -29,7 +29,7 @@ import (
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/common/math"
 	"github.com/mbali/go-mbali/consensus"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/state"
@@ -118,9 +118,9 @@ func (t *BlockTest) Run(snapshotter bool) error {
 	}
 	var engine consensus.Engine
 	if t.json.SealEngine == "NoProof" {
-		engine = ethash.NewFaker()
+		engine = mblash.NewFaker()
 	} else {
-		engine = ethash.NewShared()
+		engine = mblash.NewShared()
 	}
 	cache := &core.CacheConfig{TrieCleanLimit: 0}
 	if snapshotter {
@@ -176,7 +176,7 @@ func (t *BlockTest) genesis(config *params.ChainConfig) *core.Genesis {
 
 /* See https://github.com/mbali/tests/wiki/Blockchain-Tests-II
 
-   Whether a block is valid or not is a bit subtle, it's defined by presence of
+   Whmbler a block is valid or not is a bit subtle, it's defined by presence of
    blockHeader, transactions and uncleHeaders fields. If they are missing, the block is
    invalid and we must verify that we do not accept it.
 

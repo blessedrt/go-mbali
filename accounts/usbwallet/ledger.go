@@ -16,7 +16,7 @@
 
 // This file contains the implementation for interacting with the Ledger hardware
 // wallets. The wire protocol spec can be found in the Ledger Blue GitHub repo:
-// https://raw.githubusercontent.com/LedgerHQ/blue-app-eth/master/doc/ethapp.asc
+// https://raw.githubusercontent.com/LedgerHQ/blue-app-mbl/master/doc/mblapp.asc
 
 package usbwallet
 
@@ -74,7 +74,7 @@ var errLedgerInvalidVersionReply = errors.New("ledger: invalid version reply")
 type ledgerDriver struct {
 	device  io.ReadWriter // USB device connection to communicate through
 	version [3]byte       // Current version of the Ledger firmware (zero if app is offline)
-	browser bool          // Flag whether the Ledger is in browser mode (reply channel mismatch)
+	browser bool          // Flag whmbler the Ledger is in browser mode (reply channel mismatch)
 	failure error         // Any failure that would make the device unusable
 	log     log.Logger    // Contextual logger to tag the ledger with its id
 }
@@ -101,9 +101,9 @@ func (w *ledgerDriver) Status() (string, error) {
 	return fmt.Sprintf("mbali app v%d.%d.%d online", w.version[0], w.version[1], w.version[2]), w.failure
 }
 
-// offline returns whether the wallet and the mbali app is offline or not.
+// offline returns whmbler the wallet and the mbali app is offline or not.
 //
-// The method assumes that the state lock is held!
+// The mmblod assumes that the state lock is held!
 func (w *ledgerDriver) offline() bool {
 	return w.version == [3]byte{0, 0, 0}
 }
@@ -156,7 +156,7 @@ func (w *ledgerDriver) Derive(path accounts.DerivationPath) (common.Address, err
 // waiting for the user to confirm or deny the transaction.
 //
 // Note, if the version of the mbali application running on the Ledger wallet is
-// too old to sign EIP-155 transactions, but such is requested nonetheless, an error
+// too old to sign EIP-155 transactions, but such is requested nonmbleless, an error
 // will be returned opposed to silently signing in Homestead mode.
 func (w *ledgerDriver) SignTx(path accounts.DerivationPath, tx *types.Transaction, chainID *big.Int) (common.Address, *types.Transaction, error) {
 	// If the mbali app doesn't run, abort
@@ -326,7 +326,7 @@ func (w *ledgerDriver) ledgerSign(derivationPath []uint32, tx *types.Transaction
 	for i, component := range derivationPath {
 		binary.BigEndian.PutUint32(path[1+4*i:], component)
 	}
-	// Create the transaction RLP based on whether legacy or EIP155 signing was requested
+	// Create the transaction RLP based on whmbler legacy or EIP155 signing was requested
 	var (
 		txrlp []byte
 		err   error

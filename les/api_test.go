@@ -29,10 +29,10 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
-	"github.com/mbali/go-mbali/consensus/ethash"
-	"github.com/mbali/go-mbali/eth"
-	ethdownloader "github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/consensus/mblash"
+	"github.com/mbali/go-mbali/mbl"
+	mbldownloader "github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/les/downloader"
 	"github.com/mbali/go-mbali/les/flowcontrol"
 	"github.com/mbali/go-mbali/log"
@@ -53,7 +53,7 @@ var (
 func TestMain(m *testing.M) {
 	flag.Parse()
 	log.PrintOrigins(true)
-	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*loglevel), log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.Lvl(*loglevel), log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
 	// register the Delivery service which will run as a devp2p
 	// protocol when using the exec adapter
 	adapters.RegisterLifecycles(services)
@@ -87,7 +87,7 @@ func TestCapacityAPI10(t *testing.T) {
 // testCapacityAPI runs an end-to-end simulation test connecting one server with
 // a given number of clients. It sets different priority capacities to all clients
 // except a randomly selected one which runs in free client mode. All clients send
-// similar requests at the maximum allowed rate and the test verifies whether the
+// similar requests at the maximum allowed rate and the test verifies whmbler the
 // ratio of processed requests is close enough to the ratio of assigned capacities.
 // Running multiple rounds with different settings ensures that changing capacity
 // while connected and going back and forth between free and priority mode with
@@ -304,7 +304,7 @@ func testCapacityAPI(t *testing.T, clientCount int) {
 
 func gomblead(ctx context.Context, t *testing.T, client *rpc.Client) (uint64, common.Hash) {
 	res := make(map[string]interface{})
-	if err := client.CallContext(ctx, &res, "eth_getBlockByNumber", "latest", false); err != nil {
+	if err := client.CallContext(ctx, &res, "mbl_getBlockByNumber", "latest", false); err != nil {
 		t.Fatalf("Failed to obtain head block: %v", err)
 	}
 	numStr, ok := res["number"].(string)
@@ -329,7 +329,7 @@ func testRequest(ctx context.Context, t *testing.T, client *rpc.Client) bool {
 	rand.Read(addr[:])
 	c, cancel := context.WithTimeout(ctx, time.Second*12)
 	defer cancel()
-	err := client.CallContext(c, &res, "eth_getBalance", addr, "latest")
+	err := client.CallContext(c, &res, "mbl_getBalance", addr, "latest")
 	if err != nil {
 		t.Log("request error:", err)
 	}
@@ -493,18 +493,18 @@ func testSim(t *testing.T, serverCount, clientCount int, serverDir, clientDir []
 }
 
 func newLesClientService(ctx *adapters.ServiceContext, stack *node.Node) (node.Lifecycle, error) {
-	config := ethconfig.Defaults
-	config.SyncMode = (ethdownloader.SyncMode)(downloader.LightSync)
-	config.Ethash.PowMode = ethash.ModeFake
+	config := mblconfig.Defaults
+	config.SyncMode = (mbldownloader.SyncMode)(downloader.LightSync)
+	config.mblash.PowMode = mblash.ModeFake
 	return New(stack, &config)
 }
 
 func newLesServerService(ctx *adapters.ServiceContext, stack *node.Node) (node.Lifecycle, error) {
-	config := ethconfig.Defaults
-	config.SyncMode = (ethdownloader.SyncMode)(downloader.FullSync)
+	config := mblconfig.Defaults
+	config.SyncMode = (mbldownloader.SyncMode)(downloader.FullSync)
 	config.LightServ = testServerCapacity
 	config.LightPeers = testMaxClients
-	mbali, err := eth.New(stack, &config)
+	mbali, err := mbl.New(stack, &config)
 	if err != nil {
 		return nil, err
 	}

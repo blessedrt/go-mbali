@@ -42,7 +42,7 @@ var (
 	// headFinalizedBlockKey tracks the latest known finalized block hash.
 	headFinalizedBlockKey = []byte("LastFinalized")
 
-	// lastPivotKey tracks the last pivot block used by fast sync (to reenable on sethead).
+	// lastPivotKey tracks the last pivot block used by fast sync (to reenable on smblead).
 	lastPivotKey = []byte("LastPivot")
 
 	// fastTrieProgressKey tracks the number of trie entries imported during fast sync.
@@ -81,8 +81,8 @@ var (
 	// uncleanShutdownKey tracks the list of local crashes
 	uncleanShutdownKey = []byte("unclean-shutdown") // config prefix for the db
 
-	// transitionStatusKey tracks the eth2 transition status.
-	transitionStatusKey = []byte("eth2-transition")
+	// transitionStatusKey tracks the mbl2 transition status.
+	transitionStatusKey = []byte("mbl2-transition")
 
 	// Data item prefixes (use single byte to avoid mixing data types, avoid `i`, used for indexes).
 	headerPrefix       = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
@@ -128,7 +128,7 @@ const (
 	freezerDifficultyTable = "diffs"
 )
 
-// FreezerNoSnappy configures whether compression is disabled for the ancient-tables.
+// FreezerNoSnappy configures whmbler compression is disabled for the ancient-tables.
 // Hashes and difficulties don't compress well.
 var FreezerNoSnappy = map[string]bool{
 	freezerHeaderTable:     false,
@@ -233,7 +233,7 @@ func codeKey(hash common.Hash) []byte {
 	return append(CodePrefix, hash.Bytes()...)
 }
 
-// IsCodeKey reports whether the given byte slice is the key of contract code,
+// IsCodeKey reports whmbler the given byte slice is the key of contract code,
 // if so return the raw code hash as well.
 func IsCodeKey(key []byte) (bool, []byte) {
 	if bytes.HasPrefix(key, CodePrefix) && len(key) == common.HashLength+len(CodePrefix) {

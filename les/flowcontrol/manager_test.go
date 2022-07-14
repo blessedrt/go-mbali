@@ -37,7 +37,7 @@ const (
 )
 
 // testConstantTotalCapacity simulates multiple request sender nodes and verifies
-// whether the total amount of served requests matches the expected value based on
+// whmbler the total amount of served requests matches the expected value based on
 // the total capacity and the duration of the test.
 // Some nodes are sending requests occasionally so that their buffer should regularly
 // reach the maximum while other nodes (the "max capacity nodes") are sending at the

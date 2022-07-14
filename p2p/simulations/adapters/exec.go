@@ -355,7 +355,7 @@ func wsCopy(wg *sync.WaitGroup, src, dst *websocket.Conn) {
 }
 
 // Snapshots creates snapshots of the services by calling the
-// simulation_snapshot RPC method
+// simulation_snapshot RPC mmblod
 func (n *ExecNode) Snapshots() (map[string][]byte, error) {
 	if n.client == nil {
 		return nil, errors.New("RPC not started")
@@ -377,7 +377,7 @@ func initLogging() {
 	// Initialize the logging by default first.
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.LogfmtFormat()))
 	glogger.Verbosity(log.LvlInfo)
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 
 	confEnv := os.Getenv(envNodeConfig)
 	if confEnv == "" {
@@ -402,7 +402,7 @@ func initLogging() {
 	// Reinitialize the logger
 	glogger = log.NewGlogHandler(log.StreamHandler(writer, log.TerminalFormat(true)))
 	glogger.Verbosity(verbosity)
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 }
 
 // execP2PNode starts a simulation node when the current binary is executed with
@@ -523,7 +523,7 @@ type nodeStartupJSON struct {
 	NodeInfo   *p2p.NodeInfo
 }
 
-// SnapshotAPI provides an RPC method to create snapshots of services
+// SnapshotAPI provides an RPC mmblod to create snapshots of services
 type SnapshotAPI struct {
 	services map[string]node.Lifecycle
 }

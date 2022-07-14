@@ -22,12 +22,12 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 // TestDatabaseSuite runs a suite of tests against a KeyValueStore database
 // implementation.
-func TestDatabaseSuite(t *testing.T, New func() ethdb.KeyValueStore) {
+func TestDatabaseSuite(t *testing.T, New func() mbldb.KeyValueStore) {
 	t.Run("Iterator", func(t *testing.T) {
 		tests := []struct {
 			content map[string]string
@@ -377,7 +377,7 @@ func TestDatabaseSuite(t *testing.T, New func() ethdb.KeyValueStore) {
 	})
 }
 
-func iterateKeys(it ethdb.Iterator) []string {
+func iterateKeys(it mbldb.Iterator) []string {
 	keys := []string{}
 	for it.Next() {
 		keys = append(keys, string(it.Key()))

@@ -73,8 +73,8 @@ const (
 	// increasing upper limit or decreasing lower limit so that the limit can be reachable.
 	intervalAdjustBias = 200 * 1000.0 * 1000.0
 
-	// staleThreshold is the maximum depth of the acceptable stale block.
-	staleThreshold = 7
+	// stalmblreshold is the maximum depth of the acceptable stale block.
+	stalmblreshold = 7
 )
 
 var (
@@ -186,7 +186,7 @@ type worker struct {
 	config      *Config
 	chainConfig *params.ChainConfig
 	engine      consensus.Engine
-	eth         Backend
+	mbl         Backend
 	chain       *core.BlockChain
 
 	// Feeds
@@ -231,10 +231,10 @@ type worker struct {
 	snapshotState    *state.StateDB
 
 	// atomic status counters
-	running int32 // The indicator whether the consensus engine is running or not.
+	running int32 // The indicator whmbler the consensus engine is running or not.
 	newTxs  int32 // New arrival transaction count since last sealing work submitting.
 
-	// noempty is the flag used to control whether the feature of pre-seal empty
+	// noempty is the flag used to control whmbler the feature of pre-seal empty
 	// block is enabled. The default value is false(pre-seal is enabled by default).
 	// But in some special scenario the consensus engine will seal blocks instantaneously,
 	// in this case this feature will add all empty blocks into canonical chain
@@ -242,27 +242,27 @@ type worker struct {
 	noempty uint32
 
 	// External functions
-	isLocalBlock func(header *types.Header) bool // Function used to determine whether the specified block is mined by local miner.
+	isLocalBlock func(header *types.Header) bool // Function used to determine whmbler the specified block is mined by local miner.
 
 	// Test hooks
-	newTaskHook  func(*task)                        // Method to call upon receiving a new sealing task.
-	skipSealHook func(*task) bool                   // Method to decide whether skipping the sealing.
-	fullTaskHook func()                             // Method to call before pushing the full sealing task.
-	resubmitHook func(time.Duration, time.Duration) // Method to call upon updating resubmitting interval.
+	newTaskHook  func(*task)                        // Mmblod to call upon receiving a new sealing task.
+	skipSealHook func(*task) bool                   // Mmblod to decide whmbler skipping the sealing.
+	fullTaskHook func()                             // Mmblod to call before pushing the full sealing task.
+	resubmitHook func(time.Duration, time.Duration) // Mmblod to call upon updating resubmitting interval.
 }
 
-func newWorker(config *Config, chainConfig *params.ChainConfig, engine consensus.Engine, eth Backend, mux *event.TypeMux, isLocalBlock func(header *types.Header) bool, init bool) *worker {
+func newWorker(config *Config, chainConfig *params.ChainConfig, engine consensus.Engine, mbl Backend, mux *event.TypeMux, isLocalBlock func(header *types.Header) bool, init bool) *worker {
 	worker := &worker{
 		config:             config,
 		chainConfig:        chainConfig,
 		engine:             engine,
-		eth:                eth,
+		mbl:                mbl,
 		mux:                mux,
-		chain:              eth.BlockChain(),
+		chain:              mbl.BlockChain(),
 		isLocalBlock:       isLocalBlock,
 		localUncles:        make(map[common.Hash]*types.Block),
 		remoteUncles:       make(map[common.Hash]*types.Block),
-		unconfirmed:        newUnconfirmedBlocks(eth.BlockChain(), sealingLogAtDepth),
+		unconfirmed:        newUnconfirmedBlocks(mbl.BlockChain(), sealingLogAtDepth),
 		pendingTasks:       make(map[common.Hash]*task),
 		txsCh:              make(chan core.NewTxsEvent, txChanSize),
 		chainHeadCh:        make(chan core.ChainHeadEvent, chainHeadChanSize),
@@ -277,10 +277,10 @@ func newWorker(config *Config, chainConfig *params.ChainConfig, engine consensus
 		resubmitAdjustCh:   make(chan *intervalAdjust, resubmitAdjustChanSize),
 	}
 	// Subscribe NewTxsEvent for tx pool
-	worker.txsSub = eth.TxPool().SubscribeNewTxsEvent(worker.txsCh)
+	worker.txsSub = mbl.TxPool().SubscribeNewTxsEvent(worker.txsCh)
 	// Subscribe events for blockchain
-	worker.chainHeadSub = eth.BlockChain().SubscribeChainHeadEvent(worker.chainHeadCh)
-	worker.chainSideSub = eth.BlockChain().SubscribeChainSideEvent(worker.chainSideCh)
+	worker.chainHeadSub = mbl.BlockChain().SubscribeChainHeadEvent(worker.chainHeadCh)
+	worker.chainSideSub = mbl.BlockChain().SubscribeChainSideEvent(worker.chainSideCh)
 
 	// Sanitize recommit interval if the user-specified one is too short.
 	recommit := worker.config.Recommit
@@ -302,8 +302,8 @@ func newWorker(config *Config, chainConfig *params.ChainConfig, engine consensus
 	return worker
 }
 
-// setEtherbase sets the etherbase used to initialize the block coinbase field.
-func (w *worker) setEtherbase(addr common.Address) {
+// setmblerbase sets the mblerbase used to initialize the block coinbase field.
+func (w *worker) setmblerbase(addr common.Address) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	w.coinbase = addr
@@ -378,7 +378,7 @@ func (w *worker) stop() {
 	atomic.StoreInt32(&w.running, 0)
 }
 
-// isRunning returns an indicator whether worker is running or not.
+// isRunning returns an indicator whmbler worker is running or not.
 func (w *worker) isRunning() bool {
 	return atomic.LoadInt32(&w.running) == 1
 }
@@ -444,7 +444,7 @@ func (w *worker) newWorkLoop(recommit time.Duration) {
 	clearPending := func(number uint64) {
 		w.pendingMu.Lock()
 		for h, t := range w.pendingTasks {
-			if t.block.NumberU64()+staleThreshold <= number {
+			if t.block.NumberU64()+stalmblreshold <= number {
 				delete(w.pendingTasks, h)
 			}
 		}
@@ -569,12 +569,12 @@ func (w *worker) mainLoop() {
 		case <-cleanTicker.C:
 			chainHead := w.chain.CurrentBlock()
 			for hash, uncle := range w.localUncles {
-				if uncle.NumberU64()+staleThreshold <= chainHead.NumberU64() {
+				if uncle.NumberU64()+stalmblreshold <= chainHead.NumberU64() {
 					delete(w.localUncles, hash)
 				}
 			}
 			for hash, uncle := range w.remoteUncles {
-				if uncle.NumberU64()+staleThreshold <= chainHead.NumberU64() {
+				if uncle.NumberU64()+stalmblreshold <= chainHead.NumberU64() {
 					delete(w.remoteUncles, hash)
 				}
 			}
@@ -731,7 +731,7 @@ func (w *worker) resultLoop() {
 				logs = append(logs, receipt.Logs...)
 			}
 			// Commit block and state to database.
-			_, err := w.chain.WriteBlockAndSetHead(block, receipts, logs, task.state, true)
+			_, err := w.chain.WriteBlockAndSmblead(block, receipts, logs, task.state, true)
 			if err != nil {
 				log.Error("Failed writing block to chain", "err", err)
 				continue
@@ -763,7 +763,7 @@ func (w *worker) makeEnv(parent *types.Block, header *types.Header, coinbase com
 		//
 		// The maximum acceptable reorg depth can be limited by the finalised block
 		// somehow. TODO(rjl493456442) fix the hard-coded number here later.
-		state, err = w.eth.StateAtBlock(parent, 1024, nil, false, false)
+		state, err = w.mbl.StateAtBlock(parent, 1024, nil, false, false)
 		log.Warn("Recovered mining state", "root", parent.Root(), "err", err)
 	}
 	if err != nil {
@@ -890,7 +890,7 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 		//
 		// We use the eip155 signer regardless of the current hf.
 		from, _ := types.Sender(env.signer, tx)
-		// Check whether the tx is replay protected. If we're not in the EIP155 hf
+		// Check whmbler the tx is replay protected. If we're not in the EIP155 hf
 		// phase, start ignoring the sender until we do.
 		if tx.Protected() && !w.chainConfig.IsEIP155(env.header.Number) {
 			log.Trace("Ignoring reply protected transaction", "hash", tx.Hash(), "eip155", w.chainConfig.EIP155Block)
@@ -963,13 +963,13 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 // generateParams wraps various of settings for generating sealing task.
 type generateParams struct {
 	timestamp  uint64         // The timstamp for sealing task
-	forceTime  bool           // Flag whether the given timestamp is immutable or not
+	forceTime  bool           // Flag whmbler the given timestamp is immutable or not
 	parentHash common.Hash    // Parent block hash, empty means the latest chain head
 	coinbase   common.Address // The fee recipient address for including transaction
 	random     common.Hash    // The randomness generated by beacon chain, empty before the merge
-	noUncle    bool           // Flag whether the uncle block inclusion is allowed
-	noExtra    bool           // Flag whether the extra field assignment is allowed
-	noTxs      bool           // Flag whether an empty block without any transaction is expected
+	noUncle    bool           // Flag whmbler the uncle block inclusion is allowed
+	noExtra    bool           // Flag whmbler the extra field assignment is allowed
+	noTxs      bool           // Flag whmbler an empty block without any transaction is expected
 }
 
 // prepareWork constructs the sealing task according to the given parameters,
@@ -1060,9 +1060,9 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 func (w *worker) fillTransactions(interrupt *int32, env *environment) error {
 	// Split the pending transactions into locals and remotes
 	// Fill the block with all available pending transactions.
-	pending := w.eth.TxPool().Pending(true)
+	pending := w.mbl.TxPool().Pending(true)
 	localTxs, remoteTxs := make(map[common.Address]types.Transactions), pending
-	for _, account := range w.eth.TxPool().Locals() {
+	for _, account := range w.mbl.TxPool().Locals() {
 		if txs := remoteTxs[account]; len(txs) > 0 {
 			delete(remoteTxs, account)
 			localTxs[account] = txs
@@ -1106,7 +1106,7 @@ func (w *worker) commitWork(interrupt *int32, noempty bool, timestamp int64) {
 	var coinbase common.Address
 	if w.isRunning() {
 		if w.coinbase == (common.Address{}) {
-			log.Error("Refusing to mine without etherbase")
+			log.Error("Refusing to mine without mblerbase")
 			return
 		}
 		coinbase = w.coinbase // Use the preset address as the fee recipient
@@ -1232,12 +1232,12 @@ func (w *worker) postSideBlock(event core.ChainSideEvent) {
 	}
 }
 
-// totalFees computes total consumed miner fees in ETH. Block transactions and receipts have to have the same order.
+// totalFees computes total consumed miner fees in mbl. Block transactions and receipts have to have the same order.
 func totalFees(block *types.Block, receipts []*types.Receipt) *big.Float {
 	feesWei := new(big.Int)
 	for i, tx := range block.Transactions() {
 		minerFee, _ := tx.EffectiveGasTip(block.BaseFee())
 		feesWei.Add(feesWei, new(big.Int).Mul(new(big.Int).SetUint64(receipts[i].GasUsed), minerFee))
 	}
-	return new(big.Float).Quo(new(big.Float).SetInt(feesWei), new(big.Float).SetInt(big.NewInt(params.Ether)))
+	return new(big.Float).Quo(new(big.Float).SetInt(feesWei), new(big.Float).SetInt(big.NewInt(params.mbler)))
 }

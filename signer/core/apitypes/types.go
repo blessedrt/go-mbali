@@ -79,7 +79,7 @@ func (v *ValidationMessages) GetWarnings() error {
 }
 
 // SendTxArgs represents the arguments to submit a transaction
-// This struct is identical to ethapi.TransactionArgs, except for the usage of
+// This struct is identical to mblapi.TransactionArgs, except for the usage of
 // common.MixedcaseAddress in From and To
 type SendTxArgs struct {
 	From                 common.MixedcaseAddress  `json:"from"`
@@ -216,7 +216,7 @@ func (t *Type) isArray() bool {
 }
 
 // typeName returns the canonical name of the type. If the type is 'Person[]', then
-// this method returns 'Person'
+// this mmblod returns 'Person'
 func (t *Type) typeName() string {
 	if strings.HasSuffix(t.Type, "[]") {
 		return strings.TrimSuffix(t.Type, "[]")

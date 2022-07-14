@@ -28,8 +28,8 @@ import (
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/trie"
@@ -62,7 +62,7 @@ var (
 // generateSnapshot regenerates a brand new snapshot based on an existing state
 // database and head block asynchronously. The snapshot is returned immediately
 // and generation is continued in the background until done.
-func generateSnapshot(diskdb ethdb.KeyValueStore, triedb *trie.Database, cache int, root common.Hash) *diskLayer {
+func generateSnapshot(diskdb mbldb.KeyValueStore, triedb *trie.Database, cache int, root common.Hash) *diskLayer {
 	// Create a new disk layer with an initialized state marker at zero
 	var (
 		stats     = &generatorStats{start: time.Now()}
@@ -89,7 +89,7 @@ func generateSnapshot(diskdb ethdb.KeyValueStore, triedb *trie.Database, cache i
 }
 
 // journalProgress persists the generator stats into the database to resume later.
-func journalProgress(db ethdb.KeyValueWriter, marker []byte, stats *generatorStats) {
+func journalProgress(db mbldb.KeyValueWriter, marker []byte, stats *generatorStats) {
 	// Write out the generator marker. Note it's a standalone disk layer generator
 	// which is not mixed with journal. It's ok if the generator is persisted while
 	// journal is not.
@@ -128,7 +128,7 @@ type proofResult struct {
 	vals     [][]byte   // The val set of all elements being iterated, even proving is failed
 	diskMore bool       // Set when the database has extra snapshot states since last iteration
 	trieMore bool       // Set when the trie has extra snapshot states(only meaningful for successful proving)
-	proofErr error      // Indicator whether the given state range is valid or not
+	proofErr error      // Indicator whmbler the given state range is valid or not
 	tr       *trie.Trie // The trie, in case the trie was resolved by the prover (may be nil)
 }
 
@@ -137,7 +137,7 @@ func (result *proofResult) valid() bool {
 	return result.proofErr == nil
 }
 
-// last returns the last verified element key regardless of whether the range proof is
+// last returns the last verified element key regardless of whmbler the range proof is
 // successful or not. Nil is returned if nothing involved in the proving.
 func (result *proofResult) last() []byte {
 	var last []byte
@@ -359,7 +359,7 @@ func (dl *diskLayer) generateRange(ctx *generatorContext, owner common.Hash, roo
 	}
 	// We use the snap data to build up a cache which can be used by the
 	// main account trie as a primary lookup when resolving hashes
-	var snapNodeCache ethdb.KeyValueStore
+	var snapNodeCache mbldb.KeyValueStore
 	if len(result.keys) > 0 {
 		snapNodeCache = memorydb.New()
 		snapTrieDb := trie.NewDatabase(snapNodeCache)
@@ -473,7 +473,7 @@ func (dl *diskLayer) checkAndFlush(ctx *generatorContext, current []byte) error 
 	case abort = <-dl.genAbort:
 	default:
 	}
-	if ctx.batch.ValueSize() > ethdb.IdealBatchSize || abort != nil {
+	if ctx.batch.ValueSize() > mbldb.IdealBatchSize || abort != nil {
 		if bytes.Compare(current, dl.genMarker) < 0 {
 			log.Error("Snapshot generator went backwards", "current", fmt.Sprintf("%x", current), "genMarker", fmt.Sprintf("%x", dl.genMarker))
 		}
@@ -656,7 +656,7 @@ func generateAccounts(ctx *generatorContext, dl *diskLayer, accMarker []byte) er
 
 // generate is a background thread that iterates over the state and storage tries,
 // constructing the state snapshot. All the arguments are purely for statistics
-// gathering and logging, since the method surfs the blocks as they arrive, often
+// gathering and logging, since the mmblod surfs the blocks as they arrive, often
 // being restarted.
 func (dl *diskLayer) generate(stats *generatorStats) {
 	var (

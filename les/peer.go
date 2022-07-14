@@ -125,7 +125,7 @@ type peerCommons struct {
 	id           string    // Peer identity.
 	version      int       // Protocol version negotiated.
 	network      uint64    // Network ID being on.
-	frozen       uint32    // Flag whether the peer is frozen.
+	frozen       uint32    // Flag whmbler the peer is frozen.
 	announceType uint64    // New block announcement type.
 	serving      uint32    // The status indicates the peer is served.
 	headInfo     blockInfo // Last announced block information.
@@ -147,7 +147,7 @@ func (p *peerCommons) isFrozen() bool {
 	return atomic.LoadUint32(&p.frozen) != 0
 }
 
-// canQueue returns an indicator whether the peer can queue an operation.
+// canQueue returns an indicator whmbler the peer can queue an operation.
 func (p *peerCommons) canQueue() bool {
 	return p.sendQueue.CanQueue() && !p.isFrozen()
 }
@@ -163,7 +163,7 @@ func (p *peerCommons) String() string {
 	return fmt.Sprintf("Peer %s [%s]", p.id, fmt.Sprintf("les/%d", p.version))
 }
 
-// PeerInfo represents a short summary of the `eth` sub-protocol metadata known
+// PeerInfo represents a short summary of the `mbl` sub-protocol metadata known
 // about a connected peer.
 type PeerInfo struct {
 	Version    int      `json:"version"`    // mbali protocol version negotiated
@@ -339,8 +339,8 @@ type serverPeer struct {
 	peerCommons
 
 	// Status fields
-	trusted                 bool   // The flag whether the server is selected as trusted server.
-	onlyAnnounce            bool   // The flag whether the server sends announcement only.
+	trusted                 bool   // The flag whmbler the server is selected as trusted server.
+	onlyAnnounce            bool   // The flag whmbler the server sends announcement only.
 	chainSince, chainRecent uint64 // The range of chain server peer can serve.
 	stateSince, stateRecent uint64 // The range of state server peer can serve.
 	txHistory               uint64 // The length of available tx history, 0 means all, 1 means disabled
@@ -360,7 +360,7 @@ type serverPeer struct {
 	updateTime  mclock.AbsTime
 
 	// Test callback hooks
-	hasBlockHook func(common.Hash, uint64, bool) bool // Used to determine whether the server has the specified block.
+	hasBlockHook func(common.Hash, uint64, bool) bool // Used to determine whmbler the server has the specified block.
 }
 
 func newServerPeer(version int, network uint64, trusted bool, p *p2p.Peer, rw p2p.MsgReadWriter) *serverPeer {
@@ -1406,7 +1406,7 @@ func (ps *clientPeerSet) close() {
 // serverSet is a special set which contains all connected les servers.
 // Les servers will also be discovered by discovery protocol because they
 // also run the LES protocol. We can't drop them although they are useless
-// for us(server) but for other protocols(e.g. ETH) upon the devp2p they
+// for us(server) but for other protocols(e.g. mbl) upon the devp2p they
 // may be useful.
 type serverSet struct {
 	lock   sync.Mutex

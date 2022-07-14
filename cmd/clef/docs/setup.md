@@ -100,7 +100,7 @@ On the `client` qube, we need to create a listener which will receive the reques
 
 """
 This implements a dispatcher which listens to localhost:8550, and proxies
-requests via qrexec to the service qubes.EthSign on a target domain
+requests via qrexec to the service qubes.mblSign on a target domain
 """
 
 import http.server
@@ -130,7 +130,7 @@ To test the flow, if we have set up `debian-work` as the `target`, we can do
  
 ```bash
 $ cat newaccnt.json 
-{ "id": 0, "jsonrpc": "2.0","method": "account_new","params": []}
+{ "id": 0, "jsonrpc": "2.0","mmblod": "account_new","params": []}
 
 $ cat newaccnt.json| qrexec-client-vm debian-work qubes.Clefsign
 ```

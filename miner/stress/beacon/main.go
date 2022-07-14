@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// This file contains a miner stress test for the eth1/2 transition
+// This file contains a miner stress test for the mbl1/2 transition
 package main
 
 import (
@@ -29,15 +29,15 @@ import (
 	"github.com/mbali/go-mbali/accounts/keystore"
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/fdlimit"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/beacon"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth"
-	ethcatalyst "github.com/mbali/go-mbali/eth/catalyst"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl"
+	mblcatalyst "github.com/mbali/go-mbali/mbl/catalyst"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/les"
 	lescatalyst "github.com/mbali/go-mbali/les/catalyst"
 	"github.com/mbali/go-mbali/log"
@@ -53,9 +53,9 @@ type nodetype int
 const (
 	legacyMiningNode nodetype = iota
 	legacyNormalNode
-	eth2MiningNode
-	eth2NormalNode
-	eth2LightClient
+	mbl2MiningNode
+	mbl2NormalNode
+	mbl2LightClient
 )
 
 func (typ nodetype) String() string {
@@ -64,12 +64,12 @@ func (typ nodetype) String() string {
 		return "legacyMiningNode"
 	case legacyNormalNode:
 		return "legacyNormalNode"
-	case eth2MiningNode:
-		return "eth2MiningNode"
-	case eth2NormalNode:
-		return "eth2NormalNode"
-	case eth2LightClient:
-		return "eth2LightClient"
+	case mbl2MiningNode:
+		return "mbl2MiningNode"
+	case mbl2NormalNode:
+		return "mbl2NormalNode"
+	case mbl2LightClient:
+		return "mbl2LightClient"
 	default:
 		return "undefined"
 	}
@@ -79,7 +79,7 @@ var (
 	// transitionDifficulty is the target total difficulty for transition
 	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), params.MinimumDifficulty)
 
-	// blockInterval is the time interval for creating a new eth2 block
+	// blockInterval is the time interval for creating a new mbl2 block
 	blockInterval    = time.Second * 3
 	blockIntervalInt = 3
 
@@ -87,30 +87,30 @@ var (
 	finalizationDist = 10
 )
 
-type ethNode struct {
+type mblNode struct {
 	typ        nodetype
 	stack      *node.Node
 	enode      *enode.Node
-	api        *ethcatalyst.ConsensusAPI
-	ethBackend *eth.mbali
+	api        *mblcatalyst.ConsensusAPI
+	mblBackend *mbl.mbali
 	lapi       *lescatalyst.ConsensusAPI
 	lesBackend *les.Lightmbali
 }
 
-func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *ethNode {
+func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *mblNode {
 	var (
 		err        error
-		api        *ethcatalyst.ConsensusAPI
+		api        *mblcatalyst.ConsensusAPI
 		lapi       *lescatalyst.ConsensusAPI
 		stack      *node.Node
-		ethBackend *eth.mbali
+		mblBackend *mbl.mbali
 		lesBackend *les.Lightmbali
 	)
 	// Start the node and wait until it's up
-	if typ == eth2LightClient {
+	if typ == mbl2LightClient {
 		stack, lesBackend, lapi, err = makeLightNode(genesis)
 	} else {
-		stack, ethBackend, api, err = makeFullNode(genesis)
+		stack, mblBackend, api, err = makeFullNode(genesis)
 	}
 	if err != nil {
 		panic(err)
@@ -130,10 +130,10 @@ func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *ethNode
 	if _, err := store.NewAccount(""); err != nil {
 		panic(err)
 	}
-	return &ethNode{
+	return &mblNode{
 		typ:        typ,
 		api:        api,
-		ethBackend: ethBackend,
+		mblBackend: mblBackend,
 		lapi:       lapi,
 		lesBackend: lesBackend,
 		stack:      stack,
@@ -141,8 +141,8 @@ func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *ethNode
 	}
 }
 
-func (n *ethNode) assembleBlock(parentHash common.Hash, parentTimestamp uint64) (*beacon.ExecutableDataV1, error) {
-	if n.typ != eth2MiningNode {
+func (n *mblNode) assembleBlock(parentHash common.Hash, parentTimestamp uint64) (*beacon.ExecutableDataV1, error) {
+	if n.typ != mbl2MiningNode {
 		return nil, errors.New("invalid node type")
 	}
 	timestamp := uint64(time.Now().Unix())
@@ -166,12 +166,12 @@ func (n *ethNode) assembleBlock(parentHash common.Hash, parentTimestamp uint64) 
 	return n.api.GetPayloadV1(*payload.PayloadID)
 }
 
-func (n *ethNode) insertBlock(eb beacon.ExecutableDataV1) error {
-	if !eth2types(n.typ) {
+func (n *mblNode) insertBlock(eb beacon.ExecutableDataV1) error {
+	if !mbl2types(n.typ) {
 		return errors.New("invalid node type")
 	}
 	switch n.typ {
-	case eth2NormalNode, eth2MiningNode:
+	case mbl2NormalNode, mbl2MiningNode:
 		newResp, err := n.api.NewPayloadV1(eb)
 		if err != nil {
 			return err
@@ -179,7 +179,7 @@ func (n *ethNode) insertBlock(eb beacon.ExecutableDataV1) error {
 			return errors.New("failed to insert block")
 		}
 		return nil
-	case eth2LightClient:
+	case mbl2LightClient:
 		newResp, err := n.lapi.ExecutePayloadV1(eb)
 		if err != nil {
 			return err
@@ -192,8 +192,8 @@ func (n *ethNode) insertBlock(eb beacon.ExecutableDataV1) error {
 	}
 }
 
-func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed beacon.ExecutableDataV1) error {
-	if !eth2types(n.typ) {
+func (n *mblNode) insertBlockAndSmblead(parent *types.Header, ed beacon.ExecutableDataV1) error {
+	if !mbl2types(n.typ) {
 		return errors.New("invalid node type")
 	}
 	if err := n.insertBlock(ed); err != nil {
@@ -209,12 +209,12 @@ func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed beacon.Executab
 		FinalizedBlockHash: common.Hash{},
 	}
 	switch n.typ {
-	case eth2NormalNode, eth2MiningNode:
+	case mbl2NormalNode, mbl2MiningNode:
 		if _, err := n.api.ForkchoiceUpdatedV1(fcState, nil); err != nil {
 			return err
 		}
 		return nil
-	case eth2LightClient:
+	case mbl2LightClient:
 		if _, err := n.lapi.ForkchoiceUpdatedV1(fcState, nil); err != nil {
 			return err
 		}
@@ -227,7 +227,7 @@ func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed beacon.Executab
 type nodeManager struct {
 	genesis      *core.Genesis
 	genesisBlock *types.Block
-	nodes        []*ethNode
+	nodes        []*mblNode
 	enodes       []*enode.Node
 	close        chan struct{}
 }
@@ -246,8 +246,8 @@ func (mgr *nodeManager) createNode(typ nodetype) {
 	mgr.enodes = append(mgr.enodes, node.enode)
 }
 
-func (mgr *nodeManager) getNodes(typ nodetype) []*ethNode {
-	var ret []*ethNode
+func (mgr *nodeManager) getNodes(typ nodetype) []*mblNode {
+	var ret []*mblNode
 	for _, node := range mgr.nodes {
 		if node.typ == typ {
 			ret = append(ret, node)
@@ -257,8 +257,8 @@ func (mgr *nodeManager) getNodes(typ nodetype) []*ethNode {
 }
 
 func (mgr *nodeManager) startMining() {
-	for _, node := range append(mgr.getNodes(eth2MiningNode), mgr.getNodes(legacyMiningNode)...) {
-		if err := node.ethBackend.StartMining(1); err != nil {
+	for _, node := range append(mgr.getNodes(mbl2MiningNode), mgr.getNodes(legacyMiningNode)...) {
+		if err := node.mblBackend.StartMining(1); err != nil {
 			panic(err)
 		}
 	}
@@ -275,7 +275,7 @@ func (mgr *nodeManager) run() {
 	if len(mgr.nodes) == 0 {
 		return
 	}
-	chain := mgr.nodes[0].ethBackend.BlockChain()
+	chain := mgr.nodes[0].mblBackend.BlockChain()
 	sink := make(chan core.ChainHeadEvent, 1024)
 	sub := chain.SubscribeChainHeadEvent(sink)
 	defer sub.Unsubscribe()
@@ -313,9 +313,9 @@ func (mgr *nodeManager) run() {
 		if int(distance) < finalizationDist {
 			return
 		}
-		nodes := mgr.getNodes(eth2MiningNode)
-		nodes = append(nodes, mgr.getNodes(eth2NormalNode)...)
-		nodes = append(nodes, mgr.getNodes(eth2LightClient)...)
+		nodes := mgr.getNodes(mbl2MiningNode)
+		nodes = append(nodes, mgr.getNodes(mbl2NormalNode)...)
+		nodes = append(nodes, mgr.getNodes(mbl2LightClient)...)
 		for _, node := range append(nodes) {
 			fcState := beacon.ForkchoiceStateV1{
 				HeadBlockHash:      oldest.Hash(),
@@ -327,7 +327,7 @@ func (mgr *nodeManager) run() {
 			_ = node
 			//node.api.ForkchoiceUpdatedV1(fcState, nil)
 		}
-		log.Info("Finalised eth2 block", "number", oldest.NumberU64(), "hash", oldest.Hash())
+		log.Info("Finalised mbl2 block", "number", oldest.NumberU64(), "hash", oldest.Hash())
 		waitFinalise = waitFinalise[1:]
 	}
 
@@ -350,7 +350,7 @@ func (mgr *nodeManager) run() {
 			log.Info("Transition difficulty reached", "td", td, "target", transitionDifficulty, "number", ev.Block.NumberU64(), "hash", ev.Block.Hash())
 
 		case <-timer.C:
-			producers := mgr.getNodes(eth2MiningNode)
+			producers := mgr.getNodes(mbl2MiningNode)
 			if len(producers) == 0 {
 				continue
 			}
@@ -365,15 +365,15 @@ func (mgr *nodeManager) run() {
 			}
 			block, _ := beacon.ExecutableDataToBlock(*ed)
 
-			nodes := mgr.getNodes(eth2MiningNode)
-			nodes = append(nodes, mgr.getNodes(eth2NormalNode)...)
-			nodes = append(nodes, mgr.getNodes(eth2LightClient)...)
+			nodes := mgr.getNodes(mbl2MiningNode)
+			nodes = append(nodes, mgr.getNodes(mbl2NormalNode)...)
+			nodes = append(nodes, mgr.getNodes(mbl2LightClient)...)
 			for _, node := range nodes {
-				if err := node.insertBlockAndSetHead(parentBlock.Header(), *ed); err != nil {
+				if err := node.insertBlockAndSmblead(parentBlock.Header(), *ed); err != nil {
 					log.Error("Failed to insert block", "type", node.typ, "err", err)
 				}
 			}
-			log.Info("Create and insert eth2 block", "number", ed.Number)
+			log.Info("Create and insert mbl2 block", "number", ed.Number)
 			parentBlock = block
 			waitFinalise = append(waitFinalise, block)
 			timer.Reset(blockInterval)
@@ -382,7 +382,7 @@ func (mgr *nodeManager) run() {
 }
 
 func main() {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	fdlimit.Raise(2048)
 
 	// Generate a batch of accounts to seal and fund with
@@ -390,19 +390,19 @@ func main() {
 	for i := 0; i < len(faucets); i++ {
 		faucets[i], _ = crypto.GenerateKey()
 	}
-	// Pre-generate the ethash mining DAG so we don't race
-	ethash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".ethash"))
+	// Pre-generate the mblash mining DAG so we don't race
+	mblash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".mblash"))
 
-	// Create an Ethash network based off of the Ropsten config
+	// Create an mblash network based off of the Ropsten config
 	genesis := makeGenesis(faucets)
 	manager := newNodeManager(genesis)
 	defer manager.shutdown()
 
-	manager.createNode(eth2NormalNode)
-	manager.createNode(eth2MiningNode)
+	manager.createNode(mbl2NormalNode)
+	manager.createNode(mbl2MiningNode)
 	manager.createNode(legacyMiningNode)
 	manager.createNode(legacyNormalNode)
-	manager.createNode(eth2LightClient)
+	manager.createNode(mbl2LightClient)
 
 	// Iterate over all the nodes and start mining
 	time.Sleep(3 * time.Second)
@@ -416,7 +416,7 @@ func main() {
 	nonces := make([]uint64, len(faucets))
 	for {
 		// Pick a random mining node
-		nodes := manager.getNodes(eth2MiningNode)
+		nodes := manager.getNodes(mbl2MiningNode)
 
 		index := rand.Intn(len(faucets))
 		node := nodes[index%len(nodes)]
@@ -426,19 +426,19 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		if err := node.ethBackend.TxPool().AddLocal(tx); err != nil {
+		if err := node.mblBackend.TxPool().AddLocal(tx); err != nil {
 			panic(err)
 		}
 		nonces[index]++
 
 		// Wait if we're too saturated
-		if pend, _ := node.ethBackend.TxPool().Stats(); pend > 2048 {
+		if pend, _ := node.mblBackend.TxPool().Stats(); pend > 2048 {
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
 
-// makeGenesis creates a custom Ethash genesis block based on some pre-defined
+// makeGenesis creates a custom mblash genesis block based on some pre-defined
 // faucet accounts.
 func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	genesis := core.DefaultRopstenGenesisBlock()
@@ -446,7 +446,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	genesis.GasLimit = 25000000
 
 	genesis.BaseFee = big.NewInt(params.InitialBaseFee)
-	genesis.Config = params.AllEthashProtocolChanges
+	genesis.Config = params.AllmblashProtocolChanges
 	genesis.Config.TerminalTotalDifficulty = transitionDifficulty
 
 	genesis.Alloc = core.GenesisAlloc{}
@@ -458,7 +458,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	return genesis
 }
 
-func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.mbali, *ethcatalyst.ConsensusAPI, error) {
+func makeFullNode(genesis *core.Genesis) (*node.Node, *mbl.mbali, *mblcatalyst.ConsensusAPI, error) {
 	// Define the basic configurations for the mbali node
 	datadir, _ := os.MkdirTemp("", "")
 
@@ -478,15 +478,15 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.mbali, *ethcatalyst.C
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	econfig := &ethconfig.Config{
+	econfig := &mblconfig.Config{
 		Genesis:         genesis,
 		NetworkId:       genesis.Config.ChainID.Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
 		TxPool:          core.DefaultTxPoolConfig,
-		GPO:             ethconfig.Defaults.GPO,
-		Ethash:          ethconfig.Defaults.Ethash,
+		GPO:             mblconfig.Defaults.GPO,
+		mblash:          mblconfig.Defaults.mblash,
 		Miner: miner.Config{
 			GasFloor: genesis.GasLimit * 9 / 10,
 			GasCeil:  genesis.GasLimit * 11 / 10,
@@ -497,16 +497,16 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.mbali, *ethcatalyst.C
 		LightPeers:       10,
 		LightNoSyncServe: true,
 	}
-	ethBackend, err := eth.New(stack, econfig)
+	mblBackend, err := mbl.New(stack, econfig)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	_, err = les.NewLesServer(stack, ethBackend, econfig)
+	_, err = les.NewLesServer(stack, mblBackend, econfig)
 	if err != nil {
 		log.Crit("Failed to create the LES server", "err", err)
 	}
 	err = stack.Start()
-	return stack, ethBackend, ethcatalyst.NewConsensusAPI(ethBackend), err
+	return stack, mblBackend, mblcatalyst.NewConsensusAPI(mblBackend), err
 }
 
 func makeLightNode(genesis *core.Genesis) (*node.Node, *les.Lightmbali, *lescatalyst.ConsensusAPI, error) {
@@ -529,15 +529,15 @@ func makeLightNode(genesis *core.Genesis) (*node.Node, *les.Lightmbali, *lescata
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	lesBackend, err := les.New(stack, &ethconfig.Config{
+	lesBackend, err := les.New(stack, &mblconfig.Config{
 		Genesis:         genesis,
 		NetworkId:       genesis.Config.ChainID.Uint64(),
 		SyncMode:        downloader.LightSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
 		TxPool:          core.DefaultTxPoolConfig,
-		GPO:             ethconfig.Defaults.GPO,
-		Ethash:          ethconfig.Defaults.Ethash,
+		GPO:             mblconfig.Defaults.GPO,
+		mblash:          mblconfig.Defaults.mblash,
 		LightPeers:      10,
 	})
 	if err != nil {
@@ -547,8 +547,8 @@ func makeLightNode(genesis *core.Genesis) (*node.Node, *les.Lightmbali, *lescata
 	return stack, lesBackend, lescatalyst.NewConsensusAPI(lesBackend), err
 }
 
-func eth2types(typ nodetype) bool {
-	if typ == eth2LightClient || typ == eth2NormalNode || typ == eth2MiningNode {
+func mbl2types(typ nodetype) bool {
+	if typ == mbl2LightClient || typ == mbl2NormalNode || typ == mbl2MiningNode {
 		return true
 	}
 	return false

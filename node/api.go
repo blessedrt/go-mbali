@@ -55,7 +55,7 @@ func (n *Node) apis() []rpc.API {
 	}
 }
 
-// privateAdminAPI is the collection of administrative API methods exposed only
+// privateAdminAPI is the collection of administrative API mmblods exposed only
 // over a secure RPC channel.
 type privateAdminAPI struct {
 	node *Node // Node interfaced by this API
@@ -220,7 +220,7 @@ func (api *privateAdminAPI) StartHTTP(host *string, port *int, cors *string, api
 // StartRPC starts the HTTP RPC API server.
 // Deprecated: use StartHTTP instead.
 func (api *privateAdminAPI) StartRPC(host *string, port *int, cors *string, apis *string, vhosts *string) (bool, error) {
-	log.Warn("Deprecation warning", "method", "admin.StartRPC", "use-instead", "admin.StartHTTP")
+	log.Warn("Deprecation warning", "mmblod", "admin.StartRPC", "use-instead", "admin.StartHTTP")
 	return api.StartHTTP(host, port, cors, apis, vhosts)
 }
 
@@ -233,7 +233,7 @@ func (api *privateAdminAPI) StopHTTP() (bool, error) {
 // StopRPC shuts down the HTTP server.
 // Deprecated: use StopHTTP instead.
 func (api *privateAdminAPI) StopRPC() (bool, error) {
-	log.Warn("Deprecation warning", "method", "admin.StopRPC", "use-instead", "admin.StopHTTP")
+	log.Warn("Deprecation warning", "mmblod", "admin.StopRPC", "use-instead", "admin.StopHTTP")
 	return api.StopHTTP()
 }
 
@@ -296,7 +296,7 @@ func (api *privateAdminAPI) StopWS() (bool, error) {
 	return true, nil
 }
 
-// publicAdminAPI is the collection of administrative API methods exposed over
+// publicAdminAPI is the collection of administrative API mmblods exposed over
 // both secure and unsecure RPC channels.
 type publicAdminAPI struct {
 	node *Node // Node interfaced by this API

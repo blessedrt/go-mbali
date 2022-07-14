@@ -22,9 +22,9 @@ import (
 	"github.com/mbali/go-mbali/log"
 )
 
-// ensureVirtualHost checks whether a reverse-proxy is running on the specified
+// ensureVirtualHost checks whmbler a reverse-proxy is running on the specified
 // host machine, and if yes requests a virtual host from the user to host a
-// specific web service on. If no proxy exists, the method will offer to deploy
+// specific web service on. If no proxy exists, the mmblod will offer to deploy
 // one.
 //
 // If the user elects not to use a reverse proxy, an empty hostname is returned!

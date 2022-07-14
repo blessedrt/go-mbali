@@ -28,14 +28,14 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/consensus"
 	"github.com/mbali/go-mbali/consensus/clique"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/params"
 )
@@ -52,7 +52,7 @@ const (
 var (
 	// Test chain configurations
 	testTxPoolConfig  core.TxPoolConfig
-	ethashChainConfig *params.ChainConfig
+	mblashChainConfig *params.ChainConfig
 	cliqueChainConfig *params.ChainConfig
 
 	// Test accounts
@@ -76,8 +76,8 @@ var (
 func init() {
 	testTxPoolConfig = core.DefaultTxPoolConfig
 	testTxPoolConfig.Journal = ""
-	ethashChainConfig = new(params.ChainConfig)
-	*ethashChainConfig = *params.TestChainConfig
+	mblashChainConfig = new(params.ChainConfig)
+	*mblashChainConfig = *params.TestChainConfig
 	cliqueChainConfig = new(params.ChainConfig)
 	*cliqueChainConfig = *params.TestChainConfig
 	cliqueChainConfig.Clique = &params.CliqueConfig{
@@ -110,7 +110,7 @@ func init() {
 
 // testWorkerBackend implements worker.Backend interfaces and wraps all information needed during the testing.
 type testWorkerBackend struct {
-	db         ethdb.Database
+	db         mbldb.Database
 	txPool     *core.TxPool
 	chain      *core.BlockChain
 	testTxFeed event.Feed
@@ -118,7 +118,7 @@ type testWorkerBackend struct {
 	uncleBlock *types.Block
 }
 
-func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
+func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, db mbldb.Database, n int) *testWorkerBackend {
 	var gspec = core.Genesis{
 		Config: chainConfig,
 		Alloc:  core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
@@ -131,7 +131,7 @@ func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine 
 		e.Authorize(testBankAddress, func(account accounts.Account, s string, data []byte) ([]byte, error) {
 			return crypto.Sign(crypto.Keccak256(data), testBankKey)
 		})
-	case *ethash.Ethash:
+	case *mblash.mblash:
 	default:
 		t.Fatalf("unexpected consensus engine type: %T", engine)
 	}
@@ -199,15 +199,15 @@ func (b *testWorkerBackend) newRandomTx(creation bool) *types.Transaction {
 	return tx
 }
 
-func newTestWorker(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, db ethdb.Database, blocks int) (*worker, *testWorkerBackend) {
+func newTestWorker(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, db mbldb.Database, blocks int) (*worker, *testWorkerBackend) {
 	backend := newTestWorkerBackend(t, chainConfig, engine, db, blocks)
 	backend.txPool.AddLocals(pendingTxs)
 	w := newWorker(testConfig, chainConfig, engine, backend, new(event.TypeMux), nil, false)
-	w.setEtherbase(testBankAddress)
+	w.setmblerbase(testBankAddress)
 	return w, backend
 }
 
-func TestGenerateBlockAndImportEthash(t *testing.T) {
+func TestGenerateBlockAndImportmblash(t *testing.T) {
 	testGenerateBlockAndImport(t, false)
 }
 
@@ -226,8 +226,8 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 		chainConfig.Clique = &params.CliqueConfig{Period: 1, Epoch: 30000}
 		engine = clique.New(chainConfig.Clique, db)
 	} else {
-		chainConfig = params.AllEthashProtocolChanges
-		engine = ethash.NewFaker()
+		chainConfig = params.AllmblashProtocolChanges
+		engine = mblash.NewFaker()
 	}
 
 	chainConfig.LondonBlock = big.NewInt(0)
@@ -270,8 +270,8 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	}
 }
 
-func TestEmptyWorkEthash(t *testing.T) {
-	testEmptyWork(t, ethashChainConfig, ethash.NewFaker())
+func TestEmptyWorkmblash(t *testing.T) {
+	testEmptyWork(t, mblashChainConfig, mblash.NewFaker())
 }
 func TestEmptyWorkClique(t *testing.T) {
 	testEmptyWork(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
@@ -323,10 +323,10 @@ func testEmptyWork(t *testing.T, chainConfig *params.ChainConfig, engine consens
 }
 
 func TestStreamUncleBlock(t *testing.T) {
-	ethash := ethash.NewFaker()
-	defer ethash.Close()
+	mblash := mblash.NewFaker()
+	defer mblash.Close()
 
-	w, b := newTestWorker(t, ethashChainConfig, ethash, rawdb.NewMemoryDatabase(), 1)
+	w, b := newTestWorker(t, mblashChainConfig, mblash, rawdb.NewMemoryDatabase(), 1)
 	defer w.close()
 
 	var taskCh = make(chan struct{})
@@ -373,8 +373,8 @@ func TestStreamUncleBlock(t *testing.T) {
 	}
 }
 
-func TestRegenerateMiningBlockEthash(t *testing.T) {
-	testRegenerateMiningBlock(t, ethashChainConfig, ethash.NewFaker())
+func TestRegenerateMiningBlockmblash(t *testing.T) {
+	testRegenerateMiningBlock(t, mblashChainConfig, mblash.NewFaker())
 }
 
 func TestRegenerateMiningBlockClique(t *testing.T) {
@@ -433,8 +433,8 @@ func testRegenerateMiningBlock(t *testing.T, chainConfig *params.ChainConfig, en
 	}
 }
 
-func TestAdjustIntervalEthash(t *testing.T) {
-	testAdjustInterval(t, ethashChainConfig, ethash.NewFaker())
+func TestAdjustIntervalmblash(t *testing.T) {
+	testAdjustInterval(t, mblashChainConfig, mblash.NewFaker())
 }
 
 func TestAdjustIntervalClique(t *testing.T) {
@@ -527,8 +527,8 @@ func testAdjustInterval(t *testing.T, chainConfig *params.ChainConfig, engine co
 	}
 }
 
-func TestGetSealingWorkEthash(t *testing.T) {
-	testGetSealingWork(t, ethashChainConfig, ethash.NewFaker(), false)
+func TestGetSealingWorkmblash(t *testing.T) {
+	testGetSealingWork(t, mblashChainConfig, mblash.NewFaker(), false)
 }
 
 func TestGetSealingWorkClique(t *testing.T) {
@@ -537,9 +537,9 @@ func TestGetSealingWorkClique(t *testing.T) {
 
 func TestGetSealingWorkPostMerge(t *testing.T) {
 	local := new(params.ChainConfig)
-	*local = *ethashChainConfig
+	*local = *mblashChainConfig
 	local.TerminalTotalDifficulty = big.NewInt(0)
-	testGetSealingWork(t, local, ethash.NewFaker(), true)
+	testGetSealingWork(t, local, mblash.NewFaker(), true)
 }
 
 func testGetSealingWork(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, postMerge bool) {

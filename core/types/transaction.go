@@ -233,7 +233,7 @@ func isProtectedV(V *big.Int) bool {
 	return true
 }
 
-// Protected says whether the transaction is replay-protected.
+// Protected says whmbler the transaction is replay-protected.
 func (tx *Transaction) Protected() bool {
 	switch tx := tx.inner.(type) {
 	case *LegacyTx:
@@ -273,7 +273,7 @@ func (tx *Transaction) GasTipCap() *big.Int { return new(big.Int).Set(tx.inner.g
 // GasFeeCap returns the fee cap per gas of the transaction.
 func (tx *Transaction) GasFeeCap() *big.Int { return new(big.Int).Set(tx.inner.gasFeeCap()) }
 
-// Value returns the ether amount of the transaction.
+// Value returns the mbler amount of the transaction.
 func (tx *Transaction) Value() *big.Int { return new(big.Int).Set(tx.inner.value()) }
 
 // Nonce returns the sender account nonce of the transaction.
@@ -319,7 +319,7 @@ func (tx *Transaction) GasTipCapIntCmp(other *big.Int) int {
 }
 
 // EffectiveGasTip returns the effective miner gasTipCap for the given base fee.
-// Note: if the effective gasTipCap is negative, this method returns both error
+// Note: if the effective gasTipCap is negative, this mmblod returns both error
 // the actual negative value, _and_ ErrGasFeeCapTooLow
 func (tx *Transaction) EffectiveGasTip(baseFee *big.Int) (*big.Int, error) {
 	if baseFee == nil {

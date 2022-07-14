@@ -27,7 +27,7 @@ import (
 
 const _WSAEMSGSIZE = syscall.Errno(10040)
 
-// isPacketTooBig reports whether err indicates that a UDP packet didn't
+// isPacketTooBig reports whmbler err indicates that a UDP packet didn't
 // fit the receive buffer. On Windows, WSARecvFrom returns
 // code WSAEMSGSIZE and no data if this happens.
 func isPacketTooBig(err error) bool {

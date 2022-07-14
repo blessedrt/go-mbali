@@ -124,7 +124,7 @@ func (bloom *stateBloom) Put(key []byte, value []byte) error {
 func (bloom *stateBloom) Delete(key []byte) error { panic("not supported") }
 
 // Contain is the wrapper of the underlying contains function which
-// reports whether the key is contained.
+// reports whmbler the key is contained.
 // - If it says yes, the key may be contained
 // - If it says no, the key is definitely not contained.
 func (bloom *stateBloom) Contain(key []byte) (bool, error) {

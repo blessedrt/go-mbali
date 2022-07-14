@@ -30,7 +30,7 @@ import (
 )
 
 // This test uses the admin_startRPC and admin_startWS APIs,
-// checking whether the HTTP server is started correctly.
+// checking whmbler the HTTP server is started correctly.
 func TestStartRPC(t *testing.T) {
 	type test struct {
 		name string
@@ -38,10 +38,10 @@ func TestStartRPC(t *testing.T) {
 		fn   func(*testing.T, *Node, *privateAdminAPI)
 
 		// Checks. These run after the node is configured and all API calls have been made.
-		wantReachable bool // whether the HTTP server should be reachable at all
-		wantHandlers  bool // whether RegisterHandler handlers should be accessible
-		wantRPC       bool // whether JSON-RPC/HTTP should be accessible
-		wantWS        bool // whether JSON-RPC/WS should be accessible
+		wantReachable bool // whmbler the HTTP server should be reachable at all
+		wantHandlers  bool // whmbler RegisterHandler handlers should be accessible
+		wantRPC       bool // whmbler JSON-RPC/HTTP should be accessible
+		wantWS        bool // whmbler JSON-RPC/WS should be accessible
 	}
 
 	tests := []test{
@@ -310,7 +310,7 @@ func checkReachable(rawurl string) bool {
 	return true
 }
 
-// checkBodyOK checks whether the given HTTP URL responds with 200 OK and body "OK".
+// checkBodyOK checks whmbler the given HTTP URL responds with 200 OK and body "OK".
 func checkBodyOK(url string) bool {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -328,7 +328,7 @@ func checkBodyOK(url string) bool {
 	return bytes.Equal(buf, []byte("OK"))
 }
 
-// checkRPC checks whether JSON-RPC works against the given URL.
+// checkRPC checks whmbler JSON-RPC works against the given URL.
 func checkRPC(url string) bool {
 	c, err := rpc.Dial(url)
 	if err != nil {

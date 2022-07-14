@@ -31,11 +31,11 @@ import (
 	"github.com/mbali/go-mbali/core/bloombits"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/eth/filters"
-	"github.com/mbali/go-mbali/eth/gasprice"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mbl/filters"
+	"github.com/mbali/go-mbali/mbl/gasprice"
 	"github.com/mbali/go-mbali/event"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/internal/shutdowncheck"
 	"github.com/mbali/go-mbali/les/downloader"
 	"github.com/mbali/go-mbali/les/vflux"
@@ -74,7 +74,7 @@ type Lightmbali struct {
 	eventMux       *event.TypeMux
 	engine         consensus.Engine
 	accountManager *accounts.Manager
-	netRPCService  *ethapi.PublicNetAPI
+	netRPCService  *mblapi.PublicNetAPI
 
 	p2pServer  *p2p.Server
 	p2pConfig  *p2p.Config
@@ -84,12 +84,12 @@ type Lightmbali struct {
 }
 
 // New creates an instance of the light client.
-func New(stack *node.Node, config *ethconfig.Config) (*Lightmbali, error) {
-	chainDb, err := stack.OpenDatabase("lightchaindata", config.DatabaseCache, config.DatabaseHandles, "eth/db/chaindata/", false)
+func New(stack *node.Node, config *mblconfig.Config) (*Lightmbali, error) {
+	chainDb, err := stack.OpenDatabase("lightchaindata", config.DatabaseCache, config.DatabaseHandles, "mbl/db/chaindata/", false)
 	if err != nil {
 		return nil, err
 	}
-	lesDb, err := stack.OpenDatabase("les.client", 0, 0, "eth/db/lesclient/", false)
+	lesDb, err := stack.OpenDatabase("les.client", 0, 0, "mbl/db/lesclient/", false)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Lightmbali, error) {
 
 	peers := newServerPeerSet()
 	merger := consensus.NewMerger(chainDb)
-	leth := &Lightmbali{
+	lmbl := &Lightmbali{
 		lesCommons: lesCommons{
 			genesis:     genesisHash,
 			config:      config,
@@ -122,7 +122,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Lightmbali, error) {
 		reqDist:         newRequestDistributor(peers, &mclock.System{}),
 		accountManager:  stack.AccountManager(),
 		merger:          merger,
-		engine:          ethconfig.CreateConsensusEngine(stack, chainConfig, &config.Ethash, nil, false, chainDb),
+		engine:          mblconfig.CreateConsensusEngine(stack, chainConfig, &config.mblash, nil, false, chainDb),
 		bloomRequests:   make(chan chan *bloombits.Retrieval),
 		bloomIndexer:    core.NewBloomIndexer(chainDb, params.BloomBitsBlocksClient, params.HelperTrieConfirmations),
 		p2pServer:       stack.Server(),
@@ -132,19 +132,19 @@ func New(stack *node.Node, config *ethconfig.Config) (*Lightmbali, error) {
 	}
 
 	var prenegQuery vfc.QueryFunc
-	if leth.udpEnabled {
-		prenegQuery = leth.prenegQuery
+	if lmbl.udpEnabled {
+		prenegQuery = lmbl.prenegQuery
 	}
-	leth.serverPool, leth.serverPoolIterator = vfc.NewServerPool(lesDb, []byte("serverpool:"), time.Second, prenegQuery, &mclock.System{}, config.UltraLightServers, requestList)
-	leth.serverPool.AddMetrics(suggestedTimeoutGauge, totalValueGauge, serverSelectableGauge, serverConnectedGauge, sessionValueMeter, serverDialedMeter)
+	lmbl.serverPool, lmbl.serverPoolIterator = vfc.NewServerPool(lesDb, []byte("serverpool:"), time.Second, prenegQuery, &mclock.System{}, config.UltraLightServers, requestList)
+	lmbl.serverPool.AddMetrics(suggestedTimeoutGauge, totalValueGauge, serverSelectableGauge, serverConnectedGauge, sessionValueMeter, serverDialedMeter)
 
-	leth.retriever = newRetrieveManager(peers, leth.reqDist, leth.serverPool.GetTimeout)
-	leth.relay = newLesTxRelay(peers, leth.retriever)
+	lmbl.retriever = newRetrieveManager(peers, lmbl.reqDist, lmbl.serverPool.GetTimeout)
+	lmbl.relay = newLesTxRelay(peers, lmbl.retriever)
 
-	leth.odr = NewLesOdr(chainDb, light.DefaultClientIndexerConfig, leth.peers, leth.retriever)
-	leth.chtIndexer = light.NewChtIndexer(chainDb, leth.odr, params.CHTFrequency, params.HelperTrieConfirmations, config.LightNoPrune)
-	leth.bloomTrieIndexer = light.NewBloomTrieIndexer(chainDb, leth.odr, params.BloomBitsBlocksClient, params.BloomTrieFrequency, config.LightNoPrune)
-	leth.odr.SetIndexers(leth.chtIndexer, leth.bloomTrieIndexer, leth.bloomIndexer)
+	lmbl.odr = NewLesOdr(chainDb, light.DefaultClientIndexerConfig, lmbl.peers, lmbl.retriever)
+	lmbl.chtIndexer = light.NewChtIndexer(chainDb, lmbl.odr, params.CHTFrequency, params.HelperTrieConfirmations, config.LightNoPrune)
+	lmbl.bloomTrieIndexer = light.NewBloomTrieIndexer(chainDb, lmbl.odr, params.BloomBitsBlocksClient, params.BloomTrieFrequency, config.LightNoPrune)
+	lmbl.odr.SetIndexers(lmbl.chtIndexer, lmbl.bloomTrieIndexer, lmbl.bloomIndexer)
 
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
@@ -152,54 +152,54 @@ func New(stack *node.Node, config *ethconfig.Config) (*Lightmbali, error) {
 	}
 	// Note: NewLightChain adds the trusted checkpoint so it needs an ODR with
 	// indexers already set but not started yet
-	if leth.blockchain, err = light.NewLightChain(leth.odr, leth.chainConfig, leth.engine, checkpoint); err != nil {
+	if lmbl.blockchain, err = light.NewLightChain(lmbl.odr, lmbl.chainConfig, lmbl.engine, checkpoint); err != nil {
 		return nil, err
 	}
-	leth.chainReader = leth.blockchain
-	leth.txPool = light.NewTxPool(leth.chainConfig, leth.blockchain, leth.relay)
+	lmbl.chainReader = lmbl.blockchain
+	lmbl.txPool = light.NewTxPool(lmbl.chainConfig, lmbl.blockchain, lmbl.relay)
 
 	// Set up checkpoint oracle.
-	leth.oracle = leth.setupOracle(stack, genesisHash, config)
+	lmbl.oracle = lmbl.setupOracle(stack, genesisHash, config)
 
 	// Note: AddChildIndexer starts the update process for the child
-	leth.bloomIndexer.AddChildIndexer(leth.bloomTrieIndexer)
-	leth.chtIndexer.Start(leth.blockchain)
-	leth.bloomIndexer.Start(leth.blockchain)
+	lmbl.bloomIndexer.AddChildIndexer(lmbl.bloomTrieIndexer)
+	lmbl.chtIndexer.Start(lmbl.blockchain)
+	lmbl.bloomIndexer.Start(lmbl.blockchain)
 
 	// Start a light chain pruner to delete useless historical data.
-	leth.pruner = newPruner(chainDb, leth.chtIndexer, leth.bloomTrieIndexer)
+	lmbl.pruner = newPruner(chainDb, lmbl.chtIndexer, lmbl.bloomTrieIndexer)
 
 	// Rewind the chain in case of an incompatible config upgrade.
 	if compat, ok := genesisErr.(*params.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
-		leth.blockchain.SetHead(compat.RewindTo)
+		lmbl.blockchain.Smblead(compat.RewindTo)
 		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
 
-	leth.ApiBackend = &LesApiBackend{stack.Config().ExtRPCEnabled(), stack.Config().AllowUnprotectedTxs, leth, nil}
+	lmbl.ApiBackend = &LesApiBackend{stack.Config().ExtRPCEnabled(), stack.Config().AllowUnprotectedTxs, lmbl, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.Miner.GasPrice
 	}
-	leth.ApiBackend.gpo = gasprice.NewOracle(leth.ApiBackend, gpoParams)
+	lmbl.ApiBackend.gpo = gasprice.NewOracle(lmbl.ApiBackend, gpoParams)
 
-	leth.handler = newClientHandler(config.UltraLightServers, config.UltraLightFraction, checkpoint, leth)
-	if leth.handler.ulc != nil {
-		log.Warn("Ultra light client is enabled", "trustedNodes", len(leth.handler.ulc.keys), "minTrustedFraction", leth.handler.ulc.fraction)
-		leth.blockchain.DisableCheckFreq()
+	lmbl.handler = newClientHandler(config.UltraLightServers, config.UltraLightFraction, checkpoint, lmbl)
+	if lmbl.handler.ulc != nil {
+		log.Warn("Ultra light client is enabled", "trustedNodes", len(lmbl.handler.ulc.keys), "minTrustedFraction", lmbl.handler.ulc.fraction)
+		lmbl.blockchain.DisableCheckFreq()
 	}
 
-	leth.netRPCService = ethapi.NewPublicNetAPI(leth.p2pServer, leth.config.NetworkId)
+	lmbl.netRPCService = mblapi.NewPublicNetAPI(lmbl.p2pServer, lmbl.config.NetworkId)
 
 	// Register the backend on the node
-	stack.RegisterAPIs(leth.APIs())
-	stack.RegisterProtocols(leth.Protocols())
-	stack.RegisterLifecycle(leth)
+	stack.RegisterAPIs(lmbl.APIs())
+	stack.RegisterProtocols(lmbl.Protocols())
+	stack.RegisterLifecycle(lmbl)
 
 	// Successful startup; push a marker and check previous unclean shutdowns.
-	leth.shutdownTracker.MarkStartup()
+	lmbl.shutdownTracker.MarkStartup()
 
-	return leth, nil
+	return lmbl, nil
 }
 
 // VfluxRequest sends a batch of requests to the given node through discv5 UDP TalkRequest and returns the responses
@@ -240,7 +240,7 @@ func (s *Lightmbali) vfxVersion(n *enode.Node) uint {
 	return version
 }
 
-// prenegQuery sends a capacity query to the given server node to determine whether
+// prenegQuery sends a capacity query to the given server node to determine whmbler
 // a connection slot is immediately available
 func (s *Lightmbali) prenegQuery(n *enode.Node) int {
 	if s.vfxVersion(n) < 1 {
@@ -266,12 +266,12 @@ func (s *Lightmbali) prenegQuery(n *enode.Node) int {
 
 type LightDummyAPI struct{}
 
-// Etherbase is the address that mining rewards will be send to
-func (s *LightDummyAPI) Etherbase() (common.Address, error) {
+// mblerbase is the address that mining rewards will be send to
+func (s *LightDummyAPI) mblerbase() (common.Address, error) {
 	return common.Address{}, fmt.Errorf("mining is not supported in light mode")
 }
 
-// Coinbase is the address that mining rewards will be send to (alias for Etherbase)
+// Coinbase is the address that mining rewards will be send to (alias for mblerbase)
 func (s *LightDummyAPI) Coinbase() (common.Address, error) {
 	return common.Address{}, fmt.Errorf("mining is not supported in light mode")
 }
@@ -289,21 +289,21 @@ func (s *LightDummyAPI) Mining() bool {
 // APIs returns the collection of RPC services the mbali package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
 func (s *Lightmbali) APIs() []rpc.API {
-	apis := ethapi.GetAPIs(s.ApiBackend)
+	apis := mblapi.GetAPIs(s.ApiBackend)
 	apis = append(apis, s.engine.APIs(s.BlockChain().HeaderChain())...)
 	return append(apis, []rpc.API{
 		{
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   &LightDummyAPI{},
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   downloader.NewPublicDownloaderAPI(s.handler.downloader, s.eventMux),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "mbl",
 			Version:   "1.0",
 			Service:   filters.NewPublicFilterAPI(s.ApiBackend, true, 5*time.Minute),
 			Public:    true,
@@ -367,7 +367,7 @@ func (s *Lightmbali) Start() error {
 	s.serverPool.AddSource(discovery)
 	s.serverPool.Start()
 	// Start bloom request workers.
-	s.wg.Add(bloomServiceThreads)
+	s.wg.Add(bloomServicmblreads)
 	s.startBloomHandlers(params.BloomBitsBlocksClient)
 	s.handler.start()
 

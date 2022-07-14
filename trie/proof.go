@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 )
 
@@ -33,7 +33,7 @@ import (
 // If the trie does not contain a value for key, the returned proof contains all
 // nodes of the longest existing prefix of the key (at least the root node), ending
 // with the node that proves the absence of the key.
-func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) error {
+func (t *Trie) Prove(key []byte, fromLevel uint, proofDb mbldb.KeyValueWriter) error {
 	// Collect all nodes on the path to key.
 	key = keybytesToHex(key)
 	var nodes []node
@@ -94,14 +94,14 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 // If the trie does not contain a value for key, the returned proof contains all
 // nodes of the longest existing prefix of the key (at least the root node), ending
 // with the node that proves the absence of the key.
-func (t *SecureTrie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) error {
+func (t *SecureTrie) Prove(key []byte, fromLevel uint, proofDb mbldb.KeyValueWriter) error {
 	return t.trie.Prove(key, fromLevel, proofDb)
 }
 
 // VerifyProof checks merkle proofs. The given proof must contain the value for
 // key in a trie with the given root hash. VerifyProof returns an error if the
 // proof contains invalid trie nodes or the wrong value.
-func VerifyProof(rootHash common.Hash, key []byte, proofDb ethdb.KeyValueReader) (value []byte, err error) {
+func VerifyProof(rootHash common.Hash, key []byte, proofDb mbldb.KeyValueReader) (value []byte, err error) {
 	key = keybytesToHex(key)
 	wantHash := rootHash
 	for i := 0; ; i++ {
@@ -132,7 +132,7 @@ func VerifyProof(rootHash common.Hash, key []byte, proofDb ethdb.KeyValueReader)
 // necessary nodes will be resolved and leave the remaining as hashnode.
 //
 // The given edge proof is allowed to be an existent or non-existent proof.
-func proofToPath(rootHash common.Hash, root node, key []byte, proofDb ethdb.KeyValueReader, allowNonExistent bool) (node, []byte, error) {
+func proofToPath(rootHash common.Hash, root node, key []byte, proofDb mbldb.KeyValueReader, allowNonExistent bool) (node, []byte, error) {
 	// resolveNode retrieves and resolves trie node from merkle proof stream
 	resolveNode := func(hash common.Hash) (node, error) {
 		buf, _ := proofDb.Get(hash[:])
@@ -403,7 +403,7 @@ func unset(parent node, child node, key []byte, pos int, removeLeft bool) error 
 	}
 }
 
-// hasRightElement returns the indicator whether there exists more elements
+// hasRightElement returns the indicator whmbler there exists more elements
 // on the right side of the given path. The given path can point to an existent
 // key or a non-existent one. This function has the assumption that the whole
 // path should already be resolved.
@@ -432,7 +432,7 @@ func hasRightElement(node node, key []byte) bool {
 	return false
 }
 
-// VerifyRangeProof checks whether the given leaf nodes and edge proof
+// VerifyRangeProof checks whmbler the given leaf nodes and edge proof
 // can prove the given trie leaves range is matched with the specific root.
 // Besides, the range should be consecutive (no gap inside) and monotonic
 // increasing.
@@ -461,12 +461,12 @@ func hasRightElement(node node, key []byte) bool {
 //   an error will be returned.
 //
 // Except returning the error to indicate the proof is valid or not, the function will
-// also return a flag to indicate whether there exists more accounts/slots in the trie.
+// also return a flag to indicate whmbler there exists more accounts/slots in the trie.
 //
-// Note: This method does not verify that the proof is of minimal form. If the input
+// Note: This mmblod does not verify that the proof is of minimal form. If the input
 // proofs are 'bloated' with neighbour leaves or random data, aside from the 'useful'
 // data, then the proof will still be accepted.
-func VerifyRangeProof(rootHash common.Hash, firstKey []byte, lastKey []byte, keys [][]byte, values [][]byte, proof ethdb.KeyValueReader) (bool, error) {
+func VerifyRangeProof(rootHash common.Hash, firstKey []byte, lastKey []byte, keys [][]byte, values [][]byte, proof mbldb.KeyValueReader) (bool, error) {
 	if len(keys) != len(values) {
 		return false, fmt.Errorf("inconsistent proof data, keys: %d, values: %d", len(keys), len(values))
 	}

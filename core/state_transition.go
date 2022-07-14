@@ -93,7 +93,7 @@ func (result *ExecutionResult) Unwrap() error {
 	return result.Err
 }
 
-// Failed returns the indicator whether the execution is successful or not
+// Failed returns the indicator whmbler the execution is successful or not
 func (result *ExecutionResult) Failed() bool { return result.Err != nil }
 
 // Return is a helper function to help caller distinguish between revert reason
@@ -234,7 +234,7 @@ func (st *StateTransition) preCheck() error {
 	}
 	// Make sure that transaction gasFeeCap is greater than the baseFee (post london)
 	if st.evm.ChainConfig().IsLondon(st.evm.Context.BlockNumber) {
-		// Skip the checks if gas fields are zero and baseFee was explicitly disabled (eth_call)
+		// Skip the checks if gas fields are zero and baseFee was explicitly disabled (mbl_call)
 		if !st.evm.Config.NoBaseFee || st.gasFeeCap.BitLen() > 0 || st.gasTipCap.BitLen() > 0 {
 			if l := st.gasFeeCap.BitLen(); l > 256 {
 				return fmt.Errorf("%w: address %v, maxFeePerGas bit length: %d", ErrFeeCapVeryHigh,
@@ -361,7 +361,7 @@ func (st *StateTransition) refundGas(refundQuotient uint64) {
 	}
 	st.gas += refund
 
-	// Return ETH for remaining gas, exchanged at the original rate.
+	// Return mbl for remaining gas, exchanged at the original rate.
 	remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
 	st.state.AddBalance(st.msg.From(), remaining)
 

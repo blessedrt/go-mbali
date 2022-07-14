@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-package ethtest
+package mbltest
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/protocols/snap"
+	"github.com/mbali/go-mbali/mbl/protocols/snap"
 	"github.com/mbali/go-mbali/internal/utesting"
 	"github.com/mbali/go-mbali/light"
 	"github.com/mbali/go-mbali/trie"
@@ -312,7 +312,7 @@ func decodeNibbles(nibbles []byte, bytes []byte) {
 	}
 }
 
-// hasTerm returns whether a hex key has the terminator flag.
+// hasTerm returns whmbler a hex key has the terminator flag.
 func hasTerm(s []byte) bool {
 	return len(s) > 0 && s[len(s)-1] == 16
 }

@@ -1,6 +1,6 @@
 ---
 name: Report a bug
-about: Something with go-mbali is not working as expected
+about: Sommbling with go-mbali is not working as expected
 title: ''
 labels: 'type:bug'
 assignees: ''

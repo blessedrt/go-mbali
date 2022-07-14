@@ -28,7 +28,7 @@ import (
 	"github.com/mbali/go-mbali/common/mclock"
 	"github.com/mbali/go-mbali/core/forkid"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/protocols/eth"
+	"github.com/mbali/go-mbali/mbl/protocols/mbl"
 	"github.com/mbali/go-mbali/les/downloader"
 	"github.com/mbali/go-mbali/light"
 	"github.com/mbali/go-mbali/log"
@@ -481,7 +481,7 @@ func (d *downloaderPeerNotify) registerPeer(p *serverPeer) {
 		handler: h,
 		peer:    p,
 	}
-	h.downloader.RegisterLightPeer(p.id, eth.ETH66, pc)
+	h.downloader.RegisterLightPeer(p.id, mbl.mbl66, pc)
 }
 
 func (d *downloaderPeerNotify) unregisterPeer(p *serverPeer) {

@@ -25,7 +25,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/trie"
 	"golang.org/x/crypto/sha3"
 )
@@ -64,9 +64,9 @@ type spongeDb struct {
 func (s *spongeDb) Has(key []byte) (bool, error)             { panic("implement me") }
 func (s *spongeDb) Get(key []byte) ([]byte, error)           { return nil, errors.New("no such elem") }
 func (s *spongeDb) Delete(key []byte) error                  { panic("implement me") }
-func (s *spongeDb) NewBatch() ethdb.Batch                    { return &spongeBatch{s} }
-func (s *spongeDb) NewBatchWithSize(size int) ethdb.Batch    { return &spongeBatch{s} }
-func (s *spongeDb) NewSnapshot() (ethdb.Snapshot, error)     { panic("implement me") }
+func (s *spongeDb) NewBatch() mbldb.Batch                    { return &spongeBatch{s} }
+func (s *spongeDb) NewBatchWithSize(size int) mbldb.Batch    { return &spongeBatch{s} }
+func (s *spongeDb) NewSnapshot() (mbldb.Snapshot, error)     { panic("implement me") }
 func (s *spongeDb) Stat(property string) (string, error)     { panic("implement me") }
 func (s *spongeDb) Compact(start []byte, limit []byte) error { panic("implement me") }
 func (s *spongeDb) Close() error                             { return nil }
@@ -79,7 +79,7 @@ func (s *spongeDb) Put(key []byte, value []byte) error {
 	s.sponge.Write(value)
 	return nil
 }
-func (s *spongeDb) NewIterator(prefix []byte, start []byte) ethdb.Iterator { panic("implement me") }
+func (s *spongeDb) NewIterator(prefix []byte, start []byte) mbldb.Iterator { panic("implement me") }
 
 // spongeBatch is a dummy batch which immediately writes to the underlying spongedb
 type spongeBatch struct {
@@ -94,7 +94,7 @@ func (b *spongeBatch) Delete(key []byte) error             { panic("implement me
 func (b *spongeBatch) ValueSize() int                      { return 100 }
 func (b *spongeBatch) Write() error                        { return nil }
 func (b *spongeBatch) Reset()                              {}
-func (b *spongeBatch) Replay(w ethdb.KeyValueWriter) error { return nil }
+func (b *spongeBatch) Replay(w mbldb.KeyValueWriter) error { return nil }
 
 type kv struct {
 	k, v []byte

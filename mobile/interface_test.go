@@ -27,7 +27,7 @@ import (
 
 func TestInterfaceGetSet(t *testing.T) {
 	var tests = []struct {
-		method string
+		mmblod string
 		input  interface{}
 		expect interface{}
 	}{
@@ -64,10 +64,10 @@ func TestInterfaceGetSet(t *testing.T) {
 
 	args := NewInterfaces(len(tests))
 
-	callFn := func(receiver interface{}, method string, arg interface{}) interface{} {
+	callFn := func(receiver interface{}, mmblod string, arg interface{}) interface{} {
 		rval := reflect.ValueOf(receiver)
-		rval.MethodByName(fmt.Sprintf("Set%s", method)).Call([]reflect.Value{reflect.ValueOf(arg)})
-		res := rval.MethodByName(fmt.Sprintf("Get%s", method)).Call(nil)
+		rval.MmblodByName(fmt.Sprintf("Set%s", mmblod)).Call([]reflect.Value{reflect.ValueOf(arg)})
+		res := rval.MmblodByName(fmt.Sprintf("Get%s", mmblod)).Call(nil)
 		if len(res) > 0 {
 			return res[0].Interface()
 		}
@@ -77,11 +77,11 @@ func TestInterfaceGetSet(t *testing.T) {
 	for index, c := range tests {
 		// In theory the change of iface shouldn't effect the args value
 		iface, _ := args.Get(index)
-		result := callFn(iface, c.method, c.input)
+		result := callFn(iface, c.mmblod, c.input)
 		if !reflect.DeepEqual(result, c.expect) {
 			t.Errorf("Interface get/set mismatch, want %v, got %v", c.expect, result)
 		}
-		// Check whether the underlying value in args is still zero
+		// Check whmbler the underlying value in args is still zero
 		iface, _ = args.Get(index)
 		if iface.object != nil {
 			t.Error("Get operation is not write safe")

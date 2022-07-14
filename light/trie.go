@@ -26,7 +26,7 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/trie"
 )
@@ -159,7 +159,7 @@ func (t *odrTrie) GetKey(sha []byte) []byte {
 	return nil
 }
 
-func (t *odrTrie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) error {
+func (t *odrTrie) Prove(key []byte, fromLevel uint, proofDb mbldb.KeyValueWriter) error {
 	return errors.New("not implemented, needs client/server interface split")
 }
 

@@ -29,11 +29,11 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/consensus"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/params"
 )
 
@@ -51,8 +51,8 @@ type snapshotTestBasic struct {
 
 	// share fields, set in runtime
 	datadir string
-	db      ethdb.Database
-	gendb   ethdb.Database
+	db      mbldb.Database
+	gendb   mbldb.Database
 	engine  consensus.Engine
 }
 
@@ -67,7 +67,7 @@ func (basic *snapshotTestBasic) prepare(t *testing.T) (*BlockChain, []*types.Blo
 	// Initialize a fresh chain
 	var (
 		genesis = (&Genesis{BaseFee: big.NewInt(params.InitialBaseFee)}).MustCommit(db)
-		engine  = ethash.NewFullFaker()
+		engine  = mblash.NewFullFaker()
 		gendb   = rawdb.NewMemoryDatabase()
 
 		// Snapshot is enabled, the first snapshot is created from the Genesis.
@@ -75,7 +75,7 @@ func (basic *snapshotTestBasic) prepare(t *testing.T) (*BlockChain, []*types.Blo
 		// will happen during the block insertion.
 		cacheConfig = defaultCacheConfig
 	)
-	chain, err := NewBlockChain(db, cacheConfig, params.AllEthashProtocolChanges, engine, vm.Config{}, nil, nil)
+	chain, err := NewBlockChain(db, cacheConfig, params.AllmblashProtocolChanges, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to create chain: %v", err)
 	}
@@ -174,7 +174,7 @@ func (basic *snapshotTestBasic) dump() string {
 	//if crash {
 	//	fmt.Fprintf(buffer, "\nCRASH\n\n")
 	//} else {
-	//	fmt.Fprintf(buffer, "\nSetHead(%d)\n\n", basic.setHead)
+	//	fmt.Fprintf(buffer, "\nSmblead(%d)\n\n", basic.smblead)
 	//}
 	fmt.Fprintf(buffer, "------------------------------\n\n")
 
@@ -212,13 +212,13 @@ type snapshotTest struct {
 
 func (snaptest *snapshotTest) test(t *testing.T) {
 	// It's hard to follow the test case, visualize the input
-	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	// fmt.Println(tt.dump())
 	chain, blocks := snaptest.prepare(t)
 
 	// Restart the chain normally
 	chain.Stop()
-	newchain, err := NewBlockChain(snaptest.db, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err := NewBlockChain(snaptest.db, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -235,7 +235,7 @@ type crashSnapshotTest struct {
 
 func (snaptest *crashSnapshotTest) test(t *testing.T) {
 	// It's hard to follow the test case, visualize the input
-	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	// fmt.Println(tt.dump())
 	chain, blocks := snaptest.prepare(t)
 
@@ -254,13 +254,13 @@ func (snaptest *crashSnapshotTest) test(t *testing.T) {
 	// the crash, we do restart twice here: one after the crash and one
 	// after the normal stop. It's used to ensure the broken snapshot
 	// can be detected all the time.
-	newchain, err := NewBlockChain(newdb, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err := NewBlockChain(newdb, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
 	newchain.Stop()
 
-	newchain, err = NewBlockChain(newdb, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err = NewBlockChain(newdb, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -281,7 +281,7 @@ type gappedSnapshotTest struct {
 
 func (snaptest *gappedSnapshotTest) test(t *testing.T) {
 	// It's hard to follow the test case, visualize the input
-	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	// fmt.Println(tt.dump())
 	chain, blocks := snaptest.prepare(t)
 
@@ -296,7 +296,7 @@ func (snaptest *gappedSnapshotTest) test(t *testing.T) {
 		TrieTimeLimit:  5 * time.Minute,
 		SnapshotLimit:  0,
 	}
-	newchain, err := NewBlockChain(snaptest.db, cacheConfig, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err := NewBlockChain(snaptest.db, cacheConfig, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -304,7 +304,7 @@ func (snaptest *gappedSnapshotTest) test(t *testing.T) {
 	newchain.Stop()
 
 	// Restart the chain with enabling the snapshot
-	newchain, err = NewBlockChain(snaptest.db, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err = NewBlockChain(snaptest.db, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -313,26 +313,26 @@ func (snaptest *gappedSnapshotTest) test(t *testing.T) {
 	snaptest.verify(t, newchain, blocks)
 }
 
-// setHeadSnapshotTest is the test type used to test this scenario:
+// smbleadSnapshotTest is the test type used to test this scenario:
 // - have a complete snapshot
 // - set the head to a lower point
 // - restart
-type setHeadSnapshotTest struct {
+type smbleadSnapshotTest struct {
 	snapshotTestBasic
-	setHead uint64 // Block number to set head back to
+	smblead uint64 // Block number to set head back to
 }
 
-func (snaptest *setHeadSnapshotTest) test(t *testing.T) {
+func (snaptest *smbleadSnapshotTest) test(t *testing.T) {
 	// It's hard to follow the test case, visualize the input
-	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	// fmt.Println(tt.dump())
 	chain, blocks := snaptest.prepare(t)
 
-	// Rewind the chain if setHead operation is required.
-	chain.SetHead(snaptest.setHead)
+	// Rewind the chain if smblead operation is required.
+	chain.Smblead(snaptest.smblead)
 	chain.Stop()
 
-	newchain, err := NewBlockChain(snaptest.db, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err := NewBlockChain(snaptest.db, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -355,7 +355,7 @@ type restartCrashSnapshotTest struct {
 
 func (snaptest *restartCrashSnapshotTest) test(t *testing.T) {
 	// It's hard to follow the test case, visualize the input
-	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	// fmt.Println(tt.dump())
 	chain, blocks := snaptest.prepare(t)
 
@@ -363,7 +363,7 @@ func (snaptest *restartCrashSnapshotTest) test(t *testing.T) {
 	// and state committed.
 	chain.Stop()
 
-	newchain, err := NewBlockChain(snaptest.db, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err := NewBlockChain(snaptest.db, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -380,7 +380,7 @@ func (snaptest *restartCrashSnapshotTest) test(t *testing.T) {
 	// journal and latest state will be committed
 
 	// Restart the chain after the crash
-	newchain, err = NewBlockChain(snaptest.db, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err = NewBlockChain(snaptest.db, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -401,7 +401,7 @@ type wipeCrashSnapshotTest struct {
 
 func (snaptest *wipeCrashSnapshotTest) test(t *testing.T) {
 	// It's hard to follow the test case, visualize the input
-	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().Smblandler(log.LvlFilterHandler(log.LvlTrace, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 	// fmt.Println(tt.dump())
 	chain, blocks := snaptest.prepare(t)
 
@@ -415,7 +415,7 @@ func (snaptest *wipeCrashSnapshotTest) test(t *testing.T) {
 		TrieTimeLimit:  5 * time.Minute,
 		SnapshotLimit:  0,
 	}
-	newchain, err := NewBlockChain(snaptest.db, config, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err := NewBlockChain(snaptest.db, config, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -431,13 +431,13 @@ func (snaptest *wipeCrashSnapshotTest) test(t *testing.T) {
 		SnapshotLimit:  256,
 		SnapshotWait:   false, // Don't wait rebuild
 	}
-	newchain, err = NewBlockChain(snaptest.db, config, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err = NewBlockChain(snaptest.db, config, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
 	// Simulate the blockchain crash.
 
-	newchain, err = NewBlockChain(snaptest.db, nil, params.AllEthashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
+	newchain, err = NewBlockChain(snaptest.db, nil, params.AllmblashProtocolChanges, snaptest.engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to recreate chain: %v", err)
 	}
@@ -454,7 +454,7 @@ func TestRestartWithNewSnapshot(t *testing.T) {
 	// Commit:   G
 	// Snapshot: G
 	//
-	// SetHead(0)
+	// Smblead(0)
 	//
 	// ------------------------------
 	//
@@ -608,7 +608,7 @@ func TestGappedNewSnapshot(t *testing.T) {
 	// Commit:   G
 	// Snapshot: G
 	//
-	// SetHead(0)
+	// Smblead(0)
 	//
 	// ------------------------------
 	//
@@ -636,17 +636,17 @@ func TestGappedNewSnapshot(t *testing.T) {
 	test.teardown()
 }
 
-// Tests the gombl was running with snapshot enabled and resetHead is applied.
+// Tests the gombl was running with snapshot enabled and resmblead is applied.
 // In this case the head is rewound to the target(with state available). After
 // that the chain is restarted and the original disk layer is kept.
-func TestSetHeadWithNewSnapshot(t *testing.T) {
+func TestSmbleadWithNewSnapshot(t *testing.T) {
 	// Chain:
 	//   G->C1->C2->C3->C4->C5->C6->C7->C8 (HEAD)
 	//
 	// Commit:   G
 	// Snapshot: G
 	//
-	// SetHead(4)
+	// Smblead(4)
 	//
 	// ------------------------------
 	//
@@ -657,7 +657,7 @@ func TestSetHeadWithNewSnapshot(t *testing.T) {
 	// Expected head fast block: C4
 	// Expected head block     : C4
 	// Expected snapshot disk  : G
-	test := &setHeadSnapshotTest{
+	test := &smbleadSnapshotTest{
 		snapshotTestBasic: snapshotTestBasic{
 			chainBlocks:        8,
 			snapshotBlock:      0,
@@ -668,7 +668,7 @@ func TestSetHeadWithNewSnapshot(t *testing.T) {
 			expHeadBlock:       4,
 			expSnapshotBottom:  0, // The initial disk layer is built from the genesis
 		},
-		setHead: 4,
+		smblead: 4,
 	}
 	test.test(t)
 	test.teardown()
@@ -684,7 +684,7 @@ func TestRecoverSnapshotFromWipingCrash(t *testing.T) {
 	// Commit:   G
 	// Snapshot: G
 	//
-	// SetHead(0)
+	// Smblead(0)
 	//
 	// ------------------------------
 	//

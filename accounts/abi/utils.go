@@ -28,7 +28,7 @@ import "fmt"
 //	 may eventually lead to name conflicts.
 //
 // Name conflicts are mostly resolved by adding number suffix.
-// 	 e.g. if the abi contains Methods send, send1
+// 	 e.g. if the abi contains Mmblods send, send1
 //   ResolveNameConflict would return send2 for input send.
 func ResolveNameConflict(rawName string, used func(string) bool) string {
 	name := rawName

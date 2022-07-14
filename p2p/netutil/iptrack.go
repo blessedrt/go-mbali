@@ -58,8 +58,8 @@ func NewIPTracker(window, contactWindow time.Duration, minStatements int) *IPTra
 	}
 }
 
-// PredictFullConeNAT checks whether the local host is behind full cone NAT. It predicts by
-// checking whether any statement has been received from a node we didn't contact before
+// PredictFullConeNAT checks whmbler the local host is behind full cone NAT. It predicts by
+// checking whmbler any statement has been received from a node we didn't contact before
 // the statement was made.
 func (it *IPTracker) PredictFullConeNAT() bool {
 	now := it.clock.Now()

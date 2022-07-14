@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-package ethtest
+package mbltest
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/protocols/eth"
+	"github.com/mbali/go-mbali/mbl/protocols/mbl"
 	"github.com/mbali/go-mbali/internal/utesting"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/p2p/rlpx"
@@ -43,7 +43,7 @@ var (
 	timeout = 20 * time.Second
 )
 
-// Is_66 checks if the node supports the eth66 protocol version,
+// Is_66 checks if the node supports the mbl66 protocol version,
 // and if not, exists the test suite
 func (s *Suite) Is_66(t *utesting.T) {
 	conn, err := s.dial66()
@@ -76,22 +76,22 @@ func (s *Suite) dial() (*Conn, error) {
 	}
 	// set default p2p capabilities
 	conn.caps = []p2p.Cap{
-		{Name: "eth", Version: 64},
-		{Name: "eth", Version: 65},
+		{Name: "mbl", Version: 64},
+		{Name: "mbl", Version: 65},
 	}
 	conn.ourHighestProtoVersion = 65
 	return &conn, nil
 }
 
 // dial66 attempts to dial the given node and perform a handshake,
-// returning the created Conn with additional eth66 capabilities if
+// returning the created Conn with additional mbl66 capabilities if
 // successful
 func (s *Suite) dial66() (*Conn, error) {
 	conn, err := s.dial()
 	if err != nil {
 		return nil, fmt.Errorf("dial failed: %v", err)
 	}
-	conn.caps = append(conn.caps, p2p.Cap{Name: "eth", Version: 66})
+	conn.caps = append(conn.caps, p2p.Cap{Name: "mbl", Version: 66})
 	conn.ourHighestProtoVersion = 66
 	return conn, nil
 }
@@ -142,9 +142,9 @@ func (c *Conn) handshake() error {
 		if msg.Version >= 5 {
 			c.SetSnappy(true)
 		}
-		c.negotiateEthProtocol(msg.Caps)
+		c.negotiatemblProtocol(msg.Caps)
 		if c.negotiatedProtoVersion == 0 {
-			return fmt.Errorf("could not negotiate eth protocol (remote caps: %v, local eth version: %v)", msg.Caps, c.ourHighestProtoVersion)
+			return fmt.Errorf("could not negotiate mbl protocol (remote caps: %v, local mbl version: %v)", msg.Caps, c.ourHighestProtoVersion)
 		}
 		// If we require snap, verify that it was negotiated
 		if c.ourHighestSnapProtoVersion != c.negotiatedSnapProtoVersion {
@@ -156,16 +156,16 @@ func (c *Conn) handshake() error {
 	}
 }
 
-// negotiateEthProtocol sets the Conn's eth protocol version to highest
+// negotiatemblProtocol sets the Conn's mbl protocol version to highest
 // advertised capability from peer.
-func (c *Conn) negotiateEthProtocol(caps []p2p.Cap) {
-	var highestEthVersion uint
+func (c *Conn) negotiatemblProtocol(caps []p2p.Cap) {
+	var highestmblVersion uint
 	var highestSnapVersion uint
 	for _, capability := range caps {
 		switch capability.Name {
-		case "eth":
-			if capability.Version > highestEthVersion && capability.Version <= c.ourHighestProtoVersion {
-				highestEthVersion = capability.Version
+		case "mbl":
+			if capability.Version > highestmblVersion && capability.Version <= c.ourHighestProtoVersion {
+				highestmblVersion = capability.Version
 			}
 		case "snap":
 			if capability.Version > highestSnapVersion && capability.Version <= c.ourHighestSnapProtoVersion {
@@ -173,7 +173,7 @@ func (c *Conn) negotiateEthProtocol(caps []p2p.Cap) {
 			}
 		}
 	}
-	c.negotiatedProtoVersion = highestEthVersion
+	c.negotiatedProtoVersion = highestmblVersion
 	c.negotiatedSnapProtoVersion = highestSnapVersion
 }
 
@@ -212,9 +212,9 @@ loop:
 			return nil, fmt.Errorf("bad status message: %s", pretty.Sdump(msg))
 		}
 	}
-	// make sure eth protocol version is set for negotiation
+	// make sure mbl protocol version is set for negotiation
 	if c.negotiatedProtoVersion == 0 {
-		return nil, fmt.Errorf("eth protocol version must be set in Conn")
+		return nil, fmt.Errorf("mbl protocol version must be set in Conn")
 	}
 	if status == nil {
 		// default status message
@@ -235,13 +235,13 @@ loop:
 
 // createSendAndRecvConns creates two connections, one for sending messages to the
 // node, and one for receiving messages from the node.
-func (s *Suite) createSendAndRecvConns(isEth66 bool) (*Conn, *Conn, error) {
+func (s *Suite) createSendAndRecvConns(ismbl66 bool) (*Conn, *Conn, error) {
 	var (
 		sendConn *Conn
 		recvConn *Conn
 		err      error
 	)
-	if isEth66 {
+	if ismbl66 {
 		sendConn, err = s.dial66()
 		if err != nil {
 			return nil, nil, fmt.Errorf("dial failed: %v", err)
@@ -298,7 +298,7 @@ func (c *Conn) readAndServe65(chain *Chain, timeout time.Duration) Message {
 	return errorf("no message received within %v", timeout)
 }
 
-// readAndServe66 serves eth66 GetBlockHeaders requests while waiting
+// readAndServe66 serves mbl66 GetBlockHeaders requests while waiting
 // on another message from the node.
 func (c *Conn) readAndServe66(chain *Chain, timeout time.Duration) (uint64, Message) {
 	start := time.Now()
@@ -315,9 +315,9 @@ func (c *Conn) readAndServe66(chain *Chain, timeout time.Duration) (uint64, Mess
 			if err != nil {
 				return 0, errorf("could not get headers for inbound header request: %v", err)
 			}
-			resp := &eth.BlockHeadersPacket66{
+			resp := &mbl.BlockHeadersPacket66{
 				RequestId:          reqID,
-				BlockHeadersPacket: eth.BlockHeadersPacket(headers),
+				BlockHeadersPacket: mbl.BlockHeadersPacket(headers),
 			}
 			if err := c.Write66(resp, BlockHeaders{}.Code()); err != nil {
 				return 0, errorf("could not write to connection: %v", err)
@@ -330,11 +330,11 @@ func (c *Conn) readAndServe66(chain *Chain, timeout time.Duration) (uint64, Mess
 }
 
 // headersRequest executes the given `GetBlockHeaders` request.
-func (c *Conn) headersRequest(request *GetBlockHeaders, chain *Chain, isEth66 bool, reqID uint64) (BlockHeaders, error) {
+func (c *Conn) headersRequest(request *GetBlockHeaders, chain *Chain, ismbl66 bool, reqID uint64) (BlockHeaders, error) {
 	defer c.SetReadDeadline(time.Time{})
 	c.SetReadDeadline(time.Now().Add(20 * time.Second))
-	// if on eth66 connection, perform eth66 GetBlockHeaders request
-	if isEth66 {
+	// if on mbl66 connection, perform mbl66 GetBlockHeaders request
+	if ismbl66 {
 		return getBlockHeaders66(chain, c, request, reqID)
 	}
 	if err := c.Write(request); err != nil {
@@ -357,11 +357,11 @@ func (c *Conn) snapRequest(msg Message, id uint64, chain *Chain) (Message, error
 	return c.ReadSnap(id)
 }
 
-// getBlockHeaders66 executes the given `GetBlockHeaders` request over the eth66 protocol.
+// getBlockHeaders66 executes the given `GetBlockHeaders` request over the mbl66 protocol.
 func getBlockHeaders66(chain *Chain, conn *Conn, request *GetBlockHeaders, id uint64) (BlockHeaders, error) {
 	// write request
-	packet := eth.GetBlockHeadersPacket(*request)
-	req := &eth.GetBlockHeadersPacket66{
+	packet := mbl.GetBlockHeadersPacket(*request)
+	req := &mbl.GetBlockHeadersPacket66{
 		RequestId:             id,
 		GetBlockHeadersPacket: &packet,
 	}
@@ -377,7 +377,7 @@ func getBlockHeaders66(chain *Chain, conn *Conn, request *GetBlockHeaders, id ui
 	return headers, nil
 }
 
-// headersMatch returns whether the received headers match the given request
+// headersMatch returns whmbler the received headers match the given request
 func headersMatch(expected BlockHeaders, headers BlockHeaders) bool {
 	return reflect.DeepEqual(expected, headers)
 }
@@ -395,9 +395,9 @@ func (c *Conn) waitForResponse(chain *Chain, timeout time.Duration, requestID ui
 
 // sendNextBlock broadcasts the next block in the chain and waits
 // for the node to propagate the block and import it into its chain.
-func (s *Suite) sendNextBlock(isEth66 bool) error {
+func (s *Suite) sendNextBlock(ismbl66 bool) error {
 	// set up sending and receiving connections
-	sendConn, recvConn, err := s.createSendAndRecvConns(isEth66)
+	sendConn, recvConn, err := s.createSendAndRecvConns(ismbl66)
 	if err != nil {
 		return err
 	}
@@ -420,7 +420,7 @@ func (s *Suite) sendNextBlock(isEth66 bool) error {
 		return fmt.Errorf("failed to announce block: %v", err)
 	}
 	// wait for client to update its chain
-	if err = s.waitForBlockImport(recvConn, nextBlock, isEth66); err != nil {
+	if err = s.waitForBlockImport(recvConn, nextBlock, ismbl66); err != nil {
 		return fmt.Errorf("failed to receive confirmation of block import: %v", err)
 	}
 	// update test suite chain
@@ -465,12 +465,12 @@ func (s *Suite) waitAnnounce(conn *Conn, blockAnnouncement *NewBlock) error {
 	}
 }
 
-func (s *Suite) waitForBlockImport(conn *Conn, block *types.Block, isEth66 bool) error {
+func (s *Suite) waitForBlockImport(conn *Conn, block *types.Block, ismbl66 bool) error {
 	defer conn.SetReadDeadline(time.Time{})
 	conn.SetReadDeadline(time.Now().Add(20 * time.Second))
 	// create request
 	req := &GetBlockHeaders{
-		Origin: eth.HashOrNumber{
+		Origin: mbl.HashOrNumber{
 			Hash: block.Hash(),
 		},
 		Amount: 1,
@@ -482,11 +482,11 @@ func (s *Suite) waitForBlockImport(conn *Conn, block *types.Block, isEth66 bool)
 			headers BlockHeaders
 			err     error
 		)
-		if isEth66 {
+		if ismbl66 {
 			requestID := uint64(54)
-			headers, err = conn.headersRequest(req, s.chain, eth66, requestID)
+			headers, err = conn.headersRequest(req, s.chain, mbl66, requestID)
 		} else {
-			headers, err = conn.headersRequest(req, s.chain, eth65, 0)
+			headers, err = conn.headersRequest(req, s.chain, mbl65, 0)
 		}
 		if err != nil {
 			return fmt.Errorf("GetBlockHeader request failed: %v", err)
@@ -503,8 +503,8 @@ func (s *Suite) waitForBlockImport(conn *Conn, block *types.Block, isEth66 bool)
 	}
 }
 
-func (s *Suite) oldAnnounce(isEth66 bool) error {
-	sendConn, receiveConn, err := s.createSendAndRecvConns(isEth66)
+func (s *Suite) oldAnnounce(ismbl66 bool) error {
+	sendConn, receiveConn, err := s.createSendAndRecvConns(ismbl66)
 	if err != nil {
 		return err
 	}
@@ -550,12 +550,12 @@ func (s *Suite) oldAnnounce(isEth66 bool) error {
 	return nil
 }
 
-func (s *Suite) maliciousHandshakes(t *utesting.T, isEth66 bool) error {
+func (s *Suite) maliciousHandshakes(t *utesting.T, ismbl66 bool) error {
 	var (
 		conn *Conn
 		err  error
 	)
-	if isEth66 {
+	if ismbl66 {
 		conn, err = s.dial66()
 		if err != nil {
 			return fmt.Errorf("dial failed: %v", err)
@@ -580,24 +580,24 @@ func (s *Suite) maliciousHandshakes(t *utesting.T, isEth66 bool) error {
 		{
 			Version: 5,
 			Caps: []p2p.Cap{
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			ID: append(pub0, byte(0)),
 		},
 		{
 			Version: 5,
 			Caps: []p2p.Cap{
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			ID: append(pub0, pub0...),
 		},
 		{
 			Version: 5,
 			Caps: []p2p.Cap{
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			ID: largeBuffer(2),
 		},
@@ -627,7 +627,7 @@ func (s *Suite) maliciousHandshakes(t *utesting.T, isEth66 bool) error {
 			}
 		}
 		// dial for the next round
-		if isEth66 {
+		if ismbl66 {
 			conn, err = s.dial66()
 			if err != nil {
 				return fmt.Errorf("dial failed: %v", err)
@@ -675,9 +675,9 @@ func (s *Suite) maliciousStatus(conn *Conn) error {
 	}
 }
 
-func (s *Suite) hashAnnounce(isEth66 bool) error {
+func (s *Suite) hashAnnounce(ismbl66 bool) error {
 	// create connections
-	sendConn, recvConn, err := s.createSendAndRecvConns(isEth66)
+	sendConn, recvConn, err := s.createSendAndRecvConns(ismbl66)
 	if err != nil {
 		return fmt.Errorf("failed to create connections: %v", err)
 	}
@@ -706,7 +706,7 @@ func (s *Suite) hashAnnounce(isEth66 bool) error {
 		msg            Message
 		blockHeaderReq GetBlockHeaders
 	)
-	if isEth66 {
+	if ismbl66 {
 		id, msg = sendConn.Read66()
 		switch msg := msg.(type) {
 		case GetBlockHeaders:
@@ -722,9 +722,9 @@ func (s *Suite) hashAnnounce(isEth66 bool) error {
 				pretty.Sdump(announcement),
 				pretty.Sdump(blockHeaderReq))
 		}
-		if err := sendConn.Write66(&eth.BlockHeadersPacket66{
+		if err := sendConn.Write66(&mbl.BlockHeadersPacket66{
 			RequestId: id,
-			BlockHeadersPacket: eth.BlockHeadersPacket{
+			BlockHeadersPacket: mbl.BlockHeadersPacket{
 				nextBlock.Header(),
 			},
 		}, BlockHeaders{}.Code()); err != nil {
@@ -780,7 +780,7 @@ func (s *Suite) hashAnnounce(isEth66 bool) error {
 		return fmt.Errorf("unexpected: %s", pretty.Sdump(msg))
 	}
 	// confirm node imported block
-	if err := s.waitForBlockImport(recvConn, nextBlock, isEth66); err != nil {
+	if err := s.waitForBlockImport(recvConn, nextBlock, ismbl66); err != nil {
 		return fmt.Errorf("error waiting for node to import new block: %v", err)
 	}
 	// update the chain

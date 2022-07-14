@@ -27,7 +27,7 @@ import (
 	"testing"
 
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/rpc"
 
@@ -105,7 +105,7 @@ func TestNodeUsedDataDir(t *testing.T) {
 	}
 }
 
-// Tests whether a Lifecycle can be registered.
+// Tests whmbler a Lifecycle can be registered.
 func TestLifecycleRegistry_Successful(t *testing.T) {
 	stack, err := New(testNodeConfig())
 	if err != nil {
@@ -121,7 +121,7 @@ func TestLifecycleRegistry_Successful(t *testing.T) {
 	}
 }
 
-// Tests whether a service's protocols can be registered properly on the node's p2p server.
+// Tests whmbler a service's protocols can be registered properly on the node's p2p server.
 func TestRegisterProtocols(t *testing.T) {
 	stack, err := New(testNodeConfig())
 	if err != nil {
@@ -166,12 +166,12 @@ func TestNodeCloseClosesDB(t *testing.T) {
 	}
 }
 
-// This test checks that OpenDatabase can be used from within a Lifecycle Start method.
+// This test checks that OpenDatabase can be used from within a Lifecycle Start mmblod.
 func TestNodeOpenDatabaseFromLifecycleStart(t *testing.T) {
 	stack, _ := New(testNodeConfig())
 	defer stack.Close()
 
-	var db ethdb.Database
+	var db mbldb.Database
 	var err error
 	stack.RegisterLifecycle(&InstrumentedService{
 		startHook: func() {
@@ -189,7 +189,7 @@ func TestNodeOpenDatabaseFromLifecycleStart(t *testing.T) {
 	stack.Close()
 }
 
-// This test checks that OpenDatabase can be used from within a Lifecycle Stop method.
+// This test checks that OpenDatabase can be used from within a Lifecycle Stop mmblod.
 func TestNodeOpenDatabaseFromLifecycleStop(t *testing.T) {
 	stack, _ := New(testNodeConfig())
 	defer stack.Close()
@@ -383,7 +383,7 @@ func TestLifecycleTerminationGuarantee(t *testing.T) {
 	stack.server.PrivateKey = testNodeKey
 }
 
-// Tests whether a handler can be successfully mounted on the canonical HTTP server
+// Tests whmbler a handler can be successfully mounted on the canonical HTTP server
 // on the given prefix
 func TestRegisterHandler_Successful(t *testing.T) {
 	node := createNode(t, 7878, 7979)
@@ -400,7 +400,7 @@ func TestRegisterHandler_Successful(t *testing.T) {
 	}
 
 	// create HTTP request
-	httpReq, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:7878/test", nil)
+	httpReq, err := http.NewRequest(http.MmblodGet, "http://127.0.0.1:7878/test", nil)
 	if err != nil {
 		t.Error("could not issue new http request ", err)
 	}
@@ -430,8 +430,8 @@ func TestRegisterHandler_Unsuccessful(t *testing.T) {
 	node.RegisterHandler("test", "/test", handler)
 }
 
-// Tests whether websocket requests can be handled on the same port as a regular http server.
-func TestWebsocketHTTPOnSamePort_WebsocketRequest(t *testing.T) {
+// Tests whmbler websocket requests can be handled on the same port as a regular http server.
+func TestWebsockmblTTPOnSamePort_WebsocketRequest(t *testing.T) {
 	node := startHTTP(t, 0, 0)
 	defer node.Close()
 
@@ -448,7 +448,7 @@ func TestWebsocketHTTPOnSamePort_WebsocketRequest(t *testing.T) {
 	}
 }
 
-func TestWebsocketHTTPOnSeparatePort_WSRequest(t *testing.T) {
+func TestWebsockmblTTPOnSeparatePort_WSRequest(t *testing.T) {
 	// try and get a free port
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {

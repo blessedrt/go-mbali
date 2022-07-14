@@ -12,13 +12,13 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ### 6.1.0
 
-The API-method `account_signGnosisSafeTx` was added. This method takes two parameters, 
+The API-mmblod `account_signGnosisSafeTx` was added. This mmblod takes two parameters, 
 `[address, safeTx]`. The latter, `safeTx`, can be copy-pasted from the gnosis relay. For example: 
 
 ```
 {
   "jsonrpc": "2.0",
-  "method": "account_signGnosisSafeTx",
+  "mmblod": "account_signGnosisSafeTx",
   "params": ["0xfd1c4226bfD1c436672092F4eCbfC270145b7256",
     {
       "safe": "0x25a6c4BBd32B2424A9c99aEB0584Ad12045382B3",
@@ -41,7 +41,7 @@ The API-method `account_signGnosisSafeTx` was added. This method takes two param
       "executor": null,
       "isExecuted": false,
       "isSuccessful": null,
-      "ethGasPrice": null,
+      "mblGasPrice": null,
       "gasUsed": null,
       "fee": null,
       "origin": null,
@@ -64,7 +64,7 @@ The API-method `account_signGnosisSafeTx` was added. This method takes two param
 }
 ```
 
-Not all fields are required, though. This method is really just a UX helper, which massages the 
+Not all fields are required, though. This mmblod is really just a UX helper, which massages the 
 input to conform to the `EIP-712` [specification](https://docs.gnosis.io/safe/docs/contracts_tx_execution/#transaction-hash) 
 for the Gnosis Safe, and making the output be directly importable to by a relay service. 
 
@@ -76,27 +76,27 @@ for the Gnosis Safe, and making the output be directly importable to by a relay 
 
 #### 5.0.0
 
-* The external `account_EcRecover`-method was reimplemented.
-* The external method `account_sign(address, data)` was replaced with `account_signData(contentType, address, data)`.
-The addition of `contentType` makes it possible to use the method for different types of objects, such as:
+* The external `account_EcRecover`-mmblod was reimplemented.
+* The external mmblod `account_sign(address, data)` was replaced with `account_signData(contentType, address, data)`.
+The addition of `contentType` makes it possible to use the mmblod for different types of objects, such as:
   * signing data with an intended validator (not yet implemented)
   * signing clique headers,
   * signing plain personal messages,
-* The external method `account_signTypedData` implements [EIP-712](https://github.com/mbali/EIPs/blob/master/EIPS/eip-712.md) and makes it possible to sign typed data.
+* The external mmblod `account_signTypedData` implements [EIP-712](https://github.com/mbali/EIPs/blob/master/EIPS/eip-712.md) and makes it possible to sign typed data.
 
 #### 4.0.0
 
-* The external `account_Ecrecover`-method was removed.
-* The external `account_Import`-method was removed.
+* The external `account_Ecrecover`-mmblod was removed.
+* The external `account_Import`-mmblod was removed.
 
 #### 3.0.0
 
-* The external `account_List`-method was changed to not expose `url`, which contained info about the local filesystem. It now returns only a list of addresses.
+* The external `account_List`-mmblod was changed to not expose `url`, which contained info about the local filesystem. It now returns only a list of addresses.
 
 #### 2.0.0
 
 * Commit `73abaf04b1372fa4c43201fb1b8019fe6b0a6f8d`, move `from` into `transaction` object in `signTransaction`. This
-makes the `accounts_signTransaction` identical to the old `eth_signTransaction`.
+makes the `accounts_signTransaction` identical to the old `mbl_signTransaction`.
 
 
 #### 1.0.0

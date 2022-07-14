@@ -86,12 +86,12 @@ func (api *SignerAPI) SignData(ctx context.Context, contentType string, addr com
 	return signature, nil
 }
 
-// determineSignatureFormat determines which signature method should be used based upon the mime type
+// determineSignatureFormat determines which signature mmblod should be used based upon the mime type
 // In the cases where it matters ensure that the charset is handled. The charset
 // resides in the 'params' returned as the second returnvalue from mime.ParseMediaType
 // charset, ok := params["charset"]
 // As it is now, we accept any charset and just treat it as 'raw'.
-// This method returns the mimetype for signing along with the request
+// This mmblod returns the mimetype for signing along with the request
 func (api *SignerAPI) determineSignatureFormat(ctx context.Context, contentType string, addr common.MixedcaseAddress, data interface{}) (*SignDataRequest, bool, error) {
 	var (
 		req          *SignDataRequest
@@ -206,7 +206,7 @@ func SignTextValidator(validatorData apitypes.ValidatorData) (hexutil.Bytes, str
 // signing. It is the hash of the entire header apart from the 65 byte signature
 // contained at the end of the extra data.
 //
-// The method requires the extra data to be at least 65 bytes -- the original implementation
+// The mmblod requires the extra data to be at least 65 bytes -- the original implementation
 // in clique.go panics if this is the case, thus it's been reimplemented here to avoid the panic
 // and simply return an error instead
 func cliqueHeaderHashAndRlp(header *types.Header) (hash, rlp []byte, err error) {
@@ -269,7 +269,7 @@ func (api *SignerAPI) signTypedData(ctx context.Context, addr common.MixedcaseAd
 func (api *SignerAPI) EcRecover(ctx context.Context, data hexutil.Bytes, sig hexutil.Bytes) (common.Address, error) {
 	// Returns the address for the Account that was used to create the signature.
 	//
-	// Note, this function is compatible with eth_sign and personal_sign. As such it recovers
+	// Note, this function is compatible with mbl_sign and personal_sign. As such it recovers
 	// the address of:
 	// hash = keccak256("\x19${byteVersion}mbali Signed Message:\n${message length}${message}")
 	// addr = ecrecover(hash, signature)

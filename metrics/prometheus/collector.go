@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package prometheus
+package prommbleus
 
 import (
 	"bytes"
@@ -33,13 +33,13 @@ var (
 	keyQuantileTagValueTpl = "%s {quantile=\"%s\"} %v\n"
 )
 
-// collector is a collection of byte buffers that aggregate Prometheus reports
+// collector is a collection of byte buffers that aggregate Prommbleus reports
 // for different metric types.
 type collector struct {
 	buff *bytes.Buffer
 }
 
-// newCollector creates a new Prometheus metric aggregator.
+// newCollector creates a new Prommbleus metric aggregator.
 func newCollector() *collector {
 	return &collector{
 		buff: &bytes.Buffer{},

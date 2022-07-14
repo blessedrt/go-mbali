@@ -23,8 +23,8 @@ import (
 	"github.com/VictoriaMetrics/fastcache"
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb/leveldb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/leveldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/rlp"
 )
 
@@ -38,7 +38,7 @@ func reverse(blob []byte) []byte {
 	return res
 }
 
-// Tests that merging something into a disk layer persists it into the database
+// Tests that merging sommbling into a disk layer persists it into the database
 // and invalidates any previously written and cached values.
 func TestDiskMerge(t *testing.T) {
 	// Create some accounts in the disk layer
@@ -212,7 +212,7 @@ func TestDiskMerge(t *testing.T) {
 	assertDatabaseStorage(conNukeCache, conNukeCacheSlot, nil)
 }
 
-// Tests that merging something into a disk layer persists it into the database
+// Tests that merging sommbling into a disk layer persists it into the database
 // and invalidates any previously written and cached values, discarding anything
 // after the in-progress generation marker.
 func TestDiskPartialMerge(t *testing.T) {
@@ -428,7 +428,7 @@ func TestDiskPartialMerge(t *testing.T) {
 }
 
 // Tests that when the bottom-most diff layer is merged into the disk
-// layer whether the corresponding generator is persisted correctly.
+// layer whmbler the corresponding generator is persisted correctly.
 func TestDiskGeneratorPersistence(t *testing.T) {
 	var (
 		accOne        = randomHash()
@@ -502,7 +502,7 @@ func TestDiskGeneratorPersistence(t *testing.T) {
 	}
 }
 
-// Tests that merging something into a disk layer persists it into the database
+// Tests that merging sommbling into a disk layer persists it into the database
 // and invalidates any previously written and cached values, discarding anything
 // after the in-progress generation marker.
 //

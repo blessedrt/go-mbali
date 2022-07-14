@@ -125,12 +125,12 @@ func TestNewSimulatedBackend(t *testing.T) {
 	sim := simTestBackend(testAddr)
 	defer sim.Close()
 
-	if sim.config != params.AllEthashProtocolChanges {
-		t.Errorf("expected sim config to equal params.AllEthashProtocolChanges, got %v", sim.config)
+	if sim.config != params.AllmblashProtocolChanges {
+		t.Errorf("expected sim config to equal params.AllmblashProtocolChanges, got %v", sim.config)
 	}
 
-	if sim.blockchain.Config() != params.AllEthashProtocolChanges {
-		t.Errorf("expected sim blockchain config to equal params.AllEthashProtocolChanges, got %v", sim.config)
+	if sim.blockchain.Config() != params.AllmblashProtocolChanges {
+		t.Errorf("expected sim blockchain config to equal params.AllmblashProtocolChanges, got %v", sim.config)
 	}
 
 	stateDB, _ := sim.blockchain.State()
@@ -430,7 +430,7 @@ func TestEstimateGas(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 	opts, _ := bind.NewKeyedTransactorWithChainID(key, big.NewInt(1337))
 
-	sim := NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(params.Ether)}}, 10000000)
+	sim := NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(params.mbler)}}, 10000000)
 	defer sim.Close()
 
 	parsed, _ := abi.JSON(strings.NewReader(contractAbi))
@@ -535,7 +535,7 @@ func TestEstimateGasWithPrice(t *testing.T) {
 	key, _ := crypto.GenerateKey()
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 
-	sim := NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(params.Ether*2 + 2e17)}}, 10000000)
+	sim := NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(params.mbler*2 + 2e17)}}, 10000000)
 	defer sim.Close()
 
 	recipient := common.HexToAddress("deadbeef")
@@ -567,8 +567,8 @@ func TestEstimateGasWithPrice(t *testing.T) {
 			From:     addr,
 			To:       &recipient,
 			Gas:      0,
-			GasPrice: big.NewInt(1e14), // gascost = 2.1ether
-			Value:    big.NewInt(1e17), // the remaining balance for fee is 2.1ether
+			GasPrice: big.NewInt(1e14), // gascost = 2.1mbler
+			Value:    big.NewInt(1e17), // the remaining balance for fee is 2.1mbler
 			Data:     nil,
 		}, 21000, nil},
 
@@ -576,18 +576,18 @@ func TestEstimateGasWithPrice(t *testing.T) {
 			From:     addr,
 			To:       &recipient,
 			Gas:      0,
-			GasPrice: big.NewInt(2e14), // gascost = 4.2ether
+			GasPrice: big.NewInt(2e14), // gascost = 4.2mbler
 			Value:    big.NewInt(100000000000),
 			Data:     nil,
-		}, 21000, errors.New("gas required exceeds allowance (10999)")}, // 10999=(2.2ether-1000wei)/(2e14)
+		}, 21000, errors.New("gas required exceeds allowance (10999)")}, // 10999=(2.2mbler-1000wei)/(2e14)
 
 		{"EstimateEIP1559WithHighFees", mbali.CallMsg{
 			From:      addr,
 			To:        &addr,
 			Gas:       0,
-			GasFeeCap: big.NewInt(1e14), // maxgascost = 2.1ether
+			GasFeeCap: big.NewInt(1e14), // maxgascost = 2.1mbler
 			GasTipCap: big.NewInt(1),
-			Value:     big.NewInt(1e17), // the remaining balance for fee is 2.1ether
+			Value:     big.NewInt(1e17), // the remaining balance for fee is 2.1mbler
 			Data:      nil,
 		}, params.TxGas, nil},
 
@@ -595,11 +595,11 @@ func TestEstimateGasWithPrice(t *testing.T) {
 			From:      addr,
 			To:        &addr,
 			Gas:       0,
-			GasFeeCap: big.NewInt(1e14), // maxgascost = 2.1ether
+			GasFeeCap: big.NewInt(1e14), // maxgascost = 2.1mbler
 			GasTipCap: big.NewInt(1),
-			Value:     big.NewInt(1e17 + 1), // the remaining balance for fee is 2.1ether
+			Value:     big.NewInt(1e17 + 1), // the remaining balance for fee is 2.1mbler
 			Data:      nil,
-		}, params.TxGas, errors.New("gas required exceeds allowance (20999)")}, // 20999=(2.2ether-0.1ether-1wei)/(1e14)
+		}, params.TxGas, errors.New("gas required exceeds allowance (20999)")}, // 20999=(2.2mbler-0.1mbler-1wei)/(1e14)
 	}
 	for i, c := range cases {
 		got, err := sim.EstimateGas(context.Background(), c.message)
@@ -1024,7 +1024,7 @@ func TestPendingAndCallContract(t *testing.T) {
 		Data: input,
 	})
 	if err != nil {
-		t.Errorf("could not call receive method on contract: %v", err)
+		t.Errorf("could not call receive mmblod on contract: %v", err)
 	}
 	if len(res) == 0 {
 		t.Errorf("result of contract call was empty: %v", res)
@@ -1044,7 +1044,7 @@ func TestPendingAndCallContract(t *testing.T) {
 		Data: input,
 	}, nil)
 	if err != nil {
-		t.Errorf("could not call receive method on contract: %v", err)
+		t.Errorf("could not call receive mmblod on contract: %v", err)
 	}
 	if len(res) == 0 {
 		t.Errorf("result of contract call was empty: %v", res)
@@ -1071,7 +1071,7 @@ contract Reverter {
     }
     function noRevert() public pure {
         assembly {
-            // Assembles something that looks like require(false, "some error") but is not reverted
+            // Assembles sommbling that looks like require(false, "some error") but is not reverted
             mstore(0x0, 0x08c379a000000000000000000000000000000000000000000000000000000000)
             mstore(0x4, 0x0000000000000000000000000000000000000000000000000000000000000020)
             mstore(0x24, 0x000000000000000000000000000000000000000000000000000000000000000a)

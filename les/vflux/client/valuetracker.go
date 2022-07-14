@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/utils"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/p2p/enode"
@@ -131,7 +131,7 @@ type ValueTracker struct {
 	clock        mclock.Clock
 	lock         sync.Mutex
 	quit         chan chan struct{}
-	db           ethdb.KeyValueStore
+	db           mbldb.KeyValueStore
 	connected    map[enode.ID]*NodeValueTracker
 	reqTypeCount int
 
@@ -172,7 +172,7 @@ type RequestInfo struct {
 
 // NewValueTracker creates a new ValueTracker and loads its previously saved state from
 // the database if possible.
-func NewValueTracker(db ethdb.KeyValueStore, clock mclock.Clock, reqInfo []RequestInfo, updatePeriod time.Duration, transferRate, statsExpRate, offlineExpRate float64) *ValueTracker {
+func NewValueTracker(db mbldb.KeyValueStore, clock mclock.Clock, reqInfo []RequestInfo, updatePeriod time.Duration, transferRate, statsExpRate, offlineExpRate float64) *ValueTracker {
 	now := clock.Now()
 
 	initRefBasket := requestBasket{items: make([]basketItem, len(reqInfo))}

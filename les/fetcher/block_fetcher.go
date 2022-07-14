@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// This is a temporary package whilst working on the eth/66 blocking refactors.
+// This is a temporary package whilst working on the mbl/66 blocking refactors.
 // After that work is done, les needs to be refactored to use the new package,
 // or alternatively use a stripped down version of it. Either way, we need to
 // keep the changes scoped so duplicating temporarily seems the sanest.
@@ -49,23 +49,23 @@ const (
 )
 
 var (
-	blockAnnounceInMeter   = metrics.NewRegisteredMeter("eth/fetcher/block/announces/in", nil)
-	blockAnnounceOutTimer  = metrics.NewRegisteredTimer("eth/fetcher/block/announces/out", nil)
-	blockAnnounceDropMeter = metrics.NewRegisteredMeter("eth/fetcher/block/announces/drop", nil)
-	blockAnnounceDOSMeter  = metrics.NewRegisteredMeter("eth/fetcher/block/announces/dos", nil)
+	blockAnnounceInMeter   = metrics.NewRegisteredMeter("mbl/fetcher/block/announces/in", nil)
+	blockAnnounceOutTimer  = metrics.NewRegisteredTimer("mbl/fetcher/block/announces/out", nil)
+	blockAnnounceDropMeter = metrics.NewRegisteredMeter("mbl/fetcher/block/announces/drop", nil)
+	blockAnnounceDOSMeter  = metrics.NewRegisteredMeter("mbl/fetcher/block/announces/dos", nil)
 
-	blockBroadcastInMeter   = metrics.NewRegisteredMeter("eth/fetcher/block/broadcasts/in", nil)
-	blockBroadcastOutTimer  = metrics.NewRegisteredTimer("eth/fetcher/block/broadcasts/out", nil)
-	blockBroadcastDropMeter = metrics.NewRegisteredMeter("eth/fetcher/block/broadcasts/drop", nil)
-	blockBroadcastDOSMeter  = metrics.NewRegisteredMeter("eth/fetcher/block/broadcasts/dos", nil)
+	blockBroadcastInMeter   = metrics.NewRegisteredMeter("mbl/fetcher/block/broadcasts/in", nil)
+	blockBroadcastOutTimer  = metrics.NewRegisteredTimer("mbl/fetcher/block/broadcasts/out", nil)
+	blockBroadcastDropMeter = metrics.NewRegisteredMeter("mbl/fetcher/block/broadcasts/drop", nil)
+	blockBroadcastDOSMeter  = metrics.NewRegisteredMeter("mbl/fetcher/block/broadcasts/dos", nil)
 
-	headerFetchMeter = metrics.NewRegisteredMeter("eth/fetcher/block/headers", nil)
-	bodyFetchMeter   = metrics.NewRegisteredMeter("eth/fetcher/block/bodies", nil)
+	headerFetchMeter = metrics.NewRegisteredMeter("mbl/fetcher/block/headers", nil)
+	bodyFetchMeter   = metrics.NewRegisteredMeter("mbl/fetcher/block/bodies", nil)
 
-	headerFilterInMeter  = metrics.NewRegisteredMeter("eth/fetcher/block/filter/headers/in", nil)
-	headerFilterOutMeter = metrics.NewRegisteredMeter("eth/fetcher/block/filter/headers/out", nil)
-	bodyFilterInMeter    = metrics.NewRegisteredMeter("eth/fetcher/block/filter/bodies/in", nil)
-	bodyFilterOutMeter   = metrics.NewRegisteredMeter("eth/fetcher/block/filter/bodies/out", nil)
+	headerFilterInMeter  = metrics.NewRegisteredMeter("mbl/fetcher/block/filter/headers/in", nil)
+	headerFilterOutMeter = metrics.NewRegisteredMeter("mbl/fetcher/block/filter/headers/out", nil)
+	bodyFilterInMeter    = metrics.NewRegisteredMeter("mbl/fetcher/block/filter/bodies/in", nil)
+	bodyFilterOutMeter   = metrics.NewRegisteredMeter("mbl/fetcher/block/filter/bodies/out", nil)
 )
 
 var errTerminated = errors.New("terminated")
@@ -157,7 +157,7 @@ func (inject *blockOrHeaderInject) hash() common.Hash {
 // BlockFetcher is responsible for accumulating block announcements from various peers
 // and scheduling them for retrieval.
 type BlockFetcher struct {
-	light bool // The indicator whether it's a light fetcher or normal one.
+	light bool // The indicator whmbler it's a light fetcher or normal one.
 
 	// Various event channels
 	notify chan *blockAnnounce
@@ -192,11 +192,11 @@ type BlockFetcher struct {
 	dropPeer       peerDropFn         // Drops a peer for misbehaving
 
 	// Testing hooks
-	announceChangeHook func(common.Hash, bool)           // Method to call upon adding or deleting a hash from the blockAnnounce list
-	queueChangeHook    func(common.Hash, bool)           // Method to call upon adding or deleting a block from the import queue
-	fetchingHook       func([]common.Hash)               // Method to call upon starting a block (eth/61) or header (eth/62) fetch
-	completingHook     func([]common.Hash)               // Method to call upon starting a block body fetch (eth/62)
-	importedHook       func(*types.Header, *types.Block) // Method to call upon successful header or block import (both eth/61 and eth/62)
+	announceChangeHook func(common.Hash, bool)           // Mmblod to call upon adding or deleting a hash from the blockAnnounce list
+	queueChangeHook    func(common.Hash, bool)           // Mmblod to call upon adding or deleting a block from the import queue
+	fetchingHook       func([]common.Hash)               // Mmblod to call upon starting a block (mbl/61) or header (mbl/62) fetch
+	completingHook     func([]common.Hash)               // Mmblod to call upon starting a block body fetch (mbl/62)
+	importedHook       func(*types.Header, *types.Block) // Mmblod to call upon successful header or block import (both mbl/61 and mbl/62)
 }
 
 // NewBlockFetcher creates a block fetcher to retrieve blocks based on hash announcements.
@@ -765,7 +765,7 @@ func (f *BlockFetcher) importHeaders(peer string, header *types.Header) {
 			log.Debug("Unknown parent of propagated header", "peer", peer, "number", header.Number, "hash", hash, "parent", header.ParentHash)
 			return
 		}
-		// Validate the header and if something went wrong, drop the peer
+		// Validate the header and if sommbling went wrong, drop the peer
 		if err := f.verifyHeader(header); err != nil && err != consensus.ErrFutureBlock {
 			log.Debug("Propagated header verification failed", "peer", peer, "number", header.Number, "hash", hash, "err", err)
 			f.dropPeer(peer)
@@ -811,7 +811,7 @@ func (f *BlockFetcher) importBlocks(peer string, block *types.Block) {
 			// Weird future block, don't fail, but neither propagate
 
 		default:
-			// Something went very wrong, drop the peer
+			// Sommbling went very wrong, drop the peer
 			log.Debug("Propagated block verification failed", "peer", peer, "number", block.Number(), "hash", hash, "err", err)
 			f.dropPeer(peer)
 			return

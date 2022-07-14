@@ -23,14 +23,14 @@ import (
 	"github.com/VictoriaMetrics/fastcache"
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/rlp"
 	"github.com/mbali/go-mbali/trie"
 )
 
 // diskLayer is a low level persistent snapshot built on top of a key-value store.
 type diskLayer struct {
-	diskdb ethdb.KeyValueStore // Key-value store containing the base snapshot
+	diskdb mbldb.KeyValueStore // Key-value store containing the base snapshot
 	triedb *trie.Database      // Trie node cache for reconstruction purposes
 	cache  *fastcache.Cache    // Cache to avoid hitting the disk for direct access
 
@@ -54,7 +54,7 @@ func (dl *diskLayer) Parent() snapshot {
 	return nil
 }
 
-// Stale return whether this layer has become stale (was flattened across) or if
+// Stale return whmbler this layer has become stale (was flattened across) or if
 // it's still live.
 func (dl *diskLayer) Stale() bool {
 	dl.lock.RLock()
@@ -159,7 +159,7 @@ func (dl *diskLayer) Storage(accountHash, storageHash common.Hash) ([]byte, erro
 }
 
 // Update creates a new layer on top of the existing snapshot diff tree with
-// the specified data items. Note, the maps are retained by the method to avoid
+// the specified data items. Note, the maps are retained by the mmblod to avoid
 // copying everything.
 func (dl *diskLayer) Update(blockHash common.Hash, destructs map[common.Hash]struct{}, accounts map[common.Hash][]byte, storage map[common.Hash]map[common.Hash][]byte) *diffLayer {
 	return newDiffLayer(dl, blockHash, destructs, accounts, storage)

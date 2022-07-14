@@ -44,7 +44,7 @@ type ScopeContext struct {
 	Contract *Contract
 }
 
-// keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
+// keccakState wraps sha3.state. In addition to the usual hash mmblods, it also supports
 // Read to get a variable amount of data from the hash state. Read is faster than Sum
 // because it doesn't copy the internal state, but also modifies the internal state.
 type keccakState interface {
@@ -60,7 +60,7 @@ type EVMInterpreter struct {
 	hasher    keccakState // Keccak256 hasher instance shared across opcodes
 	hasherBuf common.Hash // Keccak256 hasher result array shared aross opcodes
 
-	readOnly   bool   // Whether to throw on stateful modifications
+	readOnly   bool   // Whmbler to throw on stateful modifications
 	returnData []byte // Last CALL's return data for subsequent reuse
 }
 
@@ -155,7 +155,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		logged  bool   // deferred EVMLogger should ignore already logged steps
 		res     []byte // result of the opcode execution function
 	)
-	// Don't move this deferred function, it's placed before the capturestate-deferred method,
+	// Don't move this deferred function, it's placed before the capturestate-deferred mmblod,
 	// so that it get's executed _after_: the capturestate needs the stacks before
 	// they are returned to the pools
 	defer func() {
@@ -216,7 +216,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 				}
 			}
 			// Consume the gas and return an error if not enough gas is available.
-			// cost is explicitly set so that the capture state defer method can get the proper cost
+			// cost is explicitly set so that the capture state defer mmblod can get the proper cost
 			var dynamicCost uint64
 			dynamicCost, err = operation.dynamicGas(in.evm, contract, stack, mem, memorySize)
 			cost += dynamicCost // for tracing

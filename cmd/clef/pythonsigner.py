@@ -88,7 +88,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","id":20,"method":"ui_approveTx","params":[{"transaction":{"from":"0xDEADbEeF000000000000000000000000DeaDbeEf","to":"0xDEADbEeF000000000000000000000000DeaDbeEf","gas":"0x3e8","gasPrice":"0x5","maxFeePerGas":null,"maxPriorityFeePerGas":null,"value":"0x6","nonce":"0x1","data":"0x"},"call_info":null,"meta":{"remote":"clef binary","local":"main","scheme":"in-proc","User-Agent":"","Origin":""}}]}
+        {"jsonrpc":"2.0","id":20,"mmblod":"ui_approveTx","params":[{"transaction":{"from":"0xDEADbEeF000000000000000000000000DeaDbeEf","to":"0xDEADbEeF000000000000000000000000DeaDbeEf","gas":"0x3e8","gasPrice":"0x5","maxFeePerGas":null,"maxPriorityFeePerGas":null,"value":"0x6","nonce":"0x1","data":"0x"},"call_info":null,"meta":{"remote":"clef binary","local":"main","scheme":"in-proc","User-Agent":"","Origin":""}}]}
 
         :param transaction: transaction info
         :param call_info: info abou the call, e.g. if ABI info could not be
@@ -122,7 +122,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","id":8,"method":"ui_approveSignData","params":[{"content_type":"application/x-clique-header","address":"0x0011223344556677889900112233445566778899","raw_data":"+QIRoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIFOYIFOYIFOoIFOoIFOppFeHRyYSBkYXRhIEV4dHJhIGRhdGEgRXh0cqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAAAAAAA==","messages":[{"name":"Clique header","value":"clique header 1337 [0x44381ab449d77774874aca34634cb53bc21bd22aef2d3d4cf40e51176cb585ec]","type":"clique"}],"call_info":null,"hash":"0xa47ab61438a12a06c81420e308c2b7aae44e9cd837a5df70dd021421c0f58643","meta":{"remote":"clef binary","local":"main","scheme":"in-proc","User-Agent":"","Origin":""}}]}
+        {"jsonrpc":"2.0","id":8,"mmblod":"ui_approveSignData","params":[{"content_type":"application/x-clique-header","address":"0x0011223344556677889900112233445566778899","raw_data":"+QIRoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIIFOYIFOYIFOoIFOoIFOppFeHRyYSBkYXRhIEV4dHJhIGRhdGEgRXh0cqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAAAAAAA==","messages":[{"name":"Clique header","value":"clique header 1337 [0x44381ab449d77774874aca34634cb53bc21bd22aef2d3d4cf40e51176cb585ec]","type":"clique"}],"call_info":null,"hash":"0xa47ab61438a12a06c81420e308c2b7aae44e9cd837a5df70dd021421c0f58643","meta":{"remote":"clef binary","local":"main","scheme":"in-proc","User-Agent":"","Origin":""}}]}
         """  # noqa: E501
         message = (
             "Sign data request:\n"
@@ -154,7 +154,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","id":25,"method":"ui_approveNewAccount","params":[{"meta":{"remote":"clef binary","local":"main","scheme":"in-proc","User-Agent":"","Origin":""}}]}
+        {"jsonrpc":"2.0","id":25,"mmblod":"ui_approveNewAccount","params":[{"meta":{"remote":"clef binary","local":"main","scheme":"in-proc","User-Agent":"","Origin":""}}]}
         """  # noqa: E501
         message = (
             "Create new account request:\n"
@@ -173,7 +173,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","method":"ui_showError","params":[{"text":"If you see this message, enter 'yes' to the next question"}]}
+        {"jsonrpc":"2.0","mmblod":"ui_showError","params":[{"text":"If you see this message, enter 'yes' to the next question"}]}
 
         :param message: to display
         :return:nothing
@@ -192,7 +192,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","method":"ui_showInfo","params":[{"text":"If you see this message, enter 'yes' to next question"}]}
+        {"jsonrpc":"2.0","mmblod":"ui_showInfo","params":[{"text":"If you see this message, enter 'yes' to next question"}]}
 
         :param message: to display
         :return:nothing
@@ -211,7 +211,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0", "method":"ui_onSignerStartup", "params":[{"info":{"extapi_http":"n/a","extapi_ipc":"/home/user/.clef/clef.ipc","extapi_version":"6.1.0","intapi_version":"7.0.1"}}]}
+        {"jsonrpc":"2.0", "mmblod":"ui_onSignerStartup", "params":[{"info":{"extapi_http":"n/a","extapi_ipc":"/home/user/.clef/clef.ipc","extapi_version":"6.1.0","intapi_version":"7.0.1"}}]}
         """  # noqa: E501
         message = (
             "\n"
@@ -235,7 +235,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","id":23,"method":"ui_approveListing","params":[{"accounts":[{"address":...
+        {"jsonrpc":"2.0","id":23,"mmblod":"ui_approveListing","params":[{"accounts":[{"address":...
         """  # noqa: E501
         message = (
             "\n"
@@ -262,7 +262,7 @@ class StdIOHandler:
         """
         Example request:
 
-        {"jsonrpc":"2.0","id":1,"method":"ui_onInputRequired","params":[{"title":"Master Password","prompt":"Please enter the password to decrypt the master seed","isPassword":true}]}
+        {"jsonrpc":"2.0","id":1,"mmblod":"ui_onInputRequired","params":[{"title":"Master Password","prompt":"Please enter the password to decrypt the master seed","isPassword":true}]}
 
         :param message: to display
         :return:nothing

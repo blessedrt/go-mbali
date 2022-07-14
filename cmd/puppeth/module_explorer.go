@@ -30,13 +30,13 @@ import (
 
 // explorerDockerfile is the Dockerfile required to run a block explorer.
 var explorerDockerfile = `
-FROM puppeth/blockscout:latest
+FROM puppmbl/blockscout:latest
 
 ADD genesis.json /genesis.json
 RUN \
   echo 'gombl --cache 512 init /genesis.json' > explorer.sh && \
-  echo $'gombl --networkid {{.NetworkID}} --syncmode "full" --gcmode "archive" --port {{.EthPort}} --bootnodes {{.Bootnodes}} --ethstats \'{{.Ethstats}}\' --cache=512 --http --http.api "net,web3,eth,debug,txpool" --http.corsdomain "*" --http.vhosts "*" --ws --ws.origins "*" --exitwhensynced' >> explorer.sh && \
-  echo $'exec gombl --networkid {{.NetworkID}} --syncmode "full" --gcmode "archive" --port {{.EthPort}} --bootnodes {{.Bootnodes}} --ethstats \'{{.Ethstats}}\' --cache=512 --http --http.api "net,web3,eth,debug,txpool" --http.corsdomain "*" --http.vhosts "*" --ws --ws.origins "*" &' >> explorer.sh && \
+  echo $'gombl --networkid {{.NetworkID}} --syncmode "full" --gcmode "archive" --port {{.mblPort}} --bootnodes {{.Bootnodes}} --mblstats \'{{.mblstats}}\' --cache=512 --http --http.api "net,web3,mbl,debug,txpool" --http.corsdomain "*" --http.vhosts "*" --ws --ws.origins "*" --exitwhensynced' >> explorer.sh && \
+  echo $'exec gombl --networkid {{.NetworkID}} --syncmode "full" --gcmode "archive" --port {{.mblPort}} --bootnodes {{.Bootnodes}} --mblstats \'{{.mblstats}}\' --cache=512 --http --http.api "net,web3,mbl,debug,txpool" --http.corsdomain "*" --http.vhosts "*" --ws --ws.origins "*" &' >> explorer.sh && \
   echo '/usr/local/bin/docker-entrypoint.sh postgres &' >> explorer.sh && \
   echo 'sleep 5' >> explorer.sh && \
   echo 'mix do ecto.drop --force, ecto.create, ecto.migrate' >> explorer.sh && \
@@ -55,12 +55,12 @@ services:
         image: {{.Network}}/explorer
         container_name: {{.Network}}_explorer_1
         ports:
-            - "{{.EthPort}}:{{.EthPort}}"
-            - "{{.EthPort}}:{{.EthPort}}/udp"{{if not .VHost}}
+            - "{{.mblPort}}:{{.mblPort}}"
+            - "{{.mblPort}}:{{.mblPort}}/udp"{{if not .VHost}}
             - "{{.WebPort}}:4000"{{end}}
         environment:
-            - ETH_PORT={{.EthPort}}
-            - ETH_NAME={{.EthName}}
+            - mbl_PORT={{.mblPort}}
+            - mbl_NAME={{.mblName}}
             - BLOCK_TRANSFORMER={{.Transformer}}{{if .VHost}}
             - VIRTUAL_HOST={{.VHost}}
             - VIRTUAL_PORT=4000{{end}}
@@ -87,8 +87,8 @@ func deployExplorer(client *sshClient, network string, bootnodes []string, confi
 	template.Must(template.New("").Parse(explorerDockerfile)).Execute(dockerfile, map[string]interface{}{
 		"NetworkID": config.node.network,
 		"Bootnodes": strings.Join(bootnodes, ","),
-		"Ethstats":  config.node.ethstats,
-		"EthPort":   config.node.port,
+		"mblstats":  config.node.mblstats,
+		"mblPort":   config.node.port,
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
 
@@ -100,11 +100,11 @@ func deployExplorer(client *sshClient, network string, bootnodes []string, confi
 	template.Must(template.New("").Parse(explorerComposefile)).Execute(composefile, map[string]interface{}{
 		"Network":     network,
 		"VHost":       config.host,
-		"Ethstats":    config.node.ethstats,
+		"mblstats":    config.node.mblstats,
 		"Datadir":     config.node.datadir,
 		"DBDir":       config.dbdir,
-		"EthPort":     config.node.port,
-		"EthName":     config.node.ethstats[:strings.Index(config.node.ethstats, ":")],
+		"mblPort":     config.node.port,
+		"mblName":     config.node.mblstats[:strings.Index(config.node.mblstats, ":")],
 		"WebPort":     config.port,
 		"Transformer": transformer,
 	})
@@ -140,13 +140,13 @@ func (info *explorerInfos) Report() map[string]string {
 		"Website address ":        info.host,
 		"Website listener port ":  strconv.Itoa(info.port),
 		"mbali listener port ": strconv.Itoa(info.node.port),
-		"Ethstats username":       info.node.ethstats,
+		"mblstats username":       info.node.mblstats,
 	}
 	return report
 }
 
 // checkExplorer does a health-check against a block explorer server to verify
-// whether it's running, and if yes, whether it's responsive.
+// whmbler it's running, and if yes, whmbler it's responsive.
 func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 	// Inspect a possible explorer container on the host
 	infos, err := inspectContainer(client, fmt.Sprintf("%s_explorer_1", network))
@@ -172,7 +172,7 @@ func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 		host = client.server
 	}
 	// Run a sanity check to see if the devp2p is reachable
-	p2pPort := infos.portmap[infos.envvars["ETH_PORT"]+"/tcp"]
+	p2pPort := infos.portmap[infos.envvars["mbl_PORT"]+"/tcp"]
 	if err = checkPort(host, p2pPort); err != nil {
 		log.Warn("Explorer node seems unreachable", "server", host, "port", p2pPort, "err", err)
 	}
@@ -183,8 +183,8 @@ func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 	stats := &explorerInfos{
 		node: &nodeInfos{
 			datadir:  infos.volumes["/opt/app/.mbali"],
-			port:     infos.portmap[infos.envvars["ETH_PORT"]+"/tcp"],
-			ethstats: infos.envvars["ETH_NAME"],
+			port:     infos.portmap[infos.envvars["mbl_PORT"]+"/tcp"],
+			mblstats: infos.envvars["mbl_NAME"],
 		},
 		dbdir: infos.volumes["/var/lib/postgresql/data"],
 		host:  host,

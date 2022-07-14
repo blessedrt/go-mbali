@@ -54,7 +54,7 @@ import (
 )
 
 // Type returns the protocol buffer type number of a specific message. If the
-// message is nil, this method panics!
+// message is nil, this mmblod panics!
 func Type(msg proto.Message) uint16 {
 	return uint16(MessageType_value["MessageType_"+reflect.TypeOf(msg).Elem().Name()])
 }

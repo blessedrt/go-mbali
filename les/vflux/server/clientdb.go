@@ -23,7 +23,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/utils"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/p2p/enode"
@@ -56,17 +56,17 @@ var (
 )
 
 type nodeDB struct {
-	db            ethdb.KeyValueStore
+	db            mbldb.KeyValueStore
 	cache         *lru.Cache
 	auxbuf        []byte                                              // 37-byte auxiliary buffer for key encoding
 	verbuf        [2]byte                                             // 2-byte auxiliary buffer for db version
-	evictCallBack func(mclock.AbsTime, bool, utils.ExpiredValue) bool // Callback to determine whether the balance can be evicted.
+	evictCallBack func(mclock.AbsTime, bool, utils.ExpiredValue) bool // Callback to determine whmbler the balance can be evicted.
 	clock         mclock.Clock
 	closeCh       chan struct{}
 	cleanupHook   func() // Test hook used for testing
 }
 
-func newNodeDB(db ethdb.KeyValueStore, clock mclock.Clock) *nodeDB {
+func newNodeDB(db mbldb.KeyValueStore, clock mclock.Clock) *nodeDB {
 	cache, _ := lru.New(balanceCacheLimit)
 	ndb := &nodeDB{
 		db:      db,
@@ -220,7 +220,7 @@ func (db *nodeDB) expirer() {
 	}
 }
 
-// expireNodes iterates the whole node db and checks whether the
+// expireNodes iterates the whole node db and checks whmbler the
 // token balances can be deleted.
 func (db *nodeDB) expireNodes() {
 	var (

@@ -28,7 +28,7 @@ import (
 	"github.com/mbali/go-mbali/common/hexutil"
 	"github.com/mbali/go-mbali/common/math"
 	"github.com/mbali/go-mbali/consensus/clique"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
 	"github.com/mbali/go-mbali/log"
@@ -72,9 +72,9 @@ type bbInput struct {
 	TxRlp     string       `json:"txs,omitempty"`
 	Clique    *cliqueInput `json:"clique,omitempty"`
 
-	Ethash    bool                 `json:"-"`
-	EthashDir string               `json:"-"`
-	PowMode   ethash.Mode          `json:"-"`
+	mblash    bool                 `json:"-"`
+	mblashDir string               `json:"-"`
+	PowMode   mblash.Mode          `json:"-"`
 	Txs       []*types.Transaction `json:"-"`
 	Ommers    []*types.Header      `json:"-"`
 }
@@ -159,8 +159,8 @@ func (i *bbInput) ToBlock() *types.Block {
 // SealBlock seals the given block using the configured engine.
 func (i *bbInput) SealBlock(block *types.Block) (*types.Block, error) {
 	switch {
-	case i.Ethash:
-		return i.sealEthash(block)
+	case i.mblash:
+		return i.sealmblash(block)
 	case i.Clique != nil:
 		return i.sealClique(block)
 	default:
@@ -168,21 +168,21 @@ func (i *bbInput) SealBlock(block *types.Block) (*types.Block, error) {
 	}
 }
 
-// sealEthash seals the given block using ethash.
-func (i *bbInput) sealEthash(block *types.Block) (*types.Block, error) {
+// sealmblash seals the given block using mblash.
+func (i *bbInput) sealmblash(block *types.Block) (*types.Block, error) {
 	if i.Header.Nonce != nil {
-		return nil, NewError(ErrorConfig, fmt.Errorf("sealing with ethash will overwrite provided nonce"))
+		return nil, NewError(ErrorConfig, fmt.Errorf("sealing with mblash will overwrite provided nonce"))
 	}
-	ethashConfig := ethash.Config{
+	mblashConfig := mblash.Config{
 		PowMode:        i.PowMode,
-		DatasetDir:     i.EthashDir,
-		CacheDir:       i.EthashDir,
+		DatasetDir:     i.mblashDir,
+		CacheDir:       i.mblashDir,
 		DatasetsInMem:  1,
 		DatasetsOnDisk: 2,
 		CachesInMem:    2,
 		CachesOnDisk:   3,
 	}
-	engine := ethash.New(ethashConfig, nil, true)
+	engine := mblash.New(mblashConfig, nil, true)
 	defer engine.Close()
 	// Use a buffered chan for results.
 	// If the testmode is used, the sealer will return quickly, and complain
@@ -239,7 +239,7 @@ func BuildBlock(ctx *cli.Context) error {
 	// Configure the go-mbali logger
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.Lvl(ctx.Int(VerbosityFlag.Name)))
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 
 	baseDir, err := createBasedir(ctx)
 	if err != nil {
@@ -263,26 +263,26 @@ func readInput(ctx *cli.Context) (*bbInput, error) {
 		ommersStr  = ctx.String(InputOmmersFlag.Name)
 		txsStr     = ctx.String(InputTxsRlpFlag.Name)
 		cliqueStr  = ctx.String(SealCliqueFlag.Name)
-		ethashOn   = ctx.Bool(SealEthashFlag.Name)
-		ethashDir  = ctx.String(SealEthashDirFlag.Name)
-		ethashMode = ctx.String(SealEthashModeFlag.Name)
+		mblashOn   = ctx.Bool(SealmblashFlag.Name)
+		mblashDir  = ctx.String(SealmblashDirFlag.Name)
+		mblashMode = ctx.String(SealmblashModeFlag.Name)
 		inputData  = &bbInput{}
 	)
-	if ethashOn && cliqueStr != "" {
-		return nil, NewError(ErrorConfig, fmt.Errorf("both ethash and clique sealing specified, only one may be chosen"))
+	if mblashOn && cliqueStr != "" {
+		return nil, NewError(ErrorConfig, fmt.Errorf("both mblash and clique sealing specified, only one may be chosen"))
 	}
-	if ethashOn {
-		inputData.Ethash = ethashOn
-		inputData.EthashDir = ethashDir
-		switch ethashMode {
+	if mblashOn {
+		inputData.mblash = mblashOn
+		inputData.mblashDir = mblashDir
+		switch mblashMode {
 		case "normal":
-			inputData.PowMode = ethash.ModeNormal
+			inputData.PowMode = mblash.ModeNormal
 		case "test":
-			inputData.PowMode = ethash.ModeTest
+			inputData.PowMode = mblash.ModeTest
 		case "fake":
-			inputData.PowMode = ethash.ModeFake
+			inputData.PowMode = mblash.ModeFake
 		default:
-			return nil, NewError(ErrorConfig, fmt.Errorf("unknown pow mode: %s, supported modes: test, fake, normal", ethashMode))
+			return nil, NewError(ErrorConfig, fmt.Errorf("unknown pow mode: %s, supported modes: test, fake, normal", mblashMode))
 		}
 	}
 	if headerStr == stdinSelector || ommersStr == stdinSelector || txsStr == stdinSelector || cliqueStr == stdinSelector {

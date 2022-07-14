@@ -41,7 +41,7 @@ func (h *expHeap) add(item string, exp mclock.AbsTime) {
 	heap.Push(h, expItem{item, exp})
 }
 
-// contains checks whether an item is present.
+// contains checks whmbler an item is present.
 func (h expHeap) contains(item string) bool {
 	for _, v := range h {
 		if v.item == item {

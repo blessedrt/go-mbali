@@ -21,7 +21,7 @@ import (
 	"testing"
 )
 
-const methoddata = `
+const mmbloddata = `
 [
 	{"type": "function", "name": "balance", "stateMutability": "view"},
 	{"type": "function", "name": "send", "inputs": [{ "name": "amount", "type": "uint256" }]},
@@ -34,62 +34,62 @@ const methoddata = `
 	{"stateMutability":"payable","type":"receive"}
 ]`
 
-func TestMethodString(t *testing.T) {
+func TestMmblodString(t *testing.T) {
 	var table = []struct {
-		method      string
+		mmblod      string
 		expectation string
 	}{
 		{
-			method:      "balance",
+			mmblod:      "balance",
 			expectation: "function balance() view returns()",
 		},
 		{
-			method:      "send",
+			mmblod:      "send",
 			expectation: "function send(uint256 amount) returns()",
 		},
 		{
-			method:      "transfer",
+			mmblod:      "transfer",
 			expectation: "function transfer(address from, address to, uint256 value) returns(bool success)",
 		},
 		{
-			method:      "tuple",
+			mmblod:      "tuple",
 			expectation: "function tuple((uint256,uint256) a) returns()",
 		},
 		{
-			method:      "tupleArray",
+			mmblod:      "tupleArray",
 			expectation: "function tupleArray((uint256,uint256)[5] a) returns()",
 		},
 		{
-			method:      "tupleSlice",
+			mmblod:      "tupleSlice",
 			expectation: "function tupleSlice((uint256,uint256)[] a) returns()",
 		},
 		{
-			method:      "complexTuple",
+			mmblod:      "complexTuple",
 			expectation: "function complexTuple((uint256,uint256)[5][] a) returns()",
 		},
 		{
-			method:      "fallback",
+			mmblod:      "fallback",
 			expectation: "fallback() returns()",
 		},
 		{
-			method:      "receive",
+			mmblod:      "receive",
 			expectation: "receive() payable returns()",
 		},
 	}
 
-	abi, err := JSON(strings.NewReader(methoddata))
+	abi, err := JSON(strings.NewReader(mmbloddata))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, test := range table {
 		var got string
-		if test.method == "fallback" {
+		if test.mmblod == "fallback" {
 			got = abi.Fallback.String()
-		} else if test.method == "receive" {
+		} else if test.mmblod == "receive" {
 			got = abi.Receive.String()
 		} else {
-			got = abi.Methods[test.method].String()
+			got = abi.Mmblods[test.mmblod].String()
 		}
 		if got != test.expectation {
 			t.Errorf("expected string to be %s, got %s", test.expectation, got)
@@ -97,47 +97,47 @@ func TestMethodString(t *testing.T) {
 	}
 }
 
-func TestMethodSig(t *testing.T) {
+func TestMmblodSig(t *testing.T) {
 	var cases = []struct {
-		method string
+		mmblod string
 		expect string
 	}{
 		{
-			method: "balance",
+			mmblod: "balance",
 			expect: "balance()",
 		},
 		{
-			method: "send",
+			mmblod: "send",
 			expect: "send(uint256)",
 		},
 		{
-			method: "transfer",
+			mmblod: "transfer",
 			expect: "transfer(address,address,uint256)",
 		},
 		{
-			method: "tuple",
+			mmblod: "tuple",
 			expect: "tuple((uint256,uint256))",
 		},
 		{
-			method: "tupleArray",
+			mmblod: "tupleArray",
 			expect: "tupleArray((uint256,uint256)[5])",
 		},
 		{
-			method: "tupleSlice",
+			mmblod: "tupleSlice",
 			expect: "tupleSlice((uint256,uint256)[])",
 		},
 		{
-			method: "complexTuple",
+			mmblod: "complexTuple",
 			expect: "complexTuple((uint256,uint256)[5][])",
 		},
 	}
-	abi, err := JSON(strings.NewReader(methoddata))
+	abi, err := JSON(strings.NewReader(mmbloddata))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, test := range cases {
-		got := abi.Methods[test.method].Sig
+		got := abi.Mmblods[test.mmblod].Sig
 		if got != test.expect {
 			t.Errorf("expected string to be %s, got %s", test.expect, got)
 		}

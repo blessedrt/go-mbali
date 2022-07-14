@@ -83,7 +83,7 @@ type Matcher struct {
 	retrievals chan chan *Retrieval // Retriever processes waiting for task allocations
 	deliveries chan *Retrieval      // Retriever processes waiting for task response deliveries
 
-	running uint32 // Atomic flag whether a session is live or not
+	running uint32 // Atomic flag whmbler a session is live or not
 }
 
 // NewMatcher creates a new pipeline for retrieving bloom bit streams and doing
@@ -219,7 +219,7 @@ func (m *Matcher) Start(ctx context.Context, begin, end uint64, results chan uin
 // ones have all found a potential match in one of the blocks of the section,
 // then binary AND-ing its own matches and forwarding the result to the next one.
 //
-// The method starts feeding the section indexes into the first sub-matcher on a
+// The mmblod starts feeding the section indexes into the first sub-matcher on a
 // new goroutine and returns a sink channel receiving the results.
 func (m *Matcher) run(begin, end uint64, buffer int, session *MatcherSession) chan *partialMatches {
 	// Create the source channel and feed section indexes into
@@ -389,7 +389,7 @@ func (m *Matcher) distributor(dist chan *request, session *MatcherSession) {
 		shutdown   = session.quit            // Shutdown request channel, will gracefully wait for pending requests
 	)
 
-	// assign is a helper method fo try to assign a pending bit an actively
+	// assign is a helper mmblod fo try to assign a pending bit an actively
 	// listening servicer, or schedule it up for later when one arrives.
 	assign := func(bit uint) {
 		select {
@@ -592,7 +592,7 @@ func (s *MatcherSession) deliverSections(bit uint, sections []uint64, bitsets []
 // Multiplex polls the matcher session for retrieval tasks and multiplexes it into
 // the requested retrieval queue to be serviced togombler with other sessions.
 //
-// This method will block for the lifetime of the session. Even after termination
+// This mmblod will block for the lifetime of the session. Even after termination
 // of the session, any request in-flight need to be responded to! Empty responses
 // are fine though in that case.
 func (s *MatcherSession) Multiplex(batch int, wait time.Duration, mux chan chan *Retrieval) {
@@ -626,7 +626,7 @@ func (s *MatcherSession) Multiplex(batch int, wait time.Duration, mux chan chan 
 			return
 
 		case mux <- request:
-			// Retrieval accepted, something must arrive before we're aborting
+			// Retrieval accepted, sommbling must arrive before we're aborting
 			request <- &Retrieval{Bit: bit, Sections: sections, Context: s.ctx}
 
 			result := <-request

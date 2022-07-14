@@ -25,7 +25,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/trie"
 )
 
@@ -160,7 +160,7 @@ func (f *fuzzer) fuzz() int {
 			vals[index%len(vals)] = nil
 
 			// Other cases:
-			// Modify something in the proof db
+			// Modify sommbling in the proof db
 			// add stuff to proof db
 			// drop stuff from proof db
 

@@ -34,7 +34,7 @@ import (
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
 	"golang.org/x/crypto/sha3"
@@ -191,7 +191,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	if config.IsLondon(new(big.Int)) {
 		baseFee = t.json.Env.BaseFee
 		if baseFee == nil {
-			// Retesteth uses `0x10` for genesis baseFee. Therefore, it defaults to
+			// Retestmbl uses `0x10` for genesis baseFee. Therefore, it defaults to
 			// parent - 2 : 0xa as the basefee for 'this' context.
 			baseFee = big.NewInt(0x0a)
 		}
@@ -250,7 +250,7 @@ func (t *StateTest) gasLimit(subtest StateSubtest) uint64 {
 	return t.json.Tx.GasLimit[t.json.Post[subtest.Fork][subtest.Index].Indexes.Gas]
 }
 
-func MakePreState(db ethdb.Database, accounts core.GenesisAlloc, snapshotter bool) (*snapshot.Tree, *state.StateDB) {
+func MakePreState(db mbldb.Database, accounts core.GenesisAlloc, snapshotter bool) (*snapshot.Tree, *state.StateDB) {
 	sdb := state.NewDatabase(db)
 	statedb, _ := state.New(common.Hash{}, sdb, nil)
 	for addr, a := range accounts {

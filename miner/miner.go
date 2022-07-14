@@ -29,13 +29,13 @@ import (
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/downloader"
+	"github.com/mbali/go-mbali/mbl/downloader"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 )
 
-// Backend wraps all methods required for mining. Only full node is capable
+// Backend wraps all mmblods required for mining. Only full node is capable
 // to offer all the functions here.
 type Backend interface {
 	BlockChain() *core.BlockChain
@@ -45,15 +45,15 @@ type Backend interface {
 
 // Config is the configuration parameters of mining.
 type Config struct {
-	Etherbase  common.Address `toml:",omitempty"` // Public address for block mining rewards (default = first account)
-	Notify     []string       `toml:",omitempty"` // HTTP URL list to be notified of new work packages (only useful in ethash).
+	mblerbase  common.Address `toml:",omitempty"` // Public address for block mining rewards (default = first account)
+	Notify     []string       `toml:",omitempty"` // HTTP URL list to be notified of new work packages (only useful in mblash).
 	NotifyFull bool           `toml:",omitempty"` // Notify with pending block headers instead of work packages
 	ExtraData  hexutil.Bytes  `toml:",omitempty"` // Block extra data set by the miner
 	GasFloor   uint64         // Target gas floor for mined blocks.
 	GasCeil    uint64         // Target gas ceiling for mined blocks.
 	GasPrice   *big.Int       // Minimum gas price for mining a transaction
 	Recommit   time.Duration  // The time interval for miner to re-create mining work.
-	Noverify   bool           // Disable remote mining solution verification(only useful in ethash).
+	Noverify   bool           // Disable remote mining solution verification(only useful in mblash).
 }
 
 // Miner creates blocks and searches for proof-of-work values.
@@ -61,7 +61,7 @@ type Miner struct {
 	mux      *event.TypeMux
 	worker   *worker
 	coinbase common.Address
-	eth      Backend
+	mbl      Backend
 	engine   consensus.Engine
 	exitCh   chan struct{}
 	startCh  chan common.Address
@@ -70,15 +70,15 @@ type Miner struct {
 	wg sync.WaitGroup
 }
 
-func New(eth Backend, config *Config, chainConfig *params.ChainConfig, mux *event.TypeMux, engine consensus.Engine, isLocalBlock func(header *types.Header) bool) *Miner {
+func New(mbl Backend, config *Config, chainConfig *params.ChainConfig, mux *event.TypeMux, engine consensus.Engine, isLocalBlock func(header *types.Header) bool) *Miner {
 	miner := &Miner{
-		eth:     eth,
+		mbl:     mbl,
 		mux:     mux,
 		engine:  engine,
 		exitCh:  make(chan struct{}),
 		startCh: make(chan common.Address),
 		stopCh:  make(chan struct{}),
-		worker:  newWorker(config, chainConfig, engine, eth, mux, isLocalBlock, true),
+		worker:  newWorker(config, chainConfig, engine, mbl, mux, isLocalBlock, true),
 	}
 	miner.wg.Add(1)
 	go miner.update()
@@ -123,20 +123,20 @@ func (miner *Miner) update() {
 			case downloader.FailedEvent:
 				canStart = true
 				if shouldStart {
-					miner.SetEtherbase(miner.coinbase)
+					miner.Setmblerbase(miner.coinbase)
 					miner.worker.start()
 				}
 			case downloader.DoneEvent:
 				canStart = true
 				if shouldStart {
-					miner.SetEtherbase(miner.coinbase)
+					miner.Setmblerbase(miner.coinbase)
 					miner.worker.start()
 				}
 				// Stop reacting to downloader events
 				events.Unsubscribe()
 			}
 		case addr := <-miner.startCh:
-			miner.SetEtherbase(addr)
+			miner.Setmblerbase(addr)
 			if canStart {
 				miner.worker.start()
 			}
@@ -197,7 +197,7 @@ func (miner *Miner) Pending() (*types.Block, *state.StateDB) {
 //
 // Note, to access both the pending block and the pending state
 // simultaneously, please use Pending(), as the pending state can
-// change between multiple method calls
+// change between multiple mmblod calls
 func (miner *Miner) PendingBlock() *types.Block {
 	return miner.worker.pendingBlock()
 }
@@ -207,9 +207,9 @@ func (miner *Miner) PendingBlockAndReceipts() (*types.Block, types.Receipts) {
 	return miner.worker.pendingBlockAndReceipts()
 }
 
-func (miner *Miner) SetEtherbase(addr common.Address) {
+func (miner *Miner) Setmblerbase(addr common.Address) {
 	miner.coinbase = addr
-	miner.worker.setEtherbase(addr)
+	miner.worker.setmblerbase(addr)
 }
 
 // SetGasCeil sets the gaslimit to strive for when mining blocks post 1559.
@@ -242,7 +242,7 @@ func (miner *Miner) SubscribePendingLogs(ch chan<- []*types.Log) event.Subscript
 }
 
 // GetSealingBlockAsync requests to generate a sealing block according to the
-// given parameters. Regardless of whether the generation is successful or not,
+// given parameters. Regardless of whmbler the generation is successful or not,
 // there is always a result that will be returned through the result channel.
 // The difference is that if the execution fails, the returned result is nil
 // and the concrete error is dropped silently.

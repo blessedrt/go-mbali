@@ -27,7 +27,7 @@ import (
 	"github.com/mbali/go-mbali/rpc"
 )
 
-// ChainHeaderReader defines a small collection of methods needed to access the local
+// ChainHeaderReader defines a small collection of mmblods needed to access the local
 // blockchain during header verification.
 type ChainHeaderReader interface {
 	// Config retrieves the blockchain's chain configuration.
@@ -49,7 +49,7 @@ type ChainHeaderReader interface {
 	GetTd(hash common.Hash, number uint64) *big.Int
 }
 
-// ChainReader defines a small collection of methods needed to access the local
+// ChainReader defines a small collection of mmblods needed to access the local
 // blockchain during header and/or uncle verification.
 type ChainReader interface {
 	ChainHeaderReader
@@ -65,13 +65,13 @@ type Engine interface {
 	// engine is based on signatures.
 	Author(header *types.Header) (common.Address, error)
 
-	// VerifyHeader checks whether a header conforms to the consensus rules of a
+	// VerifyHeader checks whmbler a header conforms to the consensus rules of a
 	// given engine. Verifying the seal may be done optionally here, or explicitly
-	// via the VerifySeal method.
+	// via the VerifySeal mmblod.
 	VerifyHeader(chain ChainHeaderReader, header *types.Header, seal bool) error
 
 	// VerifyHeaders is similar to VerifyHeader, but verifies a batch of headers
-	// concurrently. The method returns a quit channel to abort the operations and
+	// concurrently. The mmblod returns a quit channel to abort the operations and
 	// a results channel to retrieve the async verifications (the order is that of
 	// the input slice).
 	VerifyHeaders(chain ChainHeaderReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error)
@@ -103,7 +103,7 @@ type Engine interface {
 	// Seal generates a new sealing request for the given input block and pushes
 	// the result into the given channel.
 	//
-	// Note, the method returns immediately and will send the result async. More
+	// Note, the mmblod returns immediately and will send the result async. More
 	// than one result may also be returned depending on the consensus algorithm.
 	Seal(chain ChainHeaderReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error
 

@@ -38,12 +38,12 @@ const (
 	iptrackContactWindow = 10 * time.Minute
 
 	// time needed to wait between two updates to the local ENR
-	recordUpdateThrottle = time.Millisecond
+	recordUpdatmblrottle = time.Millisecond
 )
 
 // LocalNode produces the signed node record of a local node, i.e. a node run in the
-// current process. Setting ENR entries via the Set method updates the record. A new version
-// of the record is signed on demand when the Node method is called.
+// current process. Setting ENR entries via the Set mmblod updates the record. A new version
+// of the record is signed on demand when the Node mmblod is called.
 type LocalNode struct {
 	cur atomic.Value // holds a non-nil node pointer while the record is up-to-date
 
@@ -115,8 +115,8 @@ func (ln *LocalNode) Node() *Node {
 	// than once per ms. So we need to sleep here until the next possible update time has
 	// arrived.
 	lastChange := time.Since(ln.update)
-	if lastChange < recordUpdateThrottle {
-		time.Sleep(recordUpdateThrottle - lastChange)
+	if lastChange < recordUpdatmblrottle {
+		time.Sleep(recordUpdatmblrottle - lastChange)
 	}
 
 	ln.sign()

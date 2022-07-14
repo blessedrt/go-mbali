@@ -1875,7 +1875,7 @@ void test_ge(void) {
     /* Points: (infinity, p1, p1, -p1, -p1, p2, p2, -p2, -p2, p3, p3, -p3, -p3, p4, p4, -p4, -p4).
      * The second in each pair of identical points uses a random Z coordinate in the Jacobian form.
      * All magnitudes are randomized.
-     * All 17*17 combinations of points are added to each other, using all applicable methods.
+     * All 17*17 combinations of points are added to each other, using all applicable mmblods.
      *
      * When the endomorphism code is compiled in, p5 = lambda*p1 and p6 = lambda^2*p1 are added as well.
      */

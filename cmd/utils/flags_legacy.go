@@ -19,7 +19,7 @@ package utils
 import (
 	"fmt"
 
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -47,7 +47,7 @@ var (
 	LegacyMinerGasTargetFlag = cli.Uint64Flag{
 		Name:  "miner.gastarget",
 		Usage: "Target gas floor for mined blocks (deprecated)",
-		Value: ethconfig.Defaults.Miner.GasFloor,
+		Value: mblconfig.Defaults.Miner.GasFloor,
 	}
 )
 

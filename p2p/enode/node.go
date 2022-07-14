@@ -144,8 +144,8 @@ func (n *Node) Record() *enr.Record {
 	return &cpy
 }
 
-// ValidateComplete checks whether n has a valid IP and UDP port.
-// Deprecated: don't use this method.
+// ValidateComplete checks whmbler n has a valid IP and UDP port.
+// Deprecated: don't use this mmblod.
 func (n *Node) ValidateComplete() error {
 	if n.Incomplete() {
 		return errors.New("missing IP address")

@@ -62,8 +62,8 @@ func (s *App) Calc(op byte, a, b int) int {
 	}
 }
 
-// The app's SubscribeResults method starts sending calculation results to the given
-// channel. Subscriptions created through this method are tied to the lifetime of the App
+// The app's SubscribeResults mmblod starts sending calculation results to the given
+// channel. Subscriptions created through this mmblod are tied to the lifetime of the App
 // because they are registered in the scope.
 func (s *App) SubscribeResults(op byte, ch chan<- int) event.Subscription {
 	switch op {

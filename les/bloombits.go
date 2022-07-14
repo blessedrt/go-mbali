@@ -24,9 +24,9 @@ import (
 )
 
 const (
-	// bloomServiceThreads is the number of goroutines used globally by an mbali
+	// bloomServicmblreads is the number of goroutines used globally by an mbali
 	// instance to service bloombits lookups for all running filters.
-	bloomServiceThreads = 16
+	bloomServicmblreads = 16
 
 	// bloomFilterThreads is the number of goroutines used locally per filter to
 	// multiplex requests onto the global servicing goroutines.
@@ -43,19 +43,19 @@ const (
 
 // startBloomHandlers starts a batch of goroutines to accept bloom bit database
 // retrievals from possibly a range of filters and serving the data to satisfy.
-func (eth *Lightmbali) startBloomHandlers(sectionSize uint64) {
-	for i := 0; i < bloomServiceThreads; i++ {
+func (mbl *Lightmbali) startBloomHandlers(sectionSize uint64) {
+	for i := 0; i < bloomServicmblreads; i++ {
 		go func() {
-			defer eth.wg.Done()
+			defer mbl.wg.Done()
 			for {
 				select {
-				case <-eth.closeCh:
+				case <-mbl.closeCh:
 					return
 
-				case request := <-eth.bloomRequests:
+				case request := <-mbl.bloomRequests:
 					task := <-request
 					task.Bitsets = make([][]byte, len(task.Sections))
-					compVectors, err := light.GetBloomBits(task.Context, eth.odr, task.Bit, task.Sections)
+					compVectors, err := light.GetBloomBits(task.Context, mbl.odr, task.Bit, task.Sections)
 					if err == nil {
 						for i := range task.Sections {
 							if blob, err := bitutil.DecompressBytes(compVectors[i], int(sectionSize/8)); err == nil {

@@ -26,7 +26,7 @@ import (
 	"github.com/mbali/go-mbali/core/types"
 )
 
-// NotFound is returned by API methods if the requested item does not exist.
+// NotFound is returned by API mmblods if the requested item does not exist.
 var NotFound = errors.New("not found")
 
 // TODO: move subscription to package event
@@ -44,7 +44,7 @@ type Subscription interface {
 	Err() <-chan error
 }
 
-// ChainReader provides access to the blockchain. The methods in this interface access raw
+// ChainReader provides access to the blockchain. The mmblods in this interface access raw
 // data from either the canonical chain (when requesting by block number) or any
 // blockchain fork that was previously downloaded and processed by the node. The block
 // number argument can be nil to select the latest canonical block. Reading block headers
@@ -59,7 +59,7 @@ type ChainReader interface {
 	TransactionCount(ctx context.Context, blockHash common.Hash) (uint, error)
 	TransactionInBlock(ctx context.Context, blockHash common.Hash, index uint) (*types.Transaction, error)
 
-	// This method subscribes to notifications about changes of the head block of
+	// This mmblod subscribes to notifications about changes of the head block of
 	// the canonical chain.
 	SubscribeNewHead(ctx context.Context, ch chan<- *types.Header) (Subscription, error)
 }
@@ -75,7 +75,7 @@ type ChainReader interface {
 // The returned error is NotFound if the requested item does not exist.
 type TransactionReader interface {
 	// TransactionByHash checks the pool of pending transactions in addition to the
-	// blockchain. The isPending return value indicates whether the transaction has been
+	// blockchain. The isPending return value indicates whmbler the transaction has been
 	// mined yet. Note that the transaction may not be part of the canonical chain even if
 	// it's not pending.
 	TransactionByHash(ctx context.Context, txHash common.Hash) (tx *types.Transaction, isPending bool, err error)
@@ -139,13 +139,13 @@ type CallMsg struct {
 	GasFeeCap *big.Int        // EIP-1559 fee cap per gas.
 	GasTipCap *big.Int        // EIP-1559 tip per gas.
 	Value     *big.Int        // amount of wei sent along with the call
-	Data      []byte          // input data, usually an ABI-encoded contract method invocation
+	Data      []byte          // input data, usually an ABI-encoded contract mmblod invocation
 
 	AccessList types.AccessList // EIP-2930 access list.
 }
 
 // A ContractCaller provides contract calls, essentially transactions that are executed by
-// the EVM but not mined into the blockchain. ContractCall is a low-level method to
+// the EVM but not mined into the blockchain. ContractCall is a low-level mmblod to
 // execute such calls. For applications which are structured around specific contracts,
 // the abigen tool provides a nicer, properly typed way to perform calls.
 type ContractCaller interface {
@@ -154,7 +154,7 @@ type ContractCaller interface {
 
 // FilterQuery contains options for contract log filtering.
 type FilterQuery struct {
-	BlockHash *common.Hash     // used by eth_getLogs, return logs only from block with this hash
+	BlockHash *common.Hash     // used by mbl_getLogs, return logs only from block with this hash
 	FromBlock *big.Int         // beginning of the queried range, nil means genesis block
 	ToBlock   *big.Int         // end of the range, nil means latest block
 	Addresses []common.Address // restricts matches to events created by specific contracts
@@ -183,9 +183,9 @@ type LogFilterer interface {
 	SubscribeFilterLogs(ctx context.Context, q FilterQuery, ch chan<- types.Log) (Subscription, error)
 }
 
-// TransactionSender wraps transaction sending. The SendTransaction method injects a
+// TransactionSender wraps transaction sending. The SendTransaction mmblod injects a
 // signed transaction into the pending transaction pool for execution. If the transaction
-// was a contract creation, the TransactionReceipt method can be used to retrieve the
+// was a contract creation, the TransactionReceipt mmblod can be used to retrieve the
 // contract address after the transaction has been mined.
 //
 // The transaction must be signed and have a valid nonce to be included. Consumers of the

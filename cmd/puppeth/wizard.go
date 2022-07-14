@@ -37,12 +37,12 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-// config contains all the configurations needed by puppeth that should be saved
+// config contains all the configurations needed by puppmbl that should be saved
 // between sessions.
 type config struct {
 	path      string   // File containing the configuration values
 	bootnodes []string // Bootnodes to always connect to by all nodes
-	ethstats  string   // Ethstats settings to cache for node deploys
+	mblstats  string   // mblstats settings to cache for node deploys
 
 	Genesis *core.Genesis     `json:"genesis,omitempty"` // Genesis block to cache for node deploys
 	Servers map[string][]byte `json:"servers,omitempty"`
@@ -65,7 +65,7 @@ func (c config) flush() {
 
 	out, _ := json.MarshalIndent(c, "", "  ")
 	if err := os.WriteFile(c.path, out, 0644); err != nil {
-		log.Warn("Failed to save puppeth configs", "file", c.path, "err", err)
+		log.Warn("Failed to save puppmbl configs", "file", c.path, "err", err)
 	}
 }
 
@@ -293,7 +293,7 @@ func (w *wizard) readJSON() string {
 // readIPAddress reads a single line from stdin, trimming if from spaces and
 // returning it if it's convertible to an IP address. The reason for keeping
 // the user input format instead of returning a Go net.IP is to match with
-// weird formats used by ethstats, which compares IPs textually, not by value.
+// weird formats used by mblstats, which compares IPs textually, not by value.
 func (w *wizard) readIPAddress() string {
 	for {
 		// Read the IP address from the user

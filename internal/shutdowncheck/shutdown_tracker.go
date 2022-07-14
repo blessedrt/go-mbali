@@ -21,7 +21,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/core/rawdb"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 )
 
@@ -29,13 +29,13 @@ import (
 // upon start. It needs to be started after a successful start-up and stopped
 // after a successful shutdown, just before the db is closed.
 type ShutdownTracker struct {
-	db     ethdb.Database
+	db     mbldb.Database
 	stopCh chan struct{}
 }
 
 // NewShutdownTracker creates a new ShutdownTracker instance and has
 // no other side-effect.
-func NewShutdownTracker(db ethdb.Database) *ShutdownTracker {
+func NewShutdownTracker(db mbldb.Database) *ShutdownTracker {
 	return &ShutdownTracker{
 		db:     db,
 		stopCh: make(chan struct{}),

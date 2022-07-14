@@ -127,7 +127,7 @@ func (h *clientHandler) synchronise(peer *serverPeer) {
 			checkpoint = &params.TrustedCheckpoint{}
 		}
 	}
-	// Determine whether we should run checkpoint syncing or normal light syncing.
+	// Determine whmbler we should run checkpoint syncing or normal light syncing.
 	//
 	// Here has four situations that we will disable the checkpoint syncing:
 	//
@@ -178,7 +178,7 @@ func (h *clientHandler) synchronise(peer *serverPeer) {
 
 		// Fetch the start point block header.
 		//
-		// For the ethash consensus engine, the start header is the block header
+		// For the mblash consensus engine, the start header is the block header
 		// of the checkpoint.
 		//
 		// For the clique consensus engine, the start header is the block header

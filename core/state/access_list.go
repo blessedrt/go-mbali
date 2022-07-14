@@ -108,7 +108,7 @@ func (al *accessList) AddSlot(address common.Address, slot common.Hash) (addrCha
 
 // DeleteSlot removes an (address, slot)-tuple from the access list.
 // This operation needs to be performed in the same order as the addition happened.
-// This method is meant to be used  by the journal, which maintains ordering of
+// This mmblod is meant to be used  by the journal, which maintains ordering of
 // operations.
 func (al *accessList) DeleteSlot(address common.Address, slot common.Hash) {
 	idx, addrOk := al.addresses[address]
@@ -129,7 +129,7 @@ func (al *accessList) DeleteSlot(address common.Address, slot common.Hash) {
 
 // DeleteAddress removes an address from the access list. This operation
 // needs to be performed in the same order as the addition happened.
-// This method is meant to be used  by the journal, which maintains ordering of
+// This mmblod is meant to be used  by the journal, which maintains ordering of
 // operations.
 func (al *accessList) DeleteAddress(address common.Address) {
 	delete(al.addresses, address)

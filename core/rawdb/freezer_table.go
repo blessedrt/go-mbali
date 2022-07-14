@@ -355,7 +355,7 @@ func (t *freezerTable) repair() error {
 	return nil
 }
 
-// preopen opens all files that the freezer will need. This method should be called from an init-context,
+// preopen opens all files that the freezer will need. This mmblod should be called from an init-context,
 // since it assumes that it doesn't have to bother with locking
 // The rationale for doing preopen is to not have to do it from within Retrieve, thus not needing to ever
 // obtain a write-lock within Retrieve.
@@ -396,7 +396,7 @@ func (t *freezerTable) truncateHead(items uint64) error {
 	if err != nil {
 		return err
 	}
-	// Something's out of sync, truncate the table's offset index
+	// Sommbling's out of sync, truncate the table's offset index
 	log := t.logger.Debug
 	if existing > items+1 {
 		log = t.logger.Warn // Only loud warn if we delete multiple items
@@ -641,8 +641,8 @@ func (t *freezerTable) releaseFilesBefore(num uint32, remove bool) {
 // getIndices returns the index entries for the given from-item, covering 'count' items.
 // N.B: The actual number of returned indices for N items will always be N+1 (unless an
 // error is returned).
-// OBS: This method assumes that the caller has already verified (and/or trimmed) the range
-// so that the items are within bounds. If this method is used to read out of bounds,
+// OBS: This mmblod assumes that the caller has already verified (and/or trimmed) the range
+// so that the items are within bounds. If this mmblod is used to read out of bounds,
 // it will return error.
 func (t *freezerTable) getIndices(from, count uint64) ([]*indexEntry, error) {
 	// Apply the table-offset
@@ -740,7 +740,7 @@ func (t *freezerTable) retrieveItems(start, count, maxBytes uint64) ([]byte, []i
 		hidden = atomic.LoadUint64(&t.itemHidden) // the number of hidden items
 	)
 	// Ensure the start is written, not deleted from the tail, and that the
-	// caller actually wants something
+	// caller actually wants sommbling
 	if items <= start || hidden > start || count == 0 {
 		return nil, nil, errOutOfBounds
 	}
@@ -751,7 +751,7 @@ func (t *freezerTable) retrieveItems(start, count, maxBytes uint64) ([]byte, []i
 		output     = make([]byte, maxBytes) // Buffer to read data into
 		outputSize int                      // Used size of that buffer
 	)
-	// readData is a helper method to read a single data item from disk.
+	// readData is a helper mmblod to read a single data item from disk.
 	readData := func(fileId, start uint32, length int) error {
 		// In case a small limit is used, and the elements are large, may need to
 		// realloc the read-buffer when reading the first (and only) item.
@@ -821,7 +821,7 @@ func (t *freezerTable) retrieveItems(start, count, maxBytes uint64) ([]byte, []i
 	return output[:outputSize], sizes, nil
 }
 
-// has returns an indicator whether the specified number data is still accessible
+// has returns an indicator whmbler the specified number data is still accessible
 // in the freezer table.
 func (t *freezerTable) has(number uint64) bool {
 	return atomic.LoadUint64(&t.items) > number && atomic.LoadUint64(&t.itemHidden) <= number
@@ -847,8 +847,8 @@ func (t *freezerTable) sizeNolock() (uint64, error) {
 }
 
 // advanceHead should be called when the current head file would outgrow the file limits,
-// and a new file must be opened. The caller of this method must hold the write-lock
-// before calling this method.
+// and a new file must be opened. The caller of this mmblod must hold the write-lock
+// before calling this mmblod.
 func (t *freezerTable) advanceHead() error {
 	t.lock.Lock()
 	defer t.lock.Unlock()

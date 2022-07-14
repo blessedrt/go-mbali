@@ -96,7 +96,7 @@ var (
 	// node rpc subcommand flags
 	subscribeFlag = cli.BoolFlag{
 		Name:  "subscribe",
-		Usage: "method is a subscription",
+		Usage: "mmblod is a subscription",
 	}
 )
 
@@ -187,8 +187,8 @@ func main() {
 				},
 				{
 					Name:      "rpc",
-					ArgsUsage: "<node> <method> [<args>]",
-					Usage:     "call a node RPC method",
+					ArgsUsage: "<node> <mmblod> [<args>]",
+					Usage:     "call a node RPC mmblod",
 					Action:    rpcNode,
 					Flags: []cli.Flag{
 						subscribeFlag,
@@ -401,32 +401,32 @@ func rpcNode(ctx *cli.Context) error {
 		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 	nodeName := args[0]
-	method := args[1]
+	mmblod := args[1]
 	rpcClient, err := client.RPCClient(context.Background(), nodeName)
 	if err != nil {
 		return err
 	}
 	if ctx.Bool(subscribeFlag.Name) {
-		return rpcSubscribe(rpcClient, ctx.App.Writer, method, args[3:]...)
+		return rpcSubscribe(rpcClient, ctx.App.Writer, mmblod, args[3:]...)
 	}
 	var result interface{}
 	params := make([]interface{}, len(args[3:]))
 	for i, v := range args[3:] {
 		params[i] = v
 	}
-	if err := rpcClient.Call(&result, method, params...); err != nil {
+	if err := rpcClient.Call(&result, mmblod, params...); err != nil {
 		return err
 	}
 	return json.NewEncoder(ctx.App.Writer).Encode(result)
 }
 
-func rpcSubscribe(client *rpc.Client, out io.Writer, method string, args ...string) error {
-	parts := strings.SplitN(method, "_", 2)
+func rpcSubscribe(client *rpc.Client, out io.Writer, mmblod string, args ...string) error {
+	parts := strings.SplitN(mmblod, "_", 2)
 	namespace := parts[0]
-	method = parts[1]
+	mmblod = parts[1]
 	ch := make(chan interface{})
 	subArgs := make([]interface{}, len(args)+1)
-	subArgs[0] = method
+	subArgs[0] = mmblod
 	for i, v := range args {
 		subArgs[i+1] = v
 	}

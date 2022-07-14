@@ -69,7 +69,7 @@ func (ApplySettings_PassphraseSourceType) EnumDescriptor() ([]byte, []int) {
 //*
 // Type of recovery procedure. These should be used as bitmask, e.g.,
 // `RecoveryDeviceType_ScrambledWords | RecoveryDeviceType_Matrix`
-// listing every method supported by the host computer.
+// listing every mmblod supported by the host computer.
 //
 // Note that ScrambledWords must be supported by every implementation
 // for backward compatibility; there is no way to not support it.
@@ -1270,7 +1270,7 @@ type RecoveryDevice struct {
 	Language             *string `protobuf:"bytes,4,opt,name=language,def=english" json:"language,omitempty"`
 	Label                *string `protobuf:"bytes,5,opt,name=label" json:"label,omitempty"`
 	EnforceWordlist      *bool   `protobuf:"varint,6,opt,name=enforce_wordlist,json=enforceWordlist" json:"enforce_wordlist,omitempty"`
-	// 7 reserved for unused recovery method
+	// 7 reserved for unused recovery mmblod
 	Type                 *RecoveryDevice_RecoveryDeviceType `protobuf:"varint,8,opt,name=type,enum=hw.trezor.messages.management.RecoveryDevice_RecoveryDeviceType" json:"type,omitempty"`
 	U2FCounter           *uint32                            `protobuf:"varint,9,opt,name=u2f_counter,json=u2fCounter" json:"u2f_counter,omitempty"`
 	DryRun               *bool                              `protobuf:"varint,10,opt,name=dry_run,json=dryRun" json:"dry_run,omitempty"`

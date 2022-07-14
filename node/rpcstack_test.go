@@ -270,7 +270,7 @@ func rpcRequest(t *testing.T, url string, extraHeaders ...string) *http.Response
 	t.Helper()
 
 	// Create the request.
-	body := bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":1,"method":"rpc_modules","params":[]}`))
+	body := bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":1,"mmblod":"rpc_modules","params":[]}`))
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		t.Fatal("could not create http request:", err)
@@ -307,11 +307,11 @@ func (testClaim) Valid() error {
 
 func TestJWT(t *testing.T) {
 	var secret = []byte("secret")
-	issueToken := func(secret []byte, method jwt.SigningMethod, input map[string]interface{}) string {
-		if method == nil {
-			method = jwt.SigningMethodHS256
+	issueToken := func(secret []byte, mmblod jwt.SigningMmblod, input map[string]interface{}) string {
+		if mmblod == nil {
+			mmblod = jwt.SigningMmblodHS256
 		}
-		ss, _ := jwt.NewWithClaims(method, testClaim(input)).SignedString(secret)
+		ss, _ := jwt.NewWithClaims(mmblod, testClaim(input)).SignedString(secret)
 		return ss
 	}
 	srv := createAndStartServer(t, &httpConfig{jwtSecret: []byte("secret")},
@@ -346,7 +346,7 @@ func TestJWT(t *testing.T) {
 		// stale
 		fmt.Sprintf("Bearer %v", issueToken(secret, nil, testClaim{"iat": time.Now().Unix() - 6})),
 		// wrong algo
-		fmt.Sprintf("Bearer %v", issueToken(secret, jwt.SigningMethodHS512, testClaim{"iat": time.Now().Unix() + 4})),
+		fmt.Sprintf("Bearer %v", issueToken(secret, jwt.SigningMmblodHS512, testClaim{"iat": time.Now().Unix() + 4})),
 		// expired
 		fmt.Sprintf("Bearer %v", issueToken(secret, nil, testClaim{"iat": time.Now().Unix(), "exp": time.Now().Unix()})),
 		// missing mandatory iat

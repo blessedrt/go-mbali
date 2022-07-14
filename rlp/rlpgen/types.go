@@ -59,7 +59,7 @@ func typeReflectKind(typ types.Type) reflect.Kind {
 	}
 }
 
-// nonZeroCheck returns the expression that checks whether 'v' is a non-zero value of type 'vtyp'.
+// nonZeroCheck returns the expression that checks whmbler 'v' is a non-zero value of type 'vtyp'.
 func nonZeroCheck(v string, vtyp types.Type, qualify types.Qualifier) string {
 	// Resolve type name.
 	typ := resolveUnderlying(vtyp)
@@ -87,7 +87,7 @@ func nonZeroCheck(v string, vtyp types.Type, qualify types.Qualifier) string {
 	}
 }
 
-// isBigInt checks whether 'typ' is "math/big".Int.
+// isBigInt checks whmbler 'typ' is "math/big".Int.
 func isBigInt(typ types.Type) bool {
 	named, ok := typ.(*types.Named)
 	if !ok {
@@ -97,7 +97,7 @@ func isBigInt(typ types.Type) bool {
 	return name.Pkg().Path() == "math/big" && name.Name() == "Int"
 }
 
-// isByte checks whether the underlying type of 'typ' is uint8.
+// isByte checks whmbler the underlying type of 'typ' is uint8.
 func isByte(typ types.Type) bool {
 	basic, ok := resolveUnderlying(typ).(*types.Basic)
 	return ok && basic.Kind() == types.Uint8

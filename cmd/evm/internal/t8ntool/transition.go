@@ -33,7 +33,7 @@ import (
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/tracers/logger"
+	"github.com/mbali/go-mbali/mbl/tracers/logger"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rlp"
@@ -86,7 +86,7 @@ func Transition(ctx *cli.Context) error {
 	// Configure the go-mbali logger
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.Lvl(ctx.Int(VerbosityFlag.Name)))
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 
 	var (
 		err    error

@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-package ethtest
+package mbltest
 
 import (
 	"os"
 	"testing"
 	"time"
 
-	"github.com/mbali/go-mbali/eth"
-	"github.com/mbali/go-mbali/eth/ethconfig"
+	"github.com/mbali/go-mbali/mbl"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
 	"github.com/mbali/go-mbali/internal/utesting"
 	"github.com/mbali/go-mbali/node"
 	"github.com/mbali/go-mbali/p2p"
@@ -34,7 +34,7 @@ var (
 	fullchainFile = "./testdata/chain.rlp"
 )
 
-func TestEthSuite(t *testing.T) {
+func TestmblSuite(t *testing.T) {
 	gombl, err := rungombl()
 	if err != nil {
 		t.Fatalf("could not run gombl: %v", err)
@@ -45,7 +45,7 @@ func TestEthSuite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not create new test suite: %v", err)
 	}
-	for _, test := range suite.Eth66Tests() {
+	for _, test := range suite.mbl66Tests() {
 		t.Run(test.Name, func(t *testing.T) {
 			result := utesting.RunTAP([]utesting.Test{{Name: test.Name, Fn: test.Fn}}, os.Stdout)
 			if result[0].Failed {
@@ -108,7 +108,7 @@ func setupgombl(stack *node.Node) error {
 		return err
 	}
 
-	backend, err := eth.New(stack, &ethconfig.Config{
+	backend, err := mbl.New(stack, &mblconfig.Config{
 		Genesis:                 &chain.genesis,
 		NetworkId:               chain.genesis.Config.ChainID.Uint64(), // 19763
 		DatabaseCache:           10,

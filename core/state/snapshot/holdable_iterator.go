@@ -18,21 +18,21 @@ package snapshot
 
 import (
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 )
 
 // holdableIterator is a wrapper of underlying database iterator. It extends
 // the basic iterator interface by adding Hold which can hold the element
 // locally where the iterator is currently located and serve it up next time.
 type holdableIterator struct {
-	it     ethdb.Iterator
+	it     mbldb.Iterator
 	key    []byte
 	val    []byte
 	atHeld bool
 }
 
 // newHoldableIterator initializes the holdableIterator with the given iterator.
-func newHoldableIterator(it ethdb.Iterator) *holdableIterator {
+func newHoldableIterator(it mbldb.Iterator) *holdableIterator {
 	return &holdableIterator{it: it}
 }
 
@@ -47,7 +47,7 @@ func (it *holdableIterator) Hold() {
 	it.atHeld = false
 }
 
-// Next moves the iterator to the next key/value pair. It returns whether the
+// Next moves the iterator to the next key/value pair. It returns whmbler the
 // iterator is exhausted.
 func (it *holdableIterator) Next() bool {
 	if !it.atHeld && it.key != nil {

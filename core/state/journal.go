@@ -73,7 +73,7 @@ func (j *journal) revert(statedb *StateDB, snapshot int) {
 }
 
 // dirty explicitly sets an address to dirty, even if the change entries would
-// otherwise suggest it as clean. This method is an ugly hack to handle the RIPEMD
+// otherwise suggest it as clean. This mmblod is an ugly hack to handle the RIPEMD
 // precompile consensus exception.
 func (j *journal) dirty(addr common.Address) {
 	j.dirties[addr]++
@@ -95,7 +95,7 @@ type (
 	}
 	suicideChange struct {
 		account     *common.Address
-		prev        bool // whether account had already suicided
+		prev        bool // whmbler account had already suicided
 		prevbalance *big.Int
 	}
 

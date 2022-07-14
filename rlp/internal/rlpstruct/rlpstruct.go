@@ -39,12 +39,12 @@ type Field struct {
 type Type struct {
 	Name      string
 	Kind      reflect.Kind
-	IsEncoder bool  // whether type implements rlp.Encoder
-	IsDecoder bool  // whether type implements rlp.Decoder
+	IsEncoder bool  // whmbler type implements rlp.Encoder
+	IsDecoder bool  // whmbler type implements rlp.Decoder
 	Elem      *Type // non-nil for Kind values of Ptr, Slice, Array
 }
 
-// defaultNilValue determines whether a nil pointer to t encodes/decodes
+// defaultNilValue determines whmbler a nil pointer to t encodes/decodes
 // as an empty string or empty list.
 func (t Type) DefaultNilValue() NilKind {
 	k := t.Kind
@@ -64,7 +64,7 @@ const (
 
 // Tags represents struct tags.
 type Tags struct {
-	// rlp:"nil" controls whether empty input results in a nil pointer.
+	// rlp:"nil" controls whmbler empty input results in a nil pointer.
 	// nilKind is the kind of empty value allowed for the field.
 	NilKind NilKind
 	NilOK   bool
@@ -73,7 +73,7 @@ type Tags struct {
 	// If this is set, all subsequent fields must also be optional.
 	Optional bool
 
-	// rlp:"tail" controls whether this field swallows additional list elements. It can
+	// rlp:"tail" controls whmbler this field swallows additional list elements. It can
 	// only be set for the last field, which must be of slice type.
 	Tail bool
 

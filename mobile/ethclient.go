@@ -22,17 +22,17 @@ import (
 	"math/big"
 
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethclient"
+	"github.com/mbali/go-mbali/mblclient"
 )
 
 // mbaliClient provides access to the mbali APIs.
 type mbaliClient struct {
-	client *ethclient.Client
+	client *mblclient.Client
 }
 
 // NewmbaliClient connects a client to the given URL.
 func NewmbaliClient(rawurl string) (client *mbaliClient, _ error) {
-	rawClient, err := ethclient.Dial(rawurl)
+	rawClient, err := mblclient.Dial(rawurl)
 	return &mbaliClient{rawClient}, err
 }
 
@@ -309,7 +309,7 @@ func (ec *mbaliClient) EstimateGas(ctx *Context, msg *CallMsg) (gas int64, _ err
 
 // SendTransaction injects a signed transaction into the pending pool for execution.
 //
-// If the transaction was a contract creation use the TransactionReceipt method to get the
+// If the transaction was a contract creation use the TransactionReceipt mmblod to get the
 // contract address after the transaction has been mined.
 func (ec *mbaliClient) SendTransaction(ctx *Context, tx *Transaction) error {
 	return ec.client.SendTransaction(ctx.context, tx.tx)

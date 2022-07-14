@@ -194,7 +194,7 @@ func (tab *Table) setFallbackNodes(nodes []*enode.Node) error {
 	return nil
 }
 
-// isInitDone returns whether the table's initial seeding procedure has completed.
+// isInitDone returns whmbler the table's initial seeding procedure has completed.
 func (tab *Table) isInitDone() bool {
 	select {
 	case <-tab.initDone:
@@ -395,7 +395,7 @@ func (tab *Table) copyLiveNodes() {
 // findnodeByID returns the n nodes in the table that are closest to the given id.
 // This is used by the FINDNODE/v4 handler.
 //
-// The preferLive parameter says whether the caller wants liveness-checked results. If
+// The preferLive parameter says whmbler the caller wants liveness-checked results. If
 // preferLive is true and the table contains any verified nodes, the result will not
 // contain unverified nodes. However, if there are no verified nodes at all, the result
 // will contain unverified nodes.

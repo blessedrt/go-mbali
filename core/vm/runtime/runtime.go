@@ -136,7 +136,7 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 	return ret, cfg.State, err
 }
 
-// Create executes the code using the EVM create method
+// Create executes the code using the EVM create mmblod
 func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 	if cfg == nil {
 		cfg = new(Config)

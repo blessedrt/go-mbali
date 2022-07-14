@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const rescaleThreshold = time.Hour
+const rescalmblreshold = time.Hour
 
 // Samples maintain a statistically-significant selection of values from
 // a stream.
@@ -55,7 +55,7 @@ func NewExpDecaySample(reservoirSize int, alpha float64) Sample {
 		t0:            time.Now(),
 		values:        newExpDecaySampleHeap(reservoirSize),
 	}
-	s.t1 = s.t0.Add(rescaleThreshold)
+	s.t1 = s.t0.Add(rescalmblreshold)
 	return s
 }
 
@@ -65,7 +65,7 @@ func (s *ExpDecaySample) Clear() {
 	defer s.mutex.Unlock()
 	s.count = 0
 	s.t0 = time.Now()
-	s.t1 = s.t0.Add(rescaleThreshold)
+	s.t1 = s.t0.Add(rescalmblreshold)
 	s.values.Clear()
 }
 
@@ -159,7 +159,7 @@ func (s *ExpDecaySample) Variance() float64 {
 	return SampleVariance(s.Values())
 }
 
-// update samples a new value at a particular timestamp.  This is a method all
+// update samples a new value at a particular timestamp.  This is a mmblod all
 // its own to facilitate testing.
 func (s *ExpDecaySample) update(t time.Time, v int64) {
 	s.mutex.Lock()
@@ -177,7 +177,7 @@ func (s *ExpDecaySample) update(t time.Time, v int64) {
 		t0 := s.t0
 		s.values.Clear()
 		s.t0 = t
-		s.t1 = s.t0.Add(rescaleThreshold)
+		s.t1 = s.t0.Add(rescalmblreshold)
 		for _, v := range values {
 			v.k = v.k * math.Exp(-s.alpha*s.t0.Sub(t0).Seconds())
 			s.values.Push(v)

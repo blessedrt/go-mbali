@@ -94,7 +94,7 @@ func TestWatchNoDir(t *testing.T) {
 
 	// Create ks but not the directory that it watches.
 	rand.Seed(time.Now().UnixNano())
-	dir := filepath.Join(os.TempDir(), fmt.Sprintf("eth-keystore-watchnodir-test-%d-%d", os.Getpid(), rand.Int()))
+	dir := filepath.Join(os.TempDir(), fmt.Sprintf("mbl-keystore-watchnodir-test-%d-%d", os.Getpid(), rand.Int()))
 	ks := NewKeyStore(dir, LightScryptN, LightScryptP)
 
 	list := ks.Accounts()
@@ -157,7 +157,7 @@ func TestCacheAddDeleteOrder(t *testing.T) {
 		},
 		{
 			Address: common.HexToAddress("d49ff4eeb0b2686ed89c0fc0f2b6ea533ddbbd5e"),
-			URL:     accounts.URL{Scheme: KeyStoreScheme, Path: "SOMETHING.key"},
+			URL:     accounts.URL{Scheme: KeyStoreScheme, Path: "SOMmblING.key"},
 		},
 		{
 			Address: common.HexToAddress("7ef5a6135f1fd6a02593eedc869c6d41d934aef8"),
@@ -200,7 +200,7 @@ func TestCacheAddDeleteOrder(t *testing.T) {
 	for i := 0; i < len(accs); i += 2 {
 		cache.delete(wantAccounts[i])
 	}
-	cache.delete(accounts.Account{Address: common.HexToAddress("fd9bd350f08ee3c0c19b85a8e16114a11a60aa4e"), URL: accounts.URL{Scheme: KeyStoreScheme, Path: "something"}})
+	cache.delete(accounts.Account{Address: common.HexToAddress("fd9bd350f08ee3c0c19b85a8e16114a11a60aa4e"), URL: accounts.URL{Scheme: KeyStoreScheme, Path: "sommbling"}})
 
 	// Check content again after deletion.
 	wantAccountsAfterDelete := []accounts.Account{
@@ -251,7 +251,7 @@ func TestCacheFind(t *testing.T) {
 
 	nomatchAccount := accounts.Account{
 		Address: common.HexToAddress("f466859ead1932d743d622cb74fc058882e8648a"),
-		URL:     accounts.URL{Scheme: KeyStoreScheme, Path: filepath.Join(dir, "something")},
+		URL:     accounts.URL{Scheme: KeyStoreScheme, Path: filepath.Join(dir, "sommbling")},
 	}
 	tests := []struct {
 		Query      accounts.Account
@@ -320,7 +320,7 @@ func TestUpdatedKeyfileContents(t *testing.T) {
 
 	// Create a temporary kesytore to test with
 	rand.Seed(time.Now().UnixNano())
-	dir := filepath.Join(os.TempDir(), fmt.Sprintf("eth-keystore-updatedkeyfilecontents-test-%d-%d", os.Getpid(), rand.Int()))
+	dir := filepath.Join(os.TempDir(), fmt.Sprintf("mbl-keystore-updatedkeyfilecontents-test-%d-%d", os.Getpid(), rand.Int()))
 	ks := NewKeyStore(dir, LightScryptN, LightScryptP)
 
 	list := ks.Accounts()

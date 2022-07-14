@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethdb
+package mbldb
 
 // IdealBatchSize defines the size of the data batches should ideally add in one
 // write.
@@ -38,7 +38,7 @@ type Batch interface {
 	Replay(w KeyValueWriter) error
 }
 
-// Batcher wraps the NewBatch method of a backing data store.
+// Batcher wraps the NewBatch mmblod of a backing data store.
 type Batcher interface {
 	// NewBatch creates a write-only database that buffers changes to its host db
 	// until a final write is called.

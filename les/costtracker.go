@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/flowcontrol"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
@@ -115,7 +115,7 @@ const (
 // changes in the cost factor can be applied immediately without always notifying
 // the clients about the changed cost tables.
 type costTracker struct {
-	db     ethdb.Database
+	db     mbldb.Database
 	stopCh chan chan struct{}
 
 	inSizeFactor  float64
@@ -137,7 +137,7 @@ type costTracker struct {
 
 // newCostTracker creates a cost tracker and loads the cost factor statistics from the database.
 // It also returns the minimum capacity that can be assigned to any peer.
-func newCostTracker(db ethdb.Database, config *ethconfig.Config) (*costTracker, uint64) {
+func newCostTracker(db mbldb.Database, config *mblconfig.Config) (*costTracker, uint64) {
 	utilTarget := float64(config.LightServ) * flowcontrol.FixedPointMultiplier / 100
 	ct := &costTracker{
 		db:         db,

@@ -47,7 +47,7 @@ var (
 	}
 	binFlag = cli.StringFlag{
 		Name:  "bin",
-		Usage: "Path to the mbali contract bytecode (generate deploy method)",
+		Usage: "Path to the mbali contract bytecode (generate deploy mmblod)",
 	}
 	typeFlag = cli.StringFlag{
 		Name:  "type",
@@ -235,7 +235,7 @@ func abigen(c *cli.Context) error {
 }
 
 func main() {
-	log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	log.Root().Smblandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)

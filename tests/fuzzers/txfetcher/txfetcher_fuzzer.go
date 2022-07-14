@@ -26,7 +26,7 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/mclock"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/eth/fetcher"
+	"github.com/mbali/go-mbali/mbl/fetcher"
 )
 
 var (

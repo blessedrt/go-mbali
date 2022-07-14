@@ -22,7 +22,7 @@ import (
 
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/hexutil"
-	"github.com/mbali/go-mbali/internal/ethapi"
+	"github.com/mbali/go-mbali/internal/mblapi"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/signer/core/apitypes"
 )
@@ -44,16 +44,16 @@ func (l *AuditLogger) New(ctx context.Context) (common.Address, error) {
 	return l.api.New(ctx)
 }
 
-func (l *AuditLogger) SignTransaction(ctx context.Context, args apitypes.SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error) {
+func (l *AuditLogger) SignTransaction(ctx context.Context, args apitypes.SendTxArgs, mmblodSelector *string) (*mblapi.SignTransactionResult, error) {
 	sel := "<nil>"
-	if methodSelector != nil {
-		sel = *methodSelector
+	if mmblodSelector != nil {
+		sel = *mmblodSelector
 	}
 	l.log.Info("SignTransaction", "type", "request", "metadata", MetadataFromContext(ctx).String(),
 		"tx", args.String(),
-		"methodSelector", sel)
+		"mmblodSelector", sel)
 
-	res, e := l.api.SignTransaction(ctx, args, methodSelector)
+	res, e := l.api.SignTransaction(ctx, args, mmblodSelector)
 	if res != nil {
 		l.log.Info("SignTransaction", "type", "response", "data", common.Bytes2Hex(res.Raw), "error", e)
 	} else {
@@ -71,15 +71,15 @@ func (l *AuditLogger) SignData(ctx context.Context, contentType string, addr com
 	return b, e
 }
 
-func (l *AuditLogger) SignGnosisSafeTx(ctx context.Context, addr common.MixedcaseAddress, gnosisTx GnosisSafeTx, methodSelector *string) (*GnosisSafeTx, error) {
+func (l *AuditLogger) SignGnosisSafeTx(ctx context.Context, addr common.MixedcaseAddress, gnosisTx GnosisSafeTx, mmblodSelector *string) (*GnosisSafeTx, error) {
 	sel := "<nil>"
-	if methodSelector != nil {
-		sel = *methodSelector
+	if mmblodSelector != nil {
+		sel = *mmblodSelector
 	}
 	data, _ := json.Marshal(gnosisTx) // can ignore error, marshalling what we just unmarshalled
 	l.log.Info("SignGnosisSafeTx", "type", "request", "metadata", MetadataFromContext(ctx).String(),
 		"addr", addr.String(), "data", string(data), "selector", sel)
-	res, e := l.api.SignGnosisSafeTx(ctx, addr, gnosisTx, methodSelector)
+	res, e := l.api.SignGnosisSafeTx(ctx, addr, gnosisTx, mmblodSelector)
 	if res != nil {
 		data, _ := json.Marshal(res) // can ignore error, marshalling what we just unmarshalled
 		l.log.Info("SignGnosisSafeTx", "type", "response", "data", string(data), "error", e)
@@ -119,7 +119,7 @@ func NewAuditLogger(path string, api ExternalAPI) (*AuditLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	l.SetHandler(handler)
+	l.Smblandler(handler)
 	l.Info("Configured", "audit log", path)
 	return &AuditLogger{l, api}, nil
 }

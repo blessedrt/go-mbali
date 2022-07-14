@@ -25,10 +25,10 @@ import (
 	"path/filepath"
 
 	"github.com/mbali/go-mbali/core"
-	"github.com/mbali/go-mbali/eth/downloader"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethclient"
-	"github.com/mbali/go-mbali/ethstats"
+	"github.com/mbali/go-mbali/mbl/downloader"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mblclient"
+	"github.com/mbali/go-mbali/mblstats"
 	"github.com/mbali/go-mbali/internal/debug"
 	"github.com/mbali/go-mbali/les"
 	"github.com/mbali/go-mbali/node"
@@ -49,7 +49,7 @@ type NodeConfig struct {
 	// set to zero, then only the configured static and trusted peers can connect.
 	MaxPeers int
 
-	// mbaliEnabled specifies whether the node should run the mbali protocol.
+	// mbaliEnabled specifies whmbler the node should run the mbali protocol.
 	mbaliEnabled bool
 
 	// mbaliNetworkID is the network identifier used by the mbali protocol to
@@ -189,18 +189,18 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	}
 	// Register the mbali protocol if requested
 	if config.mbaliEnabled {
-		ethConf := ethconfig.Defaults
-		ethConf.Genesis = genesis
-		ethConf.SyncMode = downloader.LightSync
-		ethConf.NetworkId = uint64(config.mbaliNetworkID)
-		ethConf.DatabaseCache = config.mbaliDatabaseCache
-		lesBackend, err := les.New(rawStack, &ethConf)
+		mblConf := mblconfig.Defaults
+		mblConf.Genesis = genesis
+		mblConf.SyncMode = downloader.LightSync
+		mblConf.NetworkId = uint64(config.mbaliNetworkID)
+		mblConf.DatabaseCache = config.mbaliDatabaseCache
+		lesBackend, err := les.New(rawStack, &mblConf)
 		if err != nil {
 			return nil, fmt.Errorf("mbali init: %v", err)
 		}
 		// If netstats reporting is requested, do it
 		if config.mbaliNetStats != "" {
-			if err := ethstats.New(rawStack, lesBackend.ApiBackend, lesBackend.Engine(), config.mbaliNetStats); err != nil {
+			if err := mblstats.New(rawStack, lesBackend.ApiBackend, lesBackend.Engine(), config.mbaliNetStats); err != nil {
 				return nil, fmt.Errorf("netstats init: %v", err)
 			}
 		}
@@ -226,7 +226,7 @@ func (n *Node) GetmbaliClient() (client *mbaliClient, _ error) {
 	if err != nil {
 		return nil, err
 	}
-	return &mbaliClient{ethclient.NewClient(rpc)}, nil
+	return &mbaliClient{mblclient.NewClient(rpc)}, nil
 }
 
 // GetNodeInfo gathers and returns a collection of metadata known about the host.

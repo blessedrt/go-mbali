@@ -197,7 +197,7 @@ func (node *ClientNode) updateParams(params ServerParams, now mclock.AbsTime) {
 	node.cm.updateParams(node, params, now)
 }
 
-// AcceptRequest returns whether a new request can be accepted and the missing
+// AcceptRequest returns whmbler a new request can be accepted and the missing
 // buffer amount if it was rejected due to a buffer underrun. If accepted, maxCost
 // is deducted from the flow control buffer.
 func (node *ClientNode) AcceptRequest(reqID, index, maxCost uint64) (accepted bool, bufShort uint64, priority int64) {

@@ -19,13 +19,13 @@ package memorydb
 import (
 	"testing"
 
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/dbtest"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/dbtest"
 )
 
 func TestMemoryDB(t *testing.T) {
 	t.Run("DatabaseSuite", func(t *testing.T) {
-		dbtest.TestDatabaseSuite(t, func() ethdb.KeyValueStore {
+		dbtest.TestDatabaseSuite(t, func() mbldb.KeyValueStore {
 			return New()
 		})
 	})

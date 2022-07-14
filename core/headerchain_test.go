@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/consensus"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/log"
@@ -74,15 +74,15 @@ func TestHeaderInsertion(t *testing.T) {
 		genesis = (&Genesis{BaseFee: big.NewInt(params.InitialBaseFee)}).MustCommit(db)
 	)
 
-	hc, err := NewHeaderChain(db, params.AllEthashProtocolChanges, ethash.NewFaker(), func() bool { return false })
+	hc, err := NewHeaderChain(db, params.AllmblashProtocolChanges, mblash.NewFaker(), func() bool { return false })
 	if err != nil {
 		t.Fatal(err)
 	}
 	// chain A: G->A1->A2...A128
-	chainA := makeHeaderChain(genesis.Header(), 128, ethash.NewFaker(), db, 10)
+	chainA := makeHeaderChain(genesis.Header(), 128, mblash.NewFaker(), db, 10)
 	// chain B: G->A1->B1...B128
-	chainB := makeHeaderChain(chainA[0], 128, ethash.NewFaker(), db, 10)
-	log.Root().SetHandler(log.StdoutHandler)
+	chainB := makeHeaderChain(chainA[0], 128, mblash.NewFaker(), db, 10)
+	log.Root().Smblandler(log.StdoutHandler)
 
 	forker := NewForkChoice(hc, nil)
 	// Inserting 64 headers on an empty chain, expecting

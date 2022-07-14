@@ -60,7 +60,7 @@ type Config struct {
 
 	// DataDir is the file system folder the node should use for any data storage
 	// requirements. The configured data directory will not be directly shared with
-	// registered services, instead those can use utility methods to create/access
+	// registered services, instead those can use utility mmblods to create/access
 	// databases or flat files. This enables ephemeral nodes which can fully reside
 	// in memory.
 	DataDir string
@@ -280,7 +280,7 @@ func DefaultWSEndpoint() string {
 	return config.WSEndpoint()
 }
 
-// ExtRPCEnabled returns the indicator whether node enables the external
+// ExtRPCEnabled returns the indicator whmbler node enables the external
 // RPC(http, ws or graphql).
 func (c *Config) ExtRPCEnabled() bool {
 	return c.HTTPHost != "" || c.WSHost != ""

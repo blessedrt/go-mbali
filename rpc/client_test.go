@@ -103,17 +103,17 @@ func TestClientBatchRequest(t *testing.T) {
 
 	batch := []BatchElem{
 		{
-			Method: "test_echo",
+			Mmblod: "test_echo",
 			Args:   []interface{}{"hello", 10, &echoArgs{"world"}},
 			Result: new(echoResult),
 		},
 		{
-			Method: "test_echo",
+			Mmblod: "test_echo",
 			Args:   []interface{}{"hello2", 11, &echoArgs{"world"}},
 			Result: new(echoResult),
 		},
 		{
-			Method: "no_such_method",
+			Mmblod: "no_such_mmblod",
 			Args:   []interface{}{1, 2, 3},
 			Result: new(int),
 		},
@@ -123,20 +123,20 @@ func TestClientBatchRequest(t *testing.T) {
 	}
 	wantResult := []BatchElem{
 		{
-			Method: "test_echo",
+			Mmblod: "test_echo",
 			Args:   []interface{}{"hello", 10, &echoArgs{"world"}},
 			Result: &echoResult{"hello", 10, &echoArgs{"world"}},
 		},
 		{
-			Method: "test_echo",
+			Mmblod: "test_echo",
 			Args:   []interface{}{"hello2", 11, &echoArgs{"world"}},
 			Result: &echoResult{"hello2", 11, &echoArgs{"world"}},
 		},
 		{
-			Method: "no_such_method",
+			Mmblod: "no_such_mmblod",
 			Args:   []interface{}{1, 2, 3},
 			Result: new(int),
-			Error:  &jsonError{Code: -32601, Message: "the method no_such_method does not exist/is not available"},
+			Error:  &jsonError{Code: -32601, Message: "the mmblod no_such_mmblod does not exist/is not available"},
 		},
 	}
 	if !reflect.DeepEqual(batch, wantResult) {
@@ -260,17 +260,17 @@ func TestClientSubscribeInvalidArg(t *testing.T) {
 		defer func() {
 			err := recover()
 			if shouldPanic && err == nil {
-				t.Errorf("EthSubscribe should've panicked for %#v", arg)
+				t.Errorf("mblSubscribe should've panicked for %#v", arg)
 			}
 			if !shouldPanic && err != nil {
-				t.Errorf("EthSubscribe shouldn't have panicked for %#v", arg)
+				t.Errorf("mblSubscribe shouldn't have panicked for %#v", arg)
 				buf := make([]byte, 1024*1024)
 				buf = buf[:runtime.Stack(buf, false)]
 				t.Error(err)
 				t.Error(string(buf))
 			}
 		}()
-		client.EthSubscribe(context.Background(), arg, "foo_bar")
+		client.mblSubscribe(context.Background(), arg, "foo_bar")
 	}
 	check(true, nil)
 	check(true, 1)
@@ -401,7 +401,7 @@ func (r *unsubscribeRecorder) readBatch() ([]*jsonrpcMessage, bool, error) {
 	return msgs, batch, err
 }
 
-// This checks that Client calls the _unsubscribe method on the server when Unsubscribe is
+// This checks that Client calls the _unsubscribe mmblod on the server when Unsubscribe is
 // called on a subscription.
 func TestClientSubscriptionUnsubscribeServer(t *testing.T) {
 	t.Parallel()
@@ -411,7 +411,7 @@ func TestClientSubscriptionUnsubscribeServer(t *testing.T) {
 	srv.RegisterName("nftest", new(notificationTestService))
 	p1, p2 := net.Pipe()
 	recorder := &unsubscribeRecorder{ServerCodec: NewCodec(p1)}
-	go srv.ServeCodec(recorder, OptionMethodInvocation|OptionSubscriptions)
+	go srv.ServeCodec(recorder, OptionMmblodInvocation|OptionSubscriptions)
 	defer srv.Stop()
 
 	// Create the client on the other end of the pipe.
@@ -430,7 +430,7 @@ func TestClientSubscriptionUnsubscribeServer(t *testing.T) {
 	// Unsubscribe and check that unsubscribe was called.
 	sub.Unsubscribe()
 	if !recorder.unsubscribes[sub.subid] {
-		t.Fatal("client did not call unsubscribe method")
+		t.Fatal("client did not call unsubscribe mmblod")
 	}
 	if _, open := <-sub.Err(); open {
 		t.Fatal("subscription error channel not closed after unsubscribe")
@@ -444,7 +444,7 @@ func TestClientSubscriptionChannelClose(t *testing.T) {
 
 	var (
 		srv     = NewServer()
-		httpsrv = httptest.NewServer(srv.WebsocketHandler(nil))
+		httpsrv = httptest.NewServer(srv.Websockmblandler(nil))
 		wsURL   = "ws:" + strings.TrimPrefix(httpsrv.URL, "http:")
 	)
 	defer srv.Stop()
@@ -518,7 +518,7 @@ func TestClientNotificationStorm(t *testing.T) {
 	doTest(24000, true)
 }
 
-func TestClientSetHeader(t *testing.T) {
+func TestClientSmbleader(t *testing.T) {
 	var gotHeader bool
 	srv := newTestServer()
 	httpsrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -536,7 +536,7 @@ func TestClientSetHeader(t *testing.T) {
 	}
 	defer client.Close()
 
-	client.SetHeader("test", "ok")
+	client.Smbleader("test", "ok")
 	if _, err := client.SupportedModules(); err != nil {
 		t.Fatal(err)
 	}
@@ -545,7 +545,7 @@ func TestClientSetHeader(t *testing.T) {
 	}
 
 	// Check that Content-Type can be replaced.
-	client.SetHeader("content-type", "application/x-garbage")
+	client.Smbleader("content-type", "application/x-garbage")
 	_, err = client.SupportedModules()
 	if err == nil {
 		t.Fatal("no error for invalid content-type header")
@@ -605,7 +605,7 @@ func TestClientReconnect(t *testing.T) {
 		if err != nil {
 			t.Fatal("can't listen:", err)
 		}
-		go http.Serve(l, srv.WebsocketHandler([]string{"*"}))
+		go http.Serve(l, srv.Websockmblandler([]string{"*"}))
 		return srv, l
 	}
 
@@ -639,7 +639,7 @@ func TestClientReconnect(t *testing.T) {
 	}
 
 	// Start it up again and call again. The connection should be reestablished.
-	// We spawn multiple calls here to check whether this hangs somehow.
+	// We spawn multiple calls here to check whmbler this hangs somehow.
 	s2, l2 := startServer(l1.Addr().String())
 	defer l2.Close()
 	defer s2.Stop()
@@ -671,7 +671,7 @@ func httpTestClient(srv *Server, transport string, fl *flakeyListener) (*Client,
 	var hs *httptest.Server
 	switch transport {
 	case "ws":
-		hs = httptest.NewUnstartedServer(srv.WebsocketHandler([]string{"*"}))
+		hs = httptest.NewUnstartedServer(srv.Websockmblandler([]string{"*"}))
 	case "http":
 		hs = httptest.NewUnstartedServer(srv)
 	default:

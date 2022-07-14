@@ -27,7 +27,7 @@ import (
 // Only this reader may be used for input because it keeps an internal buffer.
 var Stdin = newTerminalPrompter()
 
-// UserPrompter defines the methods needed by the console to prompt the user for
+// UserPrompter defines the mmblods needed by the console to prompt the user for
 // various types of inputs.
 type UserPrompter interface {
 	// PromptInput displays the given prompt to the user and requests some textual
@@ -36,16 +36,16 @@ type UserPrompter interface {
 
 	// PromptPassword displays the given prompt to the user and requests some textual
 	// data to be entered, but one which must not be echoed out into the terminal.
-	// The method returns the input provided by the user.
+	// The mmblod returns the input provided by the user.
 	PromptPassword(prompt string) (string, error)
 
 	// PromptConfirm displays the given prompt to the user and requests a boolean
 	// choice to be made, returning that choice.
 	PromptConfirm(prompt string) (bool, error)
 
-	// SetHistory sets the input scrollback history that the prompter will allow
+	// Smblistory sets the input scrollback history that the prompter will allow
 	// the user to scroll back to.
-	SetHistory(history []string)
+	Smblistory(history []string)
 
 	// AppendHistory appends an entry to the scrollback history. It should be called
 	// if and only if the prompt to append was a valid command.
@@ -121,7 +121,7 @@ func (p *terminalPrompter) PromptInput(prompt string) (string, error) {
 
 // PromptPassword displays the given prompt to the user and requests some textual
 // data to be entered, but one which must not be echoed out into the terminal.
-// The method returns the input provided by the user.
+// The mmblod returns the input provided by the user.
 func (p *terminalPrompter) PromptPassword(prompt string) (passwd string, err error) {
 	if p.supported {
 		p.rawMode.ApplyMode()
@@ -149,9 +149,9 @@ func (p *terminalPrompter) PromptConfirm(prompt string) (bool, error) {
 	return false, err
 }
 
-// SetHistory sets the input scrollback history that the prompter will allow
+// Smblistory sets the input scrollback history that the prompter will allow
 // the user to scroll back to.
-func (p *terminalPrompter) SetHistory(history []string) {
+func (p *terminalPrompter) Smblistory(history []string) {
 	p.State.ReadHistory(strings.NewReader(strings.Join(history, "\n")))
 }
 

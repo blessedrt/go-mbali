@@ -34,15 +34,15 @@ import (
 	"github.com/mbali/go-mbali/common"
 	"github.com/mbali/go-mbali/common/mclock"
 	"github.com/mbali/go-mbali/consensus"
-	"github.com/mbali/go-mbali/consensus/ethash"
+	"github.com/mbali/go-mbali/consensus/mblash"
 	"github.com/mbali/go-mbali/contracts/checkpointoracle/contract"
 	"github.com/mbali/go-mbali/core"
 	"github.com/mbali/go-mbali/core/forkid"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/event"
 	"github.com/mbali/go-mbali/les/checkpointoracle"
 	"github.com/mbali/go-mbali/les/flowcontrol"
@@ -122,7 +122,7 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 			auth, _ := bind.NewKeyedTransactorWithChainID(bankKey, big.NewInt(1337))
 			oracleAddr, _, _, _ = contract.DeployCheckpointOracle(auth, backend, []common.Address{signerAddr}, sectionSize, processConfirms, big.NewInt(1))
 
-			// bankUser transfers some ether to user1
+			// bankUser transfers some mbler to user1
 			nonce, _ := backend.PendingNonceAt(ctx, bankAddr)
 			tx, _ := types.SignTx(types.NewTransaction(nonce, userAddr1, big.NewInt(10_000_000_000_000_000), params.TxGas, big.NewInt(params.InitialBaseFee), nil), signer, bankKey)
 			backend.SendTransaction(ctx, tx)
@@ -134,11 +134,11 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 			bankNonce, _ := backend.PendingNonceAt(ctx, bankAddr)
 			userNonce1, _ := backend.PendingNonceAt(ctx, userAddr1)
 
-			// bankUser transfers more ether to user1
+			// bankUser transfers more mbler to user1
 			tx1, _ := types.SignTx(types.NewTransaction(bankNonce, userAddr1, big.NewInt(1_000_000_000_000_000), params.TxGas, big.NewInt(params.InitialBaseFee), nil), signer, bankKey)
 			backend.SendTransaction(ctx, tx1)
 
-			// user1 relays ether to user2
+			// user1 relays mbler to user2
 			tx2, _ := types.SignTx(types.NewTransaction(userNonce1, userAddr2, big.NewInt(1_000_000_000_000_000), params.TxGas, big.NewInt(params.InitialBaseFee), nil), signer, userKey1)
 			backend.SendTransaction(ctx, tx2)
 
@@ -155,7 +155,7 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 			//    number: 3
 			//    txs:    2
 
-			// bankUser transfer some ether to signer
+			// bankUser transfer some mbler to signer
 			bankNonce, _ := backend.PendingNonceAt(ctx, bankAddr)
 			tx1, _ := types.SignTx(types.NewTransaction(bankNonce, signerAddr, big.NewInt(1000000000), params.TxGas, big.NewInt(params.InitialBaseFee), nil), signer, bankKey)
 			backend.SendTransaction(ctx, tx1)
@@ -180,7 +180,7 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 }
 
 // testIndexers creates a set of indexers with specified params for testing purpose.
-func testIndexers(db ethdb.Database, odr light.OdrBackend, config *light.IndexerConfig, disablePruning bool) []*core.ChainIndexer {
+func testIndexers(db mbldb.Database, odr light.OdrBackend, config *light.IndexerConfig, disablePruning bool) []*core.ChainIndexer {
 	var indexers [3]*core.ChainIndexer
 	indexers[0] = light.NewChtIndexer(db, odr, config.ChtSize, config.ChtConfirms, disablePruning)
 	indexers[1] = core.NewBloomIndexer(db, config.BloomSize, config.BloomConfirms)
@@ -190,12 +190,12 @@ func testIndexers(db ethdb.Database, odr light.OdrBackend, config *light.Indexer
 	return indexers[:]
 }
 
-func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, indexers []*core.ChainIndexer, db ethdb.Database, peers *serverPeerSet, ulcServers []string, ulcFraction int) (*clientHandler, func()) {
+func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, indexers []*core.ChainIndexer, db mbldb.Database, peers *serverPeerSet, ulcServers []string, ulcFraction int) (*clientHandler, func()) {
 	var (
 		evmux  = new(event.TypeMux)
-		engine = ethash.NewFaker()
+		engine = mblash.NewFaker()
 		gspec  = core.Genesis{
-			Config:   params.AllEthashProtocolChanges,
+			Config:   params.AllmblashProtocolChanges,
 			Alloc:    core.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 			BaseFee:  big.NewInt(params.InitialBaseFee),
@@ -225,8 +225,8 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	client := &Lightmbali{
 		lesCommons: lesCommons{
 			genesis:     genesis.Hash(),
-			config:      &ethconfig.Config{LightPeers: 100, NetworkId: NetworkId},
-			chainConfig: params.AllEthashProtocolChanges,
+			config:      &mblconfig.Config{LightPeers: 100, NetworkId: NetworkId},
+			chainConfig: params.AllmblashProtocolChanges,
 			iConfig:     light.TestClientIndexerConfig,
 			chainDb:     db,
 			oracle:      oracle,
@@ -253,10 +253,10 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	}
 }
 
-func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Database, clock mclock.Clock) (*serverHandler, *backends.SimulatedBackend, func()) {
+func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db mbldb.Database, clock mclock.Clock) (*serverHandler, *backends.SimulatedBackend, func()) {
 	var (
 		gspec = core.Genesis{
-			Config:   params.AllEthashProtocolChanges,
+			Config:   params.AllmblashProtocolChanges,
 			Alloc:    core.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 			BaseFee:  big.NewInt(params.InitialBaseFee),
@@ -293,8 +293,8 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	server := &LesServer{
 		lesCommons: lesCommons{
 			genesis:     genesis.Hash(),
-			config:      &ethconfig.Config{LightPeers: 100, NetworkId: NetworkId},
-			chainConfig: params.AllEthashProtocolChanges,
+			config:      &mblconfig.Config{LightPeers: 100, NetworkId: NetworkId},
+			chainConfig: params.AllmblashProtocolChanges,
 			iConfig:     light.TestServerIndexerConfig,
 			chainDb:     db,
 			chainReader: simulation.Blockchain(),
@@ -450,7 +450,7 @@ type indexerCallback func(*core.ChainIndexer, *core.ChainIndexer, *core.ChainInd
 // testClient represents a client object for testing with necessary auxiliary fields.
 type testClient struct {
 	clock   mclock.Clock
-	db      ethdb.Database
+	db      mbldb.Database
 	peer    *testPeer
 	handler *clientHandler
 
@@ -514,7 +514,7 @@ func (client *testClient) newRawPeer(t *testing.T, name string, version int, rec
 type testServer struct {
 	clock   mclock.Clock
 	backend *backends.SimulatedBackend
-	db      ethdb.Database
+	db      mbldb.Database
 	peer    *testPeer
 	handler *serverHandler
 

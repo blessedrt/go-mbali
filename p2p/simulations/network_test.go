@@ -686,7 +686,7 @@ func triggerChecks(ctx context.Context, ids []enode.ID, trigger chan enode.ID, i
 }
 
 // \todo: refactor to implement shapshots
-// and connect configuration methods once these are moved from
+// and connect configuration mmblods once these are moved from
 // swarm/network/simulations/connect.go
 func BenchmarkMinimalService(b *testing.B) {
 	b.Run("ring/32", benchmarkMinimalServiceTmp)
@@ -845,7 +845,7 @@ func casesNodeUnmarshalJSONUpField() []nodeUnmarshalTestCase {
 			wantErr:   "invalid character",
 		},
 		{
-			name:      "bool value expected but got something else (string)",
+			name:      "bool value expected but got sommbling else (string)",
 			marshaled: "{\"up\": \"true\"}",
 			wantErr:   "cannot unmarshal string into Go struct",
 		},

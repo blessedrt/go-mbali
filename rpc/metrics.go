@@ -29,11 +29,11 @@ var (
 	rpcServingTimer        = metrics.NewRegisteredTimer("rpc/duration/all", nil)
 )
 
-func newRPCServingTimer(method string, valid bool) metrics.Timer {
+func newRPCServingTimer(mmblod string, valid bool) metrics.Timer {
 	flag := "success"
 	if !valid {
 		flag = "failure"
 	}
-	m := fmt.Sprintf("rpc/duration/%s/%s", method, flag)
+	m := fmt.Sprintf("rpc/duration/%s/%s", mmblod, flag)
 	return metrics.GetOrRegisterTimer(m, nil)
 }

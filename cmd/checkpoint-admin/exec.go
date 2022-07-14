@@ -32,7 +32,7 @@ import (
 	"github.com/mbali/go-mbali/contracts/checkpointoracle"
 	"github.com/mbali/go-mbali/contracts/checkpointoracle/contract"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethclient"
+	"github.com/mbali/go-mbali/mblclient"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 	"github.com/mbali/go-mbali/rpc"
@@ -124,7 +124,7 @@ func deploy(ctx *cli.Context) error {
 // sign checkpoint.
 func sign(ctx *cli.Context) error {
 	var (
-		offline bool // The indicator whether we sign checkpoint by offline.
+		offline bool // The indicator whmbler we sign checkpoint by offline.
 		chash   common.Hash
 		cindex  uint64
 		address common.Address
@@ -160,7 +160,7 @@ func sign(ctx *cli.Context) error {
 		reqCtx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancelFn()
 
-		head, err := ethclient.NewClient(node).HeaderByNumber(reqCtx, nil)
+		head, err := mblclient.NewClient(node).HeaderByNumber(reqCtx, nil)
 		if err != nil {
 			return err
 		}
@@ -184,7 +184,7 @@ func sign(ctx *cli.Context) error {
 		signature string
 		signer    string
 	)
-	// isAdmin checks whether the specified signer is admin.
+	// isAdmin checks whmbler the specified signer is admin.
 	isAdmin := func(addr common.Address) error {
 		signers, err := oracle.Contract().GetAllAdmin(nil)
 		if err != nil {
@@ -283,12 +283,12 @@ func publish(ctx *cli.Context) error {
 	reqCtx, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelFn()
 
-	head, err := ethclient.NewClient(client).HeaderByNumber(reqCtx, nil)
+	head, err := mblclient.NewClient(client).HeaderByNumber(reqCtx, nil)
 	if err != nil {
 		return err
 	}
 	num := head.Number.Uint64()
-	recent, err := ethclient.NewClient(client).HeaderByNumber(reqCtx, big.NewInt(int64(num-128)))
+	recent, err := mblclient.NewClient(client).HeaderByNumber(reqCtx, big.NewInt(int64(num-128)))
 	if err != nil {
 		return err
 	}

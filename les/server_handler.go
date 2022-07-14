@@ -28,7 +28,7 @@ import (
 	"github.com/mbali/go-mbali/core/forkid"
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/les/flowcontrol"
 	"github.com/mbali/go-mbali/light"
 	"github.com/mbali/go-mbali/log"
@@ -61,19 +61,19 @@ var (
 type serverHandler struct {
 	forkFilter forkid.Filter
 	blockchain *core.BlockChain
-	chainDb    ethdb.Database
+	chainDb    mbldb.Database
 	txpool     *core.TxPool
 	server     *LesServer
 
 	closeCh chan struct{}  // Channel used to exit all background routines of handler.
 	wg      sync.WaitGroup // WaitGroup used to track all background routines of handler.
-	synced  func() bool    // Callback function used to determine whether local node is synced.
+	synced  func() bool    // Callback function used to determine whmbler local node is synced.
 
 	// Testing fields
 	addTxsSync bool
 }
 
-func newServerHandler(server *LesServer, blockchain *core.BlockChain, chainDb ethdb.Database, txpool *core.TxPool, synced func() bool) *serverHandler {
+func newServerHandler(server *LesServer, blockchain *core.BlockChain, chainDb mbldb.Database, txpool *core.TxPool, synced func() bool) *serverHandler {
 	handler := &serverHandler{
 		forkFilter: forkid.NewFilter(blockchain),
 		server:     server,
@@ -421,7 +421,7 @@ func (h *serverHandler) broadcastLoop() {
 			}
 			var reorg uint64
 			if lastHead != nil {
-				// If a setHead has been performed, the common ancestor can be nil.
+				// If a smblead has been performed, the common ancestor can be nil.
 				if ancestor := rawdb.FindCommonAncestor(h.chainDb, header, lastHead); ancestor != nil {
 					reorg = lastHead.Number.Uint64() - ancestor.Number.Uint64()
 				}

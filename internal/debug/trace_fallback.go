@@ -17,7 +17,7 @@
 //go:build !go1.5
 // +build !go1.5
 
-// no-op implementation of tracing methods for Go < 1.5.
+// no-op implementation of tracing mmblods for Go < 1.5.
 
 package debug
 

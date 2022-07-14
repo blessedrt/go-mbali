@@ -33,12 +33,12 @@ import (
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/eth/tracers"
-	"github.com/mbali/go-mbali/eth/tracers/logger"
+	"github.com/mbali/go-mbali/mbl/tracers"
+	"github.com/mbali/go-mbali/mbl/tracers/logger"
 	"github.com/mbali/go-mbali/params"
 
 	// force-load js tracers to trigger registration
-	_ "github.com/mbali/go-mbali/eth/tracers/js"
+	_ "github.com/mbali/go-mbali/mbl/tracers/js"
 )
 
 func TestDefaults(t *testing.T) {
@@ -295,7 +295,7 @@ func TestBlockhash(t *testing.T) {
 	*/
 	// The contract above
 	data := common.Hex2Bytes("6080604052348015600f57600080fd5b50600436106045576000357c010000000000000000000000000000000000000000000000000000000090048063f8a8fd6d14604a575b600080fd5b60506074565b60405180848152602001838152602001828152602001935050505060405180910390f35b600080600080439050600080600083409050600184034092506000600290505b61010481101560c35760008186034090506000816001900414151560b6578093505b5080806001019150506094565b508083839650965096505050505090919256fea165627a7a72305820462d71b510c1725ff35946c20b415b0d50b468ea157c8c77dff9466c9cb85f560029")
-	// The method call to 'test()'
+	// The mmblod call to 'test()'
 	input := common.Hex2Bytes("f8a8fd6d")
 	chain := &dummyChain{}
 	ret, _, err := Execute(data, input, &Config{

@@ -35,7 +35,7 @@ func main() {
 		output     = flag.String("out", "-", "output file (default is stdout)")
 		genEncoder = flag.Bool("encoder", true, "generate EncodeRLP?")
 		genDecoder = flag.Bool("decoder", false, "generate DecodeRLP?")
-		typename   = flag.String("type", "", "type to generate methods for")
+		typename   = flag.String("type", "", "type to generate mmblods for")
 	)
 	flag.Parse()
 

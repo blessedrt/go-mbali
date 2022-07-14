@@ -39,7 +39,7 @@ const heartbeatCycle = time.Second
 
 // Minimum time to wait between self derivation attempts, even it the user is
 // requesting accounts like crazy.
-const selfDeriveThrottling = time.Second
+const selfDerivmblrottling = time.Second
 
 // driver defines the vendor specific functionality hardware wallets instances
 // must implement to allow using them with the wallet lifecycle management.
@@ -177,7 +177,7 @@ func (w *wallet) Open(passphrase string) error {
 }
 
 // heartbeat is a health check loop for the USB wallets to periodically verify
-// whether they are still present or if they malfunctioned.
+// whmbler they are still present or if they malfunctioned.
 func (w *wallet) heartbeat() {
 	w.log.Debug("USB wallet health-check started")
 	defer w.log.Debug("USB wallet health-check stopped")
@@ -427,7 +427,7 @@ func (w *wallet) selfDerive() {
 			select {
 			case errc = <-w.deriveQuit:
 				// Termination requested, abort
-			case <-time.After(selfDeriveThrottling):
+			case <-time.After(selfDerivmblrottling):
 				// Waited enough, willing to self-derive again
 			}
 		}
@@ -440,7 +440,7 @@ func (w *wallet) selfDerive() {
 	errc <- err
 }
 
-// Contains implements accounts.Wallet, returning whether a particular account is
+// Contains implements accounts.Wallet, returning whmbler a particular account is
 // or is not pinned into this wallet instance. Although we could attempt to resolve
 // unpinned accounts, that would be an non-negligible hardware operation.
 func (w *wallet) Contains(account accounts.Account) bool {
@@ -500,7 +500,7 @@ func (w *wallet) Derive(path accounts.DerivationPath, pin bool) (accounts.Accoun
 // from non zero components.
 //
 // Some hardware wallets switched derivation paths through their evolution, so
-// this method supports providing multiple bases to discover old user accounts
+// this mmblod supports providing multiple bases to discover old user accounts
 // too. Only the last base will be used to derive the next empty account.
 //
 // You can disable automatic account discovery by calling SelfDerive with a nil
@@ -519,7 +519,7 @@ func (w *wallet) SelfDerive(bases []accounts.DerivationPath, chain mbali.ChainSt
 }
 
 // signHash implements accounts.Wallet, however signing arbitrary data is not
-// supported for hardware wallets, so this method will always return an error.
+// supported for hardware wallets, so this mmblod will always return an error.
 func (w *wallet) signHash(account accounts.Account, hash []byte) ([]byte, error) {
 	return nil, accounts.ErrNotSupported
 }
@@ -584,7 +584,7 @@ func (w *wallet) SignText(account accounts.Account, text []byte) ([]byte, error)
 // transaction or a failure if the user denied the transaction.
 //
 // Note, if the version of the mbali application running on the Ledger wallet is
-// too old to sign EIP-155 transactions, but such is requested nonetheless, an error
+// too old to sign EIP-155 transactions, but such is requested nonmbleless, an error
 // will be returned opposed to silently signing in Homestead mode.
 func (w *wallet) SignTx(account accounts.Account, tx *types.Transaction, chainID *big.Int) (*types.Transaction, error) {
 	w.stateLock.RLock() // Comms have own mutex, this is for the state fields
@@ -626,7 +626,7 @@ func (w *wallet) SignTx(account accounts.Account, tx *types.Transaction, chainID
 }
 
 // SignHashWithPassphrase implements accounts.Wallet, however signing arbitrary
-// data is not supported for Ledger wallets, so this method will always return
+// data is not supported for Ledger wallets, so this mmblod will always return
 // an error.
 func (w *wallet) SignTextWithPassphrase(account accounts.Account, passphrase string, text []byte) ([]byte, error) {
 	return w.SignText(account, accounts.TextHash(text))

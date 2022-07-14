@@ -14,21 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with go-mbali. If not, see <http://www.gnu.org/licenses/>.
 
-package ethtest
+package mbltest
 
 import (
 	"path/filepath"
 	"strconv"
 	"testing"
 
-	"github.com/mbali/go-mbali/eth/protocols/eth"
+	"github.com/mbali/go-mbali/mbl/protocols/mbl"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/stretchr/testify/assert"
 )
 
-// TestEthProtocolNegotiation tests whether the test suite
-// can negotiate the highest eth protocol in a status message exchange
-func TestEthProtocolNegotiation(t *testing.T) {
+// TestmblProtocolNegotiation tests whmbler the test suite
+// can negotiate the highest mbl protocol in a status message exchange
+func TestmblProtocolNegotiation(t *testing.T) {
 	var tests = []struct {
 		conn     *Conn
 		caps     []p2p.Cap
@@ -39,9 +39,9 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 65,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 63},
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 63},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			expected: uint32(65),
 		},
@@ -50,9 +50,9 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 65,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 63},
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 63},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			expected: uint32(65),
 		},
@@ -61,9 +61,9 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 65,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 63},
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 63},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			expected: uint32(65),
 		},
@@ -72,9 +72,9 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 64,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 63},
-				{Name: "eth", Version: 64},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 63},
+				{Name: "mbl", Version: 64},
+				{Name: "mbl", Version: 65},
 			},
 			expected: 64,
 		},
@@ -83,9 +83,9 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 65,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 0},
-				{Name: "eth", Version: 89},
-				{Name: "eth", Version: 65},
+				{Name: "mbl", Version: 0},
+				{Name: "mbl", Version: 89},
+				{Name: "mbl", Version: 65},
 			},
 			expected: uint32(65),
 		},
@@ -94,8 +94,8 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 64,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 63},
-				{Name: "eth", Version: 64},
+				{Name: "mbl", Version: 63},
+				{Name: "mbl", Version: 64},
 				{Name: "wrongProto", Version: 65},
 			},
 			expected: uint32(64),
@@ -105,8 +105,8 @@ func TestEthProtocolNegotiation(t *testing.T) {
 				ourHighestProtoVersion: 65,
 			},
 			caps: []p2p.Cap{
-				{Name: "eth", Version: 63},
-				{Name: "eth", Version: 64},
+				{Name: "mbl", Version: 63},
+				{Name: "mbl", Version: 64},
 				{Name: "wrongProto", Version: 65},
 			},
 			expected: uint32(64),
@@ -115,13 +115,13 @@ func TestEthProtocolNegotiation(t *testing.T) {
 
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			tt.conn.negotiateEthProtocol(tt.caps)
+			tt.conn.negotiatemblProtocol(tt.caps)
 			assert.Equal(t, tt.expected, uint32(tt.conn.negotiatedProtoVersion))
 		})
 	}
 }
 
-// TestChain_gombleaders tests whether the test suite can correctly
+// TestChain_gombleaders tests whmbler the test suite can correctly
 // respond to a GetBlockHeaders request from a node.
 func TestChain_gombleaders(t *testing.T) {
 	chainFile, err := filepath.Abs("./testdata/chain.rlp")
@@ -144,7 +144,7 @@ func TestChain_gombleaders(t *testing.T) {
 	}{
 		{
 			req: GetBlockHeaders{
-				Origin: eth.HashOrNumber{
+				Origin: mbl.HashOrNumber{
 					Number: uint64(2),
 				},
 				Amount:  uint64(5),
@@ -161,7 +161,7 @@ func TestChain_gombleaders(t *testing.T) {
 		},
 		{
 			req: GetBlockHeaders{
-				Origin: eth.HashOrNumber{
+				Origin: mbl.HashOrNumber{
 					Number: uint64(chain.Len() - 1),
 				},
 				Amount:  uint64(3),
@@ -176,7 +176,7 @@ func TestChain_gombleaders(t *testing.T) {
 		},
 		{
 			req: GetBlockHeaders{
-				Origin: eth.HashOrNumber{
+				Origin: mbl.HashOrNumber{
 					Hash: chain.Head().Hash(),
 				},
 				Amount:  uint64(1),

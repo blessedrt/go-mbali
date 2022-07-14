@@ -98,7 +98,7 @@ func TestUDPv4_LookupIterator(t *testing.T) {
 }
 
 // TestUDPv4_LookupIteratorClose checks that lookupIterator ends when its Close
-// method is called.
+// mmblod is called.
 func TestUDPv4_LookupIteratorClose(t *testing.T) {
 	t.Parallel()
 	test := newUDPTest(t)

@@ -35,8 +35,8 @@ import (
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/eth/ethconfig"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbl/mblconfig"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/internal/debug"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/node"
@@ -77,7 +77,7 @@ func StartNode(ctx *cli.Context, stack *node.Node, isConsole bool) {
 		signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
 		defer signal.Stop(sigc)
 
-		minFreeDiskSpace := 2 * ethconfig.Defaults.TrieDirtyCache // Default 2 * 256Mb
+		minFreeDiskSpace := 2 * mblconfig.Defaults.TrieDirtyCache // Default 2 * 256Mb
 		if ctx.GlobalIsSet(MinFreeDiskSpaceFlag.Name) {
 			minFreeDiskSpace = ctx.GlobalInt(MinFreeDiskSpaceFlag.Name)
 		} else if ctx.GlobalIsSet(CacheFlag.Name) || ctx.GlobalIsSet(CacheGCFlag.Name) {
@@ -289,7 +289,7 @@ func ExportAppendChain(blockchain *core.BlockChain, fn string, first uint64, las
 
 // ImportPreimages imports a batch of exported hash preimages into the database.
 // It's a part of the deprecated functionality, should be removed in the future.
-func ImportPreimages(db ethdb.Database, fn string) error {
+func ImportPreimages(db mbldb.Database, fn string) error {
 	log.Info("Importing preimages", "file", fn)
 
 	// Open the file handle and potentially unwrap the gzip stream
@@ -337,7 +337,7 @@ func ImportPreimages(db ethdb.Database, fn string) error {
 // ExportPreimages exports all known hash preimages into the specified file,
 // truncating any data already present in the file.
 // It's a part of the deprecated functionality, should be removed in the future.
-func ExportPreimages(db ethdb.Database, fn string) error {
+func ExportPreimages(db mbldb.Database, fn string) error {
 	log.Info("Exporting preimages", "file", fn)
 
 	// Open the file handle and potentially wrap with a gzip stream
@@ -384,7 +384,7 @@ const (
 )
 
 // ImportLDBData imports a batch of snapshot data into the database
-func ImportLDBData(db ethdb.Database, f string, startIndex int64, interrupt chan struct{}) error {
+func ImportLDBData(db mbldb.Database, f string, startIndex int64, interrupt chan struct{}) error {
 	log.Info("Importing leveldb data", "file", f)
 
 	// Open the file handle and potentially unwrap the gzip stream
@@ -453,7 +453,7 @@ func ImportLDBData(db ethdb.Database, f string, startIndex int64, interrupt chan
 		default:
 			return fmt.Errorf("unknown op %d\n", op)
 		}
-		if batch.ValueSize() > ethdb.IdealBatchSize {
+		if batch.ValueSize() > mbldb.IdealBatchSize {
 			if err := batch.Write(); err != nil {
 				return err
 			}

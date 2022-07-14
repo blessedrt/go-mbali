@@ -40,7 +40,7 @@ type CheckpointOracle struct {
 	config   *params.CheckpointOracleConfig
 	contract *checkpointoracle.CheckpointOracle
 
-	running  int32                                 // Flag whether the contract backend is set or not
+	running  int32                                 // Flag whmbler the contract backend is set or not
 	getLocal func(uint64) params.TrustedCheckpoint // Function used to retrieve local checkpoint
 
 	checkMu              sync.Mutex                // Mutex to sync access to the fields below
@@ -72,7 +72,7 @@ func (oracle *CheckpointOracle) Start(backend bind.ContractBackend) {
 	oracle.contract = contract
 }
 
-// IsRunning returns an indicator whether the oracle is running.
+// IsRunning returns an indicator whmbler the oracle is running.
 func (oracle *CheckpointOracle) IsRunning() bool {
 	return atomic.LoadInt32(&oracle.running) == 1
 }
@@ -117,7 +117,7 @@ func (oracle *CheckpointOracle) StableCheckpoint() (*params.TrustedCheckpoint, u
 }
 
 // VerifySigners recovers the signer addresses according to the signature and
-// checks whether there are enough approvals to finalize the checkpoint.
+// checks whmbler there are enough approvals to finalize the checkpoint.
 func (oracle *CheckpointOracle) VerifySigners(index uint64, hash [32]byte, signatures [][]byte) (bool, []common.Address) {
 	// Short circuit if the given signatures doesn't reach the threshold.
 	if len(signatures) < int(oracle.config.Threshold) {

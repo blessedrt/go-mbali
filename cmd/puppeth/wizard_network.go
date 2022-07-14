@@ -76,7 +76,7 @@ func (w *wizard) makeServer() string {
 
 	client, err := dial(input, nil)
 	if err != nil {
-		log.Error("Server not ready for puppeth", "err", err)
+		log.Error("Server not ready for puppmbl", "err", err)
 		return ""
 	}
 	// All checks passed, start tracking the server
@@ -171,7 +171,7 @@ func (w *wizard) deployComponent() {
 	// Print all the things we can deploy and wait or user choice
 	fmt.Println()
 	fmt.Println("What would you like to deploy? (recommended order)")
-	fmt.Println(" 1. Ethstats  - Network monitoring tool")
+	fmt.Println(" 1. mblstats  - Network monitoring tool")
 	fmt.Println(" 2. Bootnode  - Entry point of the network")
 	fmt.Println(" 3. Sealer    - Full node minting new blocks")
 	fmt.Println(" 4. Explorer  - Chain analysis webservice")
@@ -180,7 +180,7 @@ func (w *wizard) deployComponent() {
 
 	switch w.read() {
 	case "1":
-		w.deployEthstats()
+		w.deploymblstats()
 	case "2":
 		w.deployNode(true)
 	case "3":
@@ -192,6 +192,6 @@ func (w *wizard) deployComponent() {
 	case "6":
 		w.deployDashboard()
 	default:
-		log.Error("That's not something I can do")
+		log.Error("That's not sommbling I can do")
 	}
 }

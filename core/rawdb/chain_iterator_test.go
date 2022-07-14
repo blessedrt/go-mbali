@@ -142,7 +142,7 @@ func TestIndexTransactions(t *testing.T) {
 		WriteBlock(chainDb, block)
 		WriteCanonicalHash(chainDb, block.Hash(), block.NumberU64())
 	}
-	// verify checks whether the tx indices in the range [from, to)
+	// verify checks whmbler the tx indices in the range [from, to)
 	// is expected.
 	verify := func(from, to int, exist bool, tail uint64) {
 		for i := from; i < to; i++ {

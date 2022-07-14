@@ -28,19 +28,19 @@ import (
 )
 
 // The ABI holds information about a contract's context and available
-// invokable methods. It will allow you to type check function calls and
+// invokable mmblods. It will allow you to type check function calls and
 // packs data accordingly.
 type ABI struct {
-	Constructor Method
-	Methods     map[string]Method
+	Constructor Mmblod
+	Mmblods     map[string]Mmblod
 	Events      map[string]Event
 	Errors      map[string]Error
 
 	// Additional "special" functions introduced in solidity v0.6.0.
 	// It's separated from the original default fallback. Each contract
 	// can only define one fallback and receive function.
-	Fallback Method // Note it's also used to represent legacy fallback before v0.6.0
-	Receive  Method
+	Fallback Mmblod // Note it's also used to represent legacy fallback before v0.6.0
+	Receive  Mmblod
 }
 
 // JSON returns a parsed ABI interface and error if it failed.
@@ -54,13 +54,13 @@ func JSON(reader io.Reader) (ABI, error) {
 	return abi, nil
 }
 
-// Pack the given method name to conform the ABI. Method call's data
-// will consist of method_id, args0, arg1, ... argN. Method id consists
+// Pack the given mmblod name to conform the ABI. Mmblod call's data
+// will consist of mmblod_id, args0, arg1, ... argN. Mmblod id consists
 // of 4 bytes and arguments are all 32 bytes.
-// Method ids are created from the first 4 bytes of the hash of the
-// methods string signature. (signature = baz(uint32,string32))
+// Mmblod ids are created from the first 4 bytes of the hash of the
+// mmblods string signature. (signature = baz(uint32,string32))
 func (abi ABI) Pack(name string, args ...interface{}) ([]byte, error) {
-	// Fetch the ABI of the requested method
+	// Fetch the ABI of the requested mmblod
 	if name == "" {
 		// constructor
 		arguments, err := abi.Constructor.Inputs.Pack(args...)
@@ -69,33 +69,33 @@ func (abi ABI) Pack(name string, args ...interface{}) ([]byte, error) {
 		}
 		return arguments, nil
 	}
-	method, exist := abi.Methods[name]
+	mmblod, exist := abi.Mmblods[name]
 	if !exist {
-		return nil, fmt.Errorf("method '%s' not found", name)
+		return nil, fmt.Errorf("mmblod '%s' not found", name)
 	}
-	arguments, err := method.Inputs.Pack(args...)
+	arguments, err := mmblod.Inputs.Pack(args...)
 	if err != nil {
 		return nil, err
 	}
-	// Pack up the method ID too if not a constructor and return
-	return append(method.ID, arguments...), nil
+	// Pack up the mmblod ID too if not a constructor and return
+	return append(mmblod.ID, arguments...), nil
 }
 
 func (abi ABI) getArguments(name string, data []byte) (Arguments, error) {
 	// since there can't be naming collisions with contracts and events,
-	// we need to decide whether we're calling a method or an event
+	// we need to decide whmbler we're calling a mmblod or an event
 	var args Arguments
-	if method, ok := abi.Methods[name]; ok {
+	if mmblod, ok := abi.Mmblods[name]; ok {
 		if len(data)%32 != 0 {
 			return nil, fmt.Errorf("abi: improperly formatted output: %s - Bytes: [%+v]", string(data), data)
 		}
-		args = method.Outputs
+		args = mmblod.Outputs
 	}
 	if event, ok := abi.Events[name]; ok {
 		args = event.Inputs
 	}
 	if args == nil {
-		return nil, errors.New("abi: could not locate named method or event")
+		return nil, errors.New("abi: could not locate named mmblod or event")
 	}
 	return args, nil
 }
@@ -156,23 +156,23 @@ func (abi *ABI) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &fields); err != nil {
 		return err
 	}
-	abi.Methods = make(map[string]Method)
+	abi.Mmblods = make(map[string]Mmblod)
 	abi.Events = make(map[string]Event)
 	abi.Errors = make(map[string]Error)
 	for _, field := range fields {
 		switch field.Type {
 		case "constructor":
-			abi.Constructor = NewMethod("", "", Constructor, field.StateMutability, field.Constant, field.Payable, field.Inputs, nil)
+			abi.Constructor = NewMmblod("", "", Constructor, field.StateMutability, field.Constant, field.Payable, field.Inputs, nil)
 		case "function":
-			name := ResolveNameConflict(field.Name, func(s string) bool { _, ok := abi.Methods[s]; return ok })
-			abi.Methods[name] = NewMethod(name, field.Name, Function, field.StateMutability, field.Constant, field.Payable, field.Inputs, field.Outputs)
+			name := ResolveNameConflict(field.Name, func(s string) bool { _, ok := abi.Mmblods[s]; return ok })
+			abi.Mmblods[name] = NewMmblod(name, field.Name, Function, field.StateMutability, field.Constant, field.Payable, field.Inputs, field.Outputs)
 		case "fallback":
 			// New introduced function type in v0.6.0, check more detail
 			// here https://solidity.readthedocs.io/en/v0.6.0/contracts.html#fallback-function
 			if abi.HasFallback() {
 				return errors.New("only single fallback is allowed")
 			}
-			abi.Fallback = NewMethod("", "", Fallback, field.StateMutability, field.Constant, field.Payable, nil, nil)
+			abi.Fallback = NewMmblod("", "", Fallback, field.StateMutability, field.Constant, field.Payable, nil, nil)
 		case "receive":
 			// New introduced function type in v0.6.0, check more detail
 			// here https://solidity.readthedocs.io/en/v0.6.0/contracts.html#fallback-function
@@ -182,7 +182,7 @@ func (abi *ABI) UnmarshalJSON(data []byte) error {
 			if field.StateMutability != "payable" {
 				return errors.New("the statemutability of receive can only be payable")
 			}
-			abi.Receive = NewMethod("", "", Receive, field.StateMutability, field.Constant, field.Payable, nil, nil)
+			abi.Receive = NewMmblod("", "", Receive, field.StateMutability, field.Constant, field.Payable, nil, nil)
 		case "event":
 			name := ResolveNameConflict(field.Name, func(s string) bool { _, ok := abi.Events[s]; return ok })
 			abi.Events[name] = NewEvent(name, field.Name, field.Anonymous, field.Inputs)
@@ -197,18 +197,18 @@ func (abi *ABI) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MethodById looks up a method by the 4-byte id,
+// MmblodById looks up a mmblod by the 4-byte id,
 // returns nil if none found.
-func (abi *ABI) MethodById(sigdata []byte) (*Method, error) {
+func (abi *ABI) MmblodById(sigdata []byte) (*Mmblod, error) {
 	if len(sigdata) < 4 {
-		return nil, fmt.Errorf("data too short (%d bytes) for abi method lookup", len(sigdata))
+		return nil, fmt.Errorf("data too short (%d bytes) for abi mmblod lookup", len(sigdata))
 	}
-	for _, method := range abi.Methods {
-		if bytes.Equal(method.ID, sigdata[:4]) {
-			return &method, nil
+	for _, mmblod := range abi.Mmblods {
+		if bytes.Equal(mmblod.ID, sigdata[:4]) {
+			return &mmblod, nil
 		}
 	}
-	return nil, fmt.Errorf("no method with id: %#x", sigdata[:4])
+	return nil, fmt.Errorf("no mmblod with id: %#x", sigdata[:4])
 }
 
 // EventByID looks an event up by its topic hash in the
@@ -222,12 +222,12 @@ func (abi *ABI) EventByID(topic common.Hash) (*Event, error) {
 	return nil, fmt.Errorf("no event with id: %#x", topic.Hex())
 }
 
-// HasFallback returns an indicator whether a fallback function is included.
+// HasFallback returns an indicator whmbler a fallback function is included.
 func (abi *ABI) HasFallback() bool {
 	return abi.Fallback.Type == Fallback
 }
 
-// HasReceive returns an indicator whether a receive function is included.
+// HasReceive returns an indicator whmbler a receive function is included.
 func (abi *ABI) HasReceive() bool {
 	return abi.Receive.Type == Receive
 }

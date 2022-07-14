@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common/mclock"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/p2p/enode"
 	"github.com/mbali/go-mbali/p2p/enr"
 )
@@ -51,7 +51,7 @@ func testNodeIndex(id enode.ID) int {
 }
 
 type ServerPoolTest struct {
-	db                   ethdb.KeyValueStore
+	db                   mbldb.KeyValueStore
 	clock                *mclock.Simulated
 	quit                 chan chan struct{}
 	preNeg, preNegFail   bool

@@ -24,7 +24,7 @@ import (
 
 	"github.com/mbali/go-mbali/core/state"
 	"github.com/mbali/go-mbali/core/vm"
-	"github.com/mbali/go-mbali/eth/tracers/logger"
+	"github.com/mbali/go-mbali/mbl/tracers/logger"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/tests"
 
@@ -55,7 +55,7 @@ func stateTestCmd(ctx *cli.Context) error {
 	// Configure the go-mbali logger
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.Lvl(ctx.GlobalInt(VerbosityFlag.Name)))
-	log.Root().SetHandler(glogger)
+	log.Root().Smblandler(glogger)
 
 	// Configure the EVM logger
 	config := &logger.Config{

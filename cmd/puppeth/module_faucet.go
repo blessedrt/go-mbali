@@ -42,7 +42,7 @@ ADD account.pass /account.pass
 EXPOSE 8080 30303 30303/udp
 
 ENTRYPOINT [ \
-	"faucet", "--genesis", "/genesis.json", "--network", "{{.NetworkID}}", "--bootnodes", "{{.Bootnodes}}", "--ethstats", "{{.Ethstats}}", "--ethport", "{{.EthPort}}",     \
+	"faucet", "--genesis", "/genesis.json", "--network", "{{.NetworkID}}", "--bootnodes", "{{.Bootnodes}}", "--mblstats", "{{.mblstats}}", "--mblport", "{{.mblPort}}",     \
 	"--faucet.name", "{{.FaucetName}}", "--faucet.amount", "{{.FaucetAmount}}", "--faucet.minutes", "{{.FaucetMinutes}}", "--faucet.tiers", "{{.FaucetTiers}}",             \
 	"--account.json", "/account.json", "--account.pass", "/account.pass"                                                                                                    \
 	{{if .CaptchaToken}}, "--captcha.token", "{{.CaptchaToken}}", "--captcha.secret", "{{.CaptchaSecret}}"{{end}}{{if .NoAuth}}, "--noauth"{{end}}                          \
@@ -59,14 +59,14 @@ services:
     image: {{.Network}}/faucet
     container_name: {{.Network}}_faucet_1
     ports:
-      - "{{.EthPort}}:{{.EthPort}}"
-      - "{{.EthPort}}:{{.EthPort}}/udp"{{if not .VHost}}
+      - "{{.mblPort}}:{{.mblPort}}"
+      - "{{.mblPort}}:{{.mblPort}}/udp"{{if not .VHost}}
       - "{{.ApiPort}}:8080"{{end}}
     volumes:
       - {{.Datadir}}:/root/.faucet
     environment:
-      - ETH_PORT={{.EthPort}}
-      - ETH_NAME={{.EthName}}
+      - mbl_PORT={{.mblPort}}
+      - mbl_NAME={{.mblName}}
       - FAUCET_AMOUNT={{.FaucetAmount}}
       - FAUCET_MINUTES={{.FaucetMinutes}}
       - FAUCET_TIERS={{.FaucetTiers}}
@@ -96,8 +96,8 @@ func deployFaucet(client *sshClient, network string, bootnodes []string, config 
 	template.Must(template.New("").Parse(faucetDockerfile)).Execute(dockerfile, map[string]interface{}{
 		"NetworkID":     config.node.network,
 		"Bootnodes":     strings.Join(bootnodes, ","),
-		"Ethstats":      config.node.ethstats,
-		"EthPort":       config.node.port,
+		"mblstats":      config.node.mblstats,
+		"mblPort":       config.node.port,
 		"CaptchaToken":  config.captchaToken,
 		"CaptchaSecret": config.captchaSecret,
 		"FaucetName":    strings.Title(network),
@@ -115,8 +115,8 @@ func deployFaucet(client *sshClient, network string, bootnodes []string, config 
 		"Datadir":       config.node.datadir,
 		"VHost":         config.host,
 		"ApiPort":       config.port,
-		"EthPort":       config.node.port,
-		"EthName":       config.node.ethstats[:strings.Index(config.node.ethstats, ":")],
+		"mblPort":       config.node.port,
+		"mblName":       config.node.mblstats[:strings.Index(config.node.mblstats, ":")],
 		"CaptchaToken":  config.captchaToken,
 		"CaptchaSecret": config.captchaSecret,
 		"FaucetAmount":  config.amount,
@@ -166,12 +166,12 @@ func (info *faucetInfos) Report() map[string]string {
 		"Website address":              info.host,
 		"Website listener port":        strconv.Itoa(info.port),
 		"mbali listener port":       strconv.Itoa(info.node.port),
-		"Funding amount (base tier)":   fmt.Sprintf("%d Ethers", info.amount),
+		"Funding amount (base tier)":   fmt.Sprintf("%d mblers", info.amount),
 		"Funding cooldown (base tier)": fmt.Sprintf("%d mins", info.minutes),
 		"Funding tiers":                strconv.Itoa(info.tiers),
 		"Captha protection":            fmt.Sprintf("%v", info.captchaToken != ""),
 		"Using Twitter API":            fmt.Sprintf("%v", info.twitterToken != ""),
-		"Ethstats username":            info.node.ethstats,
+		"mblstats username":            info.node.mblstats,
 	}
 	if info.noauth {
 		report["Debug mode (no auth)"] = "enabled"
@@ -189,7 +189,7 @@ func (info *faucetInfos) Report() map[string]string {
 	return report
 }
 
-// checkFaucet does a health-check against a faucet server to verify whether
+// checkFaucet does a health-check against a faucet server to verify whmbler
 // it's running, and if yes, gathering a collection of useful infos about it.
 func checkFaucet(client *sshClient, network string) (*faucetInfos, error) {
 	// Inspect a possible faucet container on the host
@@ -236,8 +236,8 @@ func checkFaucet(client *sshClient, network string) (*faucetInfos, error) {
 	return &faucetInfos{
 		node: &nodeInfos{
 			datadir:  infos.volumes["/root/.faucet"],
-			port:     infos.portmap[infos.envvars["ETH_PORT"]+"/tcp"],
-			ethstats: infos.envvars["ETH_NAME"],
+			port:     infos.portmap[infos.envvars["mbl_PORT"]+"/tcp"],
+			mblstats: infos.envvars["mbl_NAME"],
 			keyJSON:  keyJSON,
 			keyPass:  keyPass,
 		},

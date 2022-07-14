@@ -68,7 +68,7 @@ type TrieHasher interface {
 
 // DerivableList is the input to DeriveSha.
 // It is implemented by the 'Transactions' and 'Receipts' types.
-// This is internal, do not use these methods.
+// This is internal, do not use these mmblods.
 type DerivableList interface {
 	Len() int
 	EncodeIndex(int, *bytes.Buffer)

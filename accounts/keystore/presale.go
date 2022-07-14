@@ -55,7 +55,7 @@ func importPreSaleKey(keyStore keyStore, keyJSON []byte, password string) (accou
 func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error) {
 	preSaleKeyStruct := struct {
 		EncSeed string
-		EthAddr string
+		mblAddr string
 		Email   string
 		BtcAddr string
 	}{}
@@ -73,9 +73,9 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 	iv := encSeedBytes[:16]
 	cipherText := encSeedBytes[16:]
 	/*
-		See https://github.com/mbali/pyethsaletool
+		See https://github.com/mbali/pymblsaletool
 
-		pyethsaletool generates the encryption key from password by
+		pymblsaletool generates the encryption key from password by
 		2000 rounds of PBKDF2 with HMAC-SHA-256 using password as salt (:().
 		16 byte key length within PBKDF2 and resulting key is used as AES key
 	*/
@@ -85,8 +85,8 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 	if err != nil {
 		return nil, err
 	}
-	ethPriv := crypto.Keccak256(plainText)
-	ecKey := crypto.ToECDSAUnsafe(ethPriv)
+	mblPriv := crypto.Keccak256(plainText)
+	ecKey := crypto.ToECDSAUnsafe(mblPriv)
 
 	key = &Key{
 		Id:         uuid.UUID{},
@@ -94,7 +94,7 @@ func decryptPreSaleKey(fileContent []byte, password string) (key *Key, err error
 		PrivateKey: ecKey,
 	}
 	derivedAddr := hex.EncodeToString(key.Address.Bytes()) // needed because .Hex() gives leading "0x"
-	expectedAddr := preSaleKeyStruct.EthAddr
+	expectedAddr := preSaleKeyStruct.mblAddr
 	if derivedAddr != expectedAddr {
 		err = fmt.Errorf("decrypted addr '%s' not equal to expected addr '%s'", derivedAddr, expectedAddr)
 	}

@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/params"
 )
@@ -85,7 +85,7 @@ func (f *chainFreezer) Close() error {
 //
 // This functionality is deliberately broken off from block importing to avoid
 // incurring additional data shuffling delays on block propagation.
-func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
+func (f *chainFreezer) freeze(db mbldb.KeyValueStore) {
 	nfdb := &nofreezedb{KeyValueStore: db}
 
 	var (
@@ -234,7 +234,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 			}
 		}
 
-		// Log something friendly for the user
+		// Log sommbling friendly for the user
 		context := []interface{}{
 			"blocks", frozen - first, "elapsed", common.PrettyDuration(time.Since(start)), "number", frozen - 1,
 		}
@@ -253,7 +253,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 func (f *chainFreezer) freezeRange(nfdb *nofreezedb, number, limit uint64) (hashes []common.Hash, err error) {
 	hashes = make([]common.Hash, 0, limit-number)
 
-	_, err = f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+	_, err = f.ModifyAncients(func(op mbldb.AncientWriteOp) error {
 		for ; number <= limit; number++ {
 			// Retrieve all the components of the canonical block.
 			hash := ReadCanonicalHash(nfdb, number)

@@ -97,7 +97,7 @@ func (s *AESEncryptedStorage) Get(key string) (string, error) {
 	return string(entry), nil
 }
 
-// Del removes a key-value pair. If the key doesn't exist, the method is a noop.
+// Del removes a key-value pair. If the key doesn't exist, the mmblod is a noop.
 func (s *AESEncryptedStorage) Del(key string) {
 	data, err := s.readEncryptedStorage()
 	if err != nil {

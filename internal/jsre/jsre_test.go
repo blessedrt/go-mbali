@@ -34,7 +34,7 @@ type msg struct {
 	Msg string
 }
 
-func (no *testNativeObjectBinding) TestMethod(call goja.FunctionCall) goja.Value {
+func (no *testNativeObjectBinding) TestMmblod(call goja.FunctionCall) goja.Value {
 	m := call.Argument(0).ToString().String()
 	return no.vm.ToValue(&msg{m})
 }
@@ -101,7 +101,7 @@ func TestBind(t *testing.T) {
 
 	jsre.Set("no", &testNativeObjectBinding{vm: jsre.vm})
 
-	_, err := jsre.Run(`no.TestMethod("testMsg")`)
+	_, err := jsre.Run(`no.TestMmblod("testMsg")`)
 	if err != nil {
 		t.Errorf("expected no error, got %v", err)
 	}

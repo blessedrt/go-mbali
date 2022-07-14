@@ -50,7 +50,7 @@ func New() (*Database, error) {
 }
 
 // NewFromFile loads signature database from file, and errors if the file is not
-// valid JSON. The constructor does no other validation of contents. This method
+// valid JSON. The constructor does no other validation of contents. This mmblod
 // does not load the embedded 4byte database.
 //
 // The provided path will be used to write new values into if they are submitted
@@ -97,9 +97,9 @@ func (db *Database) Size() (int, int) {
 	return len(db.embedded), len(db.custom)
 }
 
-// Selector checks the given 4byte ID against the known ABI methods.
+// Selector checks the given 4byte ID against the known ABI mmblods.
 //
-// This method does not validate the match, it's assumed the caller will do.
+// This mmblod does not validate the match, it's assumed the caller will do.
 func (db *Database) Selector(id []byte) (string, error) {
 	if len(id) < 4 {
 		return "", fmt.Errorf("expected 4-byte id, got %d", len(id))
@@ -117,7 +117,7 @@ func (db *Database) Selector(id []byte) (string, error) {
 // AddSelector inserts a new 4byte entry into the database. If custom database
 // saving is enabled, the new dataset is also persisted to disk.
 //
-// Node, this method does _not_ validate the correctness of the data. It assumes
+// Node, this mmblod does _not_ validate the correctness of the data. It assumes
 // the caller has already done so.
 func (db *Database) AddSelector(selector string, data []byte) error {
 	// If the selector is already known, skip duplicating it

@@ -70,17 +70,17 @@ The security model of Clef is as follows:
 The general flow for signing a transaction using e.g. gombl is as follows:
 ![image](sign_flow.png)
 
-In this case, `gombl` would be started with `--signer http://localhost:8550` and would relay requests to `eth.sendTransaction`.
+In this case, `gombl` would be started with `--signer http://localhost:8550` and would relay requests to `mbl.sendTransaction`.
 
 ## TODOs
 
 Some snags and todos
 
 * [ ] Clef should take a startup param "--no-change", for UIs that do not contain the capability to perform changes to things, only approve/deny. Such a UI should be able to start the signer in a more secure mode by telling it that it only wants approve/deny capabilities.
-* [x] It would be nice if Clef could collect new 4byte-id:s/method selectors, and have a secondary database for those (`4byte_custom.json`). Users could then (optionally) submit their collections for inclusion upstream.
+* [x] It would be nice if Clef could collect new 4byte-id:s/mmblod selectors, and have a secondary database for those (`4byte_custom.json`). Users could then (optionally) submit their collections for inclusion upstream.
 * [ ] It should be possible to configure Clef to check if an account is indeed known to it, before passing on to the UI. The reason it currently does not, is that it would make it possible to enumerate accounts if it immediately returned "unknown account" (side channel attack).
 * [x] It should be possible to configure Clef to auto-allow listing (certain) accounts, instead of asking every time.
-* [x] Done Upon startup, Clef should spit out some info to the caller (particularly important when executed in `stdio-ui`-mode), invoking methods with the following info:
+* [x] Done Upon startup, Clef should spit out some info to the caller (particularly important when executed in `stdio-ui`-mode), invoking mmblods with the following info:
   * [x] Version info about the signer
   * [x] Address of API (HTTP/IPC)
   * [ ] List of known accounts
@@ -107,7 +107,7 @@ Some snags and todos
   * Thus gombl/cpp would cryptographically handshake and afterwards the caller would be allowed to make signing requests.
   * This feature would make the addition of rules less dangerous.
 
-* Wallets / accounts. Add API methods for wallets.
+* Wallets / accounts. Add API mmblods for wallets.
 
 ## Communication
 
@@ -151,7 +151,7 @@ All hex encoded values must be prefixed with `0x`.
 #### Create new password protected account
 
 The signer will generate a new private key, encrypt it according to [web3 keystore spec](https://github.com/mbali/wiki/wiki/Web3-Secret-Storage-Definition) and store it in the keystore directory.  
-The client is responsible for creating a backup of the keystore. If the keystore is lost there is no method of retrieving lost accounts.
+The client is responsible for creating a backup of the keystore. If the keystore is lost there is no mmblod of retrieving lost accounts.
 
 #### Arguments
 
@@ -165,7 +165,7 @@ None
 {
   "id": 0,
   "jsonrpc": "2.0",
-  "method": "account_new",
+  "mmblod": "account_new",
   "params": []
 }
 ```
@@ -196,7 +196,7 @@ None
 {
   "id": 1,
   "jsonrpc": "2.0",
-  "method": "account_list"
+  "mmblod": "account_list"
 }
 ```
 Response
@@ -225,8 +225,8 @@ Response
      - `value` [number:optional]: amount of Wei to send with the transaction
      - `data` [data:optional]:  input data
      - `nonce` [number]: account nonce
-  1. method signature [string:optional]
-     - The method signature, if present, is to aid decoding the calldata. Should consist of `methodname(paramtype,...)`, e.g. `transfer(uint256,address)`. The signer may use this data to parse the supplied calldata, and show the user. The data, however, is considered totally untrusted, and reliability is not expected.
+  1. mmblod signature [string:optional]
+     - The mmblod signature, if present, is to aid decoding the calldata. Should consist of `mmblodname(paramtype,...)`, e.g. `transfer(uint256,address)`. The signer may use this data to parse the supplied calldata, and show the user. The data, however, is considered totally untrusted, and reliability is not expected.
 
 
 #### Result
@@ -238,7 +238,7 @@ Response
 {
   "id": 2,
   "jsonrpc": "2.0",
-  "method": "account_signTransaction",
+  "mmblod": "account_signTransaction",
   "params": [
     {
       "from": "0x1923f626bb8dc025849e00f99c25fe2b2f7fb0db",
@@ -282,7 +282,7 @@ Response
 {
   "id": 67,
   "jsonrpc": "2.0",
-  "method": "account_signTransaction",
+  "mmblod": "account_signTransaction",
   "params": [
     {
       "from": "0x694267f14675d7e1b9494fd8d72fefe1755710fa",
@@ -323,7 +323,7 @@ Response
 
 Bash example:
 ```bash
-> curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
+> curl -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","mmblod":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 
 {"jsonrpc":"2.0","id":67,"result":{"raw":"0xf88380018203339407a565b7ed7d7a678680a4c162885bedbb695fe080a44401a6e4000000000000000000000000000000000000000000000000000000000000001226a0223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20ea02aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663","tx":{"nonce":"0x0","gasPrice":"0x1","gas":"0x333","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0","value":"0x0","input":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012","v":"0x26","r":"0x223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20e","s":"0x2aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663","hash":"0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e"}}}
 ```
@@ -349,7 +349,7 @@ Bash example:
 {
   "id": 3,
   "jsonrpc": "2.0",
-  "method": "account_signData",
+  "mmblod": "account_signData",
   "params": [
     "data/plain",
     "0x1923f626bb8dc025849e00f99c25fe2b2f7fb0db",
@@ -384,7 +384,7 @@ Response
 {
   "id": 68,
   "jsonrpc": "2.0",
-  "method": "account_signTypedData",
+  "mmblod": "account_signTypedData",
   "params": [
     "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
     {
@@ -434,7 +434,7 @@ Response
       },
       "primaryType": "Mail",
       "domain": {
-        "name": "Ether Mail",
+        "name": "mbler Mail",
         "version": "1",
         "chainId": 1,
         "verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
@@ -482,7 +482,7 @@ Derive the address from the account that was used to sign data with content type
 {
   "id": 4,
   "jsonrpc": "2.0",
-  "method": "account_ecRecover",
+  "mmblod": "account_ecRecover",
   "params": [
     "0xaabbccdd",
     "0x5b6693f153b48ec1c706ba4169960386dbaa6903e249cc79a8e6ddc434451d417e1e57327872c7f538beeb323c300afa9999a3d4a5de6caf3be0d5ef832b67ef1c"
@@ -518,7 +518,7 @@ None
 {
   "id": 0,
   "jsonrpc": "2.0",
-  "method": "account_version",
+  "mmblod": "account_version",
   "params": []
 }
 ```
@@ -534,13 +534,13 @@ Response
 
 ## UI API
 
-These methods needs to be implemented by a UI listener.
+These mmblods needs to be implemented by a UI listener.
 
-By starting the signer with the switch `--stdio-ui-test`, the signer will invoke all known methods, and expect the UI to respond with
+By starting the signer with the switch `--stdio-ui-test`, the signer will invoke all known mmblods, and expect the UI to respond with
 denials. This can be used during development to ensure that the API is (at least somewhat) correctly implemented.
 See `pythonsigner`, which can be invoked via `python3 pythonsigner.py test` to perform the 'denial-handshake-test'.
 
-All methods in this API use object-based parameters, so that there can be no mixup of parameters: each piece of data is accessed by key.
+All mmblods in this API use object-based parameters, so that there can be no mixup of parameters: each piece of data is accessed by key.
 
 See the [ui API changelog](intapi_changelog.md) for information about changes to this API.
 
@@ -555,10 +555,10 @@ Invoked when there's a transaction for approval.
 
 #### Sample call
 
-Here's a method invocation:
+Here's a mmblod invocation:
 ```bash
 
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","mmblod":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 ```
 Results in the following invocation on the UI:
 ```json
@@ -566,7 +566,7 @@ Results in the following invocation on the UI:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "ui_approveTx",
+  "mmblod": "ui_approveTx",
   "params": [
     {
       "transaction": {
@@ -600,10 +600,10 @@ Results in the following invocation on the UI:
 
 ```
 
-The same method invocation, but with invalid data:
+The same mmblod invocation, but with invalid data:
 ```bash
 
-curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000002000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
+curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","mmblod":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000002000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 ```
 
 ```json
@@ -611,7 +611,7 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","me
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "ui_approveTx",
+  "mmblod": "ui_approveTx",
   "params": [
     {
       "transaction": {
@@ -631,7 +631,7 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","me
           },
           {
             "type": "WARNING",
-            "message": "Transaction data did not match ABI-interface: WARNING: Supplied data is stuffed with extra data. \nWant 0000000000000002000000000000000000000000000000000000000000000012\nHave 0000000000000000000000000000000000000000000000000000000000000012\nfor method safeSend(address)"
+            "message": "Transaction data did not match ABI-interface: WARNING: Supplied data is stuffed with extra data. \nWant 0000000000000002000000000000000000000000000000000000000000000012\nHave 0000000000000000000000000000000000000000000000000000000000000012\nfor mmblod safeSend(address)"
           }
         ],
       "meta": {
@@ -654,7 +654,7 @@ One which has missing `to`, but with no `data`:
 {
   "jsonrpc": "2.0",
   "id": 3,
-  "method": "ui_approveTx",
+  "mmblod": "ui_approveTx",
   "params": [
     {
       "transaction": {
@@ -694,7 +694,7 @@ Invoked when a request for account listing has been made.
 {
   "jsonrpc": "2.0",
   "id": 5,
-  "method": "ui_approveListing",
+  "mmblod": "ui_approveListing",
   "params": [
     {
       "accounts": [
@@ -727,7 +727,7 @@ Invoked when a request for account listing has been made.
 {
   "jsonrpc": "2.0",
   "id": 4,
-  "method": "ui_approveSignData",
+  "mmblod": "ui_approveSignData",
   "params": [
     {
       "address": "0x123409812340981234098123409812deadbeef42",
@@ -760,7 +760,7 @@ Invoked when a request for creating a new account has been made.
 {
   "jsonrpc": "2.0",
   "id": 4,
-  "method": "ui_approveNewAccount",
+  "mmblod": "ui_approveNewAccount",
   "params": [
     {
       "meta": {
@@ -783,7 +783,7 @@ The UI should show the info (a single message) to the user. Does not expect resp
 {
   "jsonrpc": "2.0",
   "id": 9,
-  "method": "ui_showInfo",
+  "mmblod": "ui_showInfo",
   "params": [
     "Tests completed"
   ]
@@ -800,9 +800,9 @@ The UI should show the error (a single message) to the user. Does not expect res
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "method": "ui_showError",
+  "mmblod": "ui_showError",
   "params": [
-    "Something bad happened!"
+    "Sommbling bad happened!"
   ]
 }
 
@@ -810,11 +810,11 @@ The UI should show the error (a single message) to the user. Does not expect res
 
 ### OnApprovedTx / `ui_onApprovedTx`
 
-`OnApprovedTx` is called when a transaction has been approved and signed. The call contains the return value that will be sent to the external caller.  The return value from this method is ignored - the reason for having this callback is to allow the ruleset to keep track of approved transactions.
+`OnApprovedTx` is called when a transaction has been approved and signed. The call contains the return value that will be sent to the external caller.  The return value from this mmblod is ignored - the reason for having this callback is to allow the ruleset to keep track of approved transactions.
 
 When implementing rate-limited rules, this callback should be used.
 
-TLDR; Use this method to keep track of signed transactions, instead of using the data in `ApproveTx`.
+TLDR; Use this mmblod to keep track of signed transactions, instead of using the data in `ApproveTx`.
 
 Example call:
 ```json
@@ -822,7 +822,7 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "ui_onApprovedTx",
+  "mmblod": "ui_onApprovedTx",
   "params": [
     {
       "raw": "0xf88380018203339407a565b7ed7d7a678680a4c162885bedbb695fe080a44401a6e4000000000000000000000000000000000000000000000000000000000000001226a0223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20ea02aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663",
@@ -845,7 +845,7 @@ Example call:
 
 ### OnSignerStartup / `ui_onSignerStartup`
 
-This method provides the UI with information about what API version the signer uses (both internal and external) as well as build-info and external API,
+This mmblod provides the UI with information about what API version the signer uses (both internal and external) as well as build-info and external API,
 in k/v-form.
 
 Example call:
@@ -854,7 +854,7 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "ui_onSignerStartup",
+  "mmblod": "ui_onSignerStartup",
   "params": [
     {
       "info": {
@@ -879,7 +879,7 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "ui_onInputRequired",
+  "mmblod": "ui_onInputRequired",
   "params": [
     {
       "title": "Account password",

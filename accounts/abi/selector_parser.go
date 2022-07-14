@@ -144,7 +144,7 @@ func assembleArgs(args []interface{}) ([]ArgumentMarshaling, error) {
 	return arguments, nil
 }
 
-// ParseSelector converts a method selector into a struct that can be JSON encoded
+// ParseSelector converts a mmblod selector into a struct that can be JSON encoded
 // and consumed by other functions in this package.
 // Note, although uppercase letters are not part of the ABI spec, this function
 // still accepts it as the general format is valid.

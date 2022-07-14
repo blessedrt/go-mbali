@@ -43,7 +43,7 @@ type twoOperandParams struct {
 
 var alphabetSoup = "ABCDEF090807060504030201ffffffffffffffffffffffffffffffffffffffff"
 var commonParams []*twoOperandParams
-var twoOpMethods map[string]executionFunc
+var twoOpMmblods map[string]executionFunc
 
 func init() {
 
@@ -66,7 +66,7 @@ func init() {
 			commonParams[i*len(params)+j] = &twoOperandParams{x, y}
 		}
 	}
-	twoOpMethods = map[string]executionFunc{
+	twoOpMmblods = map[string]executionFunc{
 		"add":     opAdd,
 		"sub":     opSub,
 		"mul":     opMul,
@@ -255,8 +255,8 @@ func getResult(args []*twoOperandParams, opFn executionFunc) []TwoOperandTestcas
 func TestWriteExpectedValues(t *testing.T) {
 	t.Skip("Enable this test to create json test cases.")
 
-	for name, method := range twoOpMethods {
-		data, err := json.Marshal(getResult(commonParams, method))
+	for name, mmblod := range twoOpMmblods {
+		data, err := json.Marshal(getResult(commonParams, mmblod))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -269,14 +269,14 @@ func TestWriteExpectedValues(t *testing.T) {
 
 // TestJsonTestcases runs through all the testcases defined as json-files
 func TestJsonTestcases(t *testing.T) {
-	for name := range twoOpMethods {
+	for name := range twoOpMmblods {
 		data, err := os.ReadFile(fmt.Sprintf("testdata/testcases_%v.json", name))
 		if err != nil {
 			t.Fatal("Failed to read file", err)
 		}
 		var testcases []TwoOperandTestcase
 		json.Unmarshal(data, &testcases)
-		testTwoOperandOp(t, testcases, twoOpMethods[name], name)
+		testTwoOperandOp(t, testcases, twoOpMmblods[name], name)
 	}
 }
 

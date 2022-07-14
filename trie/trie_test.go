@@ -34,16 +34,16 @@ import (
 	"github.com/mbali/go-mbali/core/rawdb"
 	"github.com/mbali/go-mbali/core/types"
 	"github.com/mbali/go-mbali/crypto"
-	"github.com/mbali/go-mbali/ethdb"
-	"github.com/mbali/go-mbali/ethdb/leveldb"
-	"github.com/mbali/go-mbali/ethdb/memorydb"
+	"github.com/mbali/go-mbali/mbldb"
+	"github.com/mbali/go-mbali/mbldb/leveldb"
+	"github.com/mbali/go-mbali/mbldb/memorydb"
 	"github.com/mbali/go-mbali/rlp"
 	"golang.org/x/crypto/sha3"
 )
 
 func init() {
 	spew.Config.Indent = "    "
-	spew.Config.DisableMethods = false
+	spew.Config.DisableMmblods = false
 }
 
 // Used for testing
@@ -210,11 +210,11 @@ func TestDelete(t *testing.T) {
 	trie := newEmpty()
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
-		{"ether", ""},
+		{"mbler", ""},
 		{"dog", "puppy"},
 		{"shaman", ""},
 	}
@@ -238,11 +238,11 @@ func TestEmptyValues(t *testing.T) {
 
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
-		{"ether", ""},
+		{"mbler", ""},
 		{"dog", "puppy"},
 		{"shaman", ""},
 	}
@@ -261,12 +261,12 @@ func TestReplication(t *testing.T) {
 	trie := newEmpty()
 	vals := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		{"shaman", "horse"},
 		{"doge", "coin"},
 		{"dog", "puppy"},
-		{"somethingveryoddindeedthis is", "myothernodedata"},
+		{"sommblingveryoddindeedthis is", "myothernodedata"},
 	}
 	for _, val := range vals {
 		updateString(trie, val.k, val.v)
@@ -297,13 +297,13 @@ func TestReplication(t *testing.T) {
 	// perform some insertions on the new trie.
 	vals2 := []struct{ k, v string }{
 		{"do", "verb"},
-		{"ether", "wookiedoo"},
+		{"mbler", "wookiedoo"},
 		{"horse", "stallion"},
 		// {"shaman", "horse"},
 		// {"doge", "coin"},
-		// {"ether", ""},
+		// {"mbler", ""},
 		// {"dog", "puppy"},
-		// {"somethingveryoddindeedthis is", "myothernodedata"},
+		// {"sommblingveryoddindeedthis is", "myothernodedata"},
 		// {"shaman", ""},
 	}
 	for _, val := range vals2 {
@@ -736,9 +736,9 @@ type spongeDb struct {
 func (s *spongeDb) Has(key []byte) (bool, error)             { panic("implement me") }
 func (s *spongeDb) Get(key []byte) ([]byte, error)           { return nil, errors.New("no such elem") }
 func (s *spongeDb) Delete(key []byte) error                  { panic("implement me") }
-func (s *spongeDb) NewBatch() ethdb.Batch                    { return &spongeBatch{s} }
-func (s *spongeDb) NewBatchWithSize(size int) ethdb.Batch    { return &spongeBatch{s} }
-func (s *spongeDb) NewSnapshot() (ethdb.Snapshot, error)     { panic("implement me") }
+func (s *spongeDb) NewBatch() mbldb.Batch                    { return &spongeBatch{s} }
+func (s *spongeDb) NewBatchWithSize(size int) mbldb.Batch    { return &spongeBatch{s} }
+func (s *spongeDb) NewSnapshot() (mbldb.Snapshot, error)     { panic("implement me") }
 func (s *spongeDb) Stat(property string) (string, error)     { panic("implement me") }
 func (s *spongeDb) Compact(start []byte, limit []byte) error { panic("implement me") }
 func (s *spongeDb) Close() error                             { return nil }
@@ -752,7 +752,7 @@ func (s *spongeDb) Put(key []byte, value []byte) error {
 	s.sponge.Write(value)
 	return nil
 }
-func (s *spongeDb) NewIterator(prefix []byte, start []byte) ethdb.Iterator { panic("implement me") }
+func (s *spongeDb) NewIterator(prefix []byte, start []byte) mbldb.Iterator { panic("implement me") }
 
 // spongeBatch is a dummy batch which immediately writes to the underlying spongedb
 type spongeBatch struct {
@@ -767,12 +767,12 @@ func (b *spongeBatch) Delete(key []byte) error             { panic("implement me
 func (b *spongeBatch) ValueSize() int                      { return 100 }
 func (b *spongeBatch) Write() error                        { return nil }
 func (b *spongeBatch) Reset()                              {}
-func (b *spongeBatch) Replay(w ethdb.KeyValueWriter) error { return nil }
+func (b *spongeBatch) Replay(w mbldb.KeyValueWriter) error { return nil }
 
 // TestCommitSequence tests that the trie.Commit operation writes the elements of the trie
 // in the expected order, and calls the callbacks in the expected order.
 // The test data was based on the 'master' code, and is basically random. It can be used
-// to check whether changes to the trie modifies the write order or data in any way.
+// to check whmbler changes to the trie modifies the write order or data in any way.
 func TestCommitSequence(t *testing.T) {
 	for i, tc := range []struct {
 		count              int

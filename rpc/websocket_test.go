@@ -57,7 +57,7 @@ func TestWebsocketOriginCheck(t *testing.T) {
 
 	var (
 		srv     = newTestServer()
-		httpsrv = httptest.NewServer(srv.WebsocketHandler([]string{"http://example.com"}))
+		httpsrv = httptest.NewServer(srv.Websockmblandler([]string{"http://example.com"}))
 		wsURL   = "ws:" + strings.TrimPrefix(httpsrv.URL, "http:")
 	)
 	defer srv.Stop()
@@ -81,13 +81,13 @@ func TestWebsocketOriginCheck(t *testing.T) {
 	client.Close()
 }
 
-// This test checks whether calls exceeding the request size limit are rejected.
+// This test checks whmbler calls exceeding the request size limit are rejected.
 func TestWebsocketLargeCall(t *testing.T) {
 	t.Parallel()
 
 	var (
 		srv     = newTestServer()
-		httpsrv = httptest.NewServer(srv.WebsocketHandler([]string{"*"}))
+		httpsrv = httptest.NewServer(srv.Websockmblandler([]string{"*"}))
 		wsURL   = "ws:" + strings.TrimPrefix(httpsrv.URL, "http:")
 	)
 	defer srv.Stop()
@@ -120,7 +120,7 @@ func TestWebsocketLargeCall(t *testing.T) {
 func TestWebsocketPeerInfo(t *testing.T) {
 	var (
 		s     = newTestServer()
-		ts    = httptest.NewServer(s.WebsocketHandler([]string{"origin.example.com"}))
+		ts    = httptest.NewServer(s.Websockmblandler([]string{"origin.example.com"}))
 		tsurl = "ws:" + strings.TrimPrefix(ts.URL, "http:")
 	)
 	defer s.Stop()
@@ -171,7 +171,7 @@ func TestClientWebsocketPing(t *testing.T) {
 	defer client.Close()
 
 	resultChan := make(chan int)
-	sub, err := client.EthSubscribe(ctx, resultChan, "foo")
+	sub, err := client.mblSubscribe(ctx, resultChan, "foo")
 	if err != nil {
 		t.Fatalf("client subscribe error: %v", err)
 	}
@@ -204,7 +204,7 @@ func TestClientWebsocketPing(t *testing.T) {
 func TestClientWebsocketLargeMessage(t *testing.T) {
 	var (
 		srv     = NewServer()
-		httpsrv = httptest.NewServer(srv.WebsocketHandler(nil))
+		httpsrv = httptest.NewServer(srv.Websockmblandler(nil))
 		wsURL   = "ws:" + strings.TrimPrefix(httpsrv.URL, "http:")
 	)
 	defer srv.Stop()
@@ -258,7 +258,7 @@ func TestClientWebsocketSevered(t *testing.T) {
 	defer client.Close()
 
 	resultChan := make(chan int)
-	sub, err := client.EthSubscribe(ctx, resultChan, "foo")
+	sub, err := client.mblSubscribe(ctx, resultChan, "foo")
 	if err != nil {
 		t.Fatalf("client subscribe error: %v", err)
 	}
@@ -320,10 +320,10 @@ func wsPingTestServer(t *testing.T, sendPing <-chan struct{}) *http.Server {
 }
 
 func wsPingTestHandler(t *testing.T, conn *websocket.Conn, shutdown, sendPing <-chan struct{}) {
-	// Canned responses for the eth_subscribe call in TestClientWebsocketPing.
+	// Canned responses for the mbl_subscribe call in TestClientWebsocketPing.
 	const (
 		subResp   = `{"jsonrpc":"2.0","id":1,"result":"0x00"}`
-		subNotify = `{"jsonrpc":"2.0","method":"eth_subscription","params":{"subscription":"0x00","result":1}}`
+		subNotify = `{"jsonrpc":"2.0","mmblod":"mbl_subscription","params":{"subscription":"0x00","result":1}}`
 	)
 
 	// Handle subscribe request.
@@ -387,7 +387,7 @@ func wsPingTestHandler(t *testing.T, conn *websocket.Conn, shutdown, sendPing <-
 	}
 }
 
-// severableReadWriteCloser wraps an io.ReadWriteCloser and provides a Sever() method to drop writes and read empty.
+// severableReadWriteCloser wraps an io.ReadWriteCloser and provides a Sever() mmblod to drop writes and read empty.
 type severableReadWriteCloser struct {
 	io.ReadWriteCloser
 	severed int32 // atomic

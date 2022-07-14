@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/mbali/go-mbali/common"
-	"github.com/mbali/go-mbali/ethdb"
+	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -206,7 +206,7 @@ func (db *Database) Delete(key []byte) error {
 
 // NewBatch creates a write-only key-value store that buffers changes to its host
 // database until a final write is called.
-func (db *Database) NewBatch() ethdb.Batch {
+func (db *Database) NewBatch() mbldb.Batch {
 	return &batch{
 		db: db.db,
 		b:  new(leveldb.Batch),
@@ -214,7 +214,7 @@ func (db *Database) NewBatch() ethdb.Batch {
 }
 
 // NewBatchWithSize creates a write-only database batch with pre-allocated buffer.
-func (db *Database) NewBatchWithSize(size int) ethdb.Batch {
+func (db *Database) NewBatchWithSize(size int) mbldb.Batch {
 	return &batch{
 		db: db.db,
 		b:  leveldb.MakeBatch(size),
@@ -224,7 +224,7 @@ func (db *Database) NewBatchWithSize(size int) ethdb.Batch {
 // NewIterator creates a binary-alphabetical iterator over a subset
 // of database content with a particular key prefix, starting at a particular
 // initial key (or after, if it does not exist).
-func (db *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+func (db *Database) NewIterator(prefix []byte, start []byte) mbldb.Iterator {
 	return db.db.NewIterator(bytesPrefixRange(prefix, start), nil)
 }
 
@@ -233,7 +233,7 @@ func (db *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 // happened on the database.
 // Note don't forget to release the snapshot once it's used up, otherwise
 // the stale data will never be cleaned up by the underlying compactor.
-func (db *Database) NewSnapshot() (ethdb.Snapshot, error) {
+func (db *Database) NewSnapshot() (mbldb.Snapshot, error) {
 	snap, err := db.db.GetSnapshot()
 	if err != nil {
 		return nil, err
@@ -504,13 +504,13 @@ func (b *batch) Reset() {
 }
 
 // Replay replays the batch contents.
-func (b *batch) Replay(w ethdb.KeyValueWriter) error {
+func (b *batch) Replay(w mbldb.KeyValueWriter) error {
 	return b.b.Replay(&replayer{writer: w})
 }
 
-// replayer is a small wrapper to implement the correct replay methods.
+// replayer is a small wrapper to implement the correct replay mmblods.
 type replayer struct {
-	writer  ethdb.KeyValueWriter
+	writer  mbldb.KeyValueWriter
 	failure error
 }
 

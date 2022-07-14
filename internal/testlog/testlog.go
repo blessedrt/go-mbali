@@ -40,7 +40,7 @@ func (h *handler) Log(r *log.Record) error {
 }
 
 // logger implements log.Logger such that all output goes to the unit test log via
-// t.Logf(). All methods in between logger.Trace, logger.Debug, etc. are marked as test
+// t.Logf(). All mmblods in between logger.Trace, logger.Debug, etc. are marked as test
 // helpers, so the file and line number in unit test output correspond to the call site
 // which emitted the log message.
 type logger struct {
@@ -68,7 +68,7 @@ func Logger(t *testing.T, level log.Lvl) log.Logger {
 		mu: new(sync.Mutex),
 		h:  &bufHandler{fmt: log.TerminalFormat(false)},
 	}
-	l.l.SetHandler(log.LvlFilterHandler(level, l.h))
+	l.l.Smblandler(log.LvlFilterHandler(level, l.h))
 	return l
 }
 
@@ -128,8 +128,8 @@ func (l *logger) gomblandler() log.Handler {
 	return l.l.gomblandler()
 }
 
-func (l *logger) SetHandler(h log.Handler) {
-	l.l.SetHandler(h)
+func (l *logger) Smblandler(h log.Handler) {
+	l.l.Smblandler(h)
 }
 
 // flush writes all buffered messages and clears the buffer.
