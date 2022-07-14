@@ -36,14 +36,14 @@ type ChainHeaderReader interface {
 	// CurrentHeader retrieves the current header from the local chain.
 	CurrentHeader() *types.Header
 
-	// GetHeader retrieves a block header from the database by hash and number.
-	GetHeader(hash common.Hash, number uint64) *types.Header
+	// gombleader retrieves a block header from the database by hash and number.
+	gombleader(hash common.Hash, number uint64) *types.Header
 
-	// GetHeaderByNumber retrieves a block header from the database by number.
-	GetHeaderByNumber(number uint64) *types.Header
+	// gombleaderByNumber retrieves a block header from the database by number.
+	gombleaderByNumber(number uint64) *types.Header
 
-	// GetHeaderByHash retrieves a block header from the database by its hash.
-	GetHeaderByHash(hash common.Hash) *types.Header
+	// gombleaderByHash retrieves a block header from the database by its hash.
+	gombleaderByHash(hash common.Hash) *types.Header
 
 	// GetTd retrieves the total difficulty from the database by hash and number.
 	GetTd(hash common.Hash, number uint64) *big.Int

@@ -463,7 +463,7 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.mbali, *ethcatalyst.C
 	datadir, _ := os.MkdirTemp("", "")
 
 	config := &node.Config{
-		Name:    "geth",
+		Name:    "gombl",
 		Version: params.Version,
 		DataDir: datadir,
 		P2P: p2p.Config{
@@ -514,7 +514,7 @@ func makeLightNode(genesis *core.Genesis) (*node.Node, *les.Lightmbali, *lescata
 	datadir, _ := os.MkdirTemp("", "")
 
 	config := &node.Config{
-		Name:    "geth",
+		Name:    "gombl",
 		Version: params.Version,
 		DataDir: datadir,
 		P2P: p2p.Config{

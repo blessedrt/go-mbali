@@ -590,7 +590,7 @@ func (s *PrivateAccountAPI) InitializeWallet(ctx context.Context, url string) (s
 	}
 }
 
-// Unpair deletes a pairing between wallet and geth.
+// Unpair deletes a pairing between wallet and gombl.
 func (s *PrivateAccountAPI) Unpair(ctx context.Context, url string, pin string) error {
 	wallet, err := s.am.Wallet(url)
 	if err != nil {
@@ -709,10 +709,10 @@ func (s *PublicBlockChainAPI) GetProof(ctx context.Context, address common.Addre
 	}, state.Error()
 }
 
-// GetHeaderByNumber returns the requested canonical block header.
+// gombleaderByNumber returns the requested canonical block header.
 // * When blockNr is -1 the chain head is returned.
 // * When blockNr is -2 the pending chain head is returned.
-func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.BlockNumber) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) gombleaderByNumber(ctx context.Context, number rpc.BlockNumber) (map[string]interface{}, error) {
 	header, err := s.b.HeaderByNumber(ctx, number)
 	if header != nil && err == nil {
 		response := s.rpcMarshalHeader(ctx, header)
@@ -727,8 +727,8 @@ func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.
 	return nil, err
 }
 
-// GetHeaderByHash returns the requested header by hash.
-func (s *PublicBlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.Hash) map[string]interface{} {
+// gombleaderByHash returns the requested header by hash.
+func (s *PublicBlockChainAPI) gombleaderByHash(ctx context.Context, hash common.Hash) map[string]interface{} {
 	header, _ := s.b.HeaderByHash(ctx, hash)
 	if header != nil {
 		return s.rpcMarshalHeader(ctx, header)
@@ -1891,8 +1891,8 @@ func NewPublicDebugAPI(b Backend) *PublicDebugAPI {
 	return &PublicDebugAPI{b: b}
 }
 
-// GetHeaderRlp retrieves the RLP encoded for of a single header.
-func (api *PublicDebugAPI) GetHeaderRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
+// gombleaderRlp retrieves the RLP encoded for of a single header.
+func (api *PublicDebugAPI) gombleaderRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
 	header, _ := api.b.HeaderByNumber(ctx, rpc.BlockNumber(number))
 	if header == nil {
 		return nil, fmt.Errorf("header #%d not found", number)

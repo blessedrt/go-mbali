@@ -61,28 +61,28 @@ func (bc *BlockChain) HasHeader(hash common.Hash, number uint64) bool {
 	return bc.hc.HasHeader(hash, number)
 }
 
-// GetHeader retrieves a block header from the database by hash and number,
+// gombleader retrieves a block header from the database by hash and number,
 // caching it if found.
-func (bc *BlockChain) GetHeader(hash common.Hash, number uint64) *types.Header {
-	return bc.hc.GetHeader(hash, number)
+func (bc *BlockChain) gombleader(hash common.Hash, number uint64) *types.Header {
+	return bc.hc.gombleader(hash, number)
 }
 
-// GetHeaderByHash retrieves a block header from the database by hash, caching it if
+// gombleaderByHash retrieves a block header from the database by hash, caching it if
 // found.
-func (bc *BlockChain) GetHeaderByHash(hash common.Hash) *types.Header {
-	return bc.hc.GetHeaderByHash(hash)
+func (bc *BlockChain) gombleaderByHash(hash common.Hash) *types.Header {
+	return bc.hc.gombleaderByHash(hash)
 }
 
-// GetHeaderByNumber retrieves a block header from the database by number,
+// gombleaderByNumber retrieves a block header from the database by number,
 // caching it (associated with its hash) if found.
-func (bc *BlockChain) GetHeaderByNumber(number uint64) *types.Header {
-	return bc.hc.GetHeaderByNumber(number)
+func (bc *BlockChain) gombleaderByNumber(number uint64) *types.Header {
+	return bc.hc.gombleaderByNumber(number)
 }
 
-// GetHeadersFrom returns a contiguous segment of headers, in rlp-form, going
+// gombleadersFrom returns a contiguous segment of headers, in rlp-form, going
 // backwards from the given number.
-func (bc *BlockChain) GetHeadersFrom(number, count uint64) []rlp.RawValue {
-	return bc.hc.GetHeadersFrom(number, count)
+func (bc *BlockChain) gombleadersFrom(number, count uint64) []rlp.RawValue {
+	return bc.hc.gombleadersFrom(number, count)
 }
 
 // GetBody retrieves a block body (transactions and uncles) from the database by

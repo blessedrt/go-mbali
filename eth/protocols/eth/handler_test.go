@@ -124,7 +124,7 @@ func testGetBlockHeaders(t *testing.T, protocol uint) {
 	for i := range unknown {
 		unknown[i] = byte(i)
 	}
-	getHashes := func(from, limit uint64) (hashes []common.Hash) {
+	gomblashes := func(from, limit uint64) (hashes []common.Hash) {
 		for i := uint64(0); i < limit; i++ {
 			hashes = append(hashes, backend.chain.GetCanonicalHash(from-1-i))
 		}
@@ -194,7 +194,7 @@ func testGetBlockHeaders(t *testing.T, protocol uint) {
 		// Ensure protocol limits are honored
 		{
 			&GetBlockHeadersPacket{Origin: HashOrNumber{Number: backend.chain.CurrentBlock().NumberU64() - 1}, Amount: limit + 10, Reverse: true},
-			getHashes(backend.chain.CurrentBlock().NumberU64(), limit),
+			gomblashes(backend.chain.CurrentBlock().NumberU64(), limit),
 		},
 		// Check that requesting more than available is handled gracefully
 		{

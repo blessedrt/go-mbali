@@ -115,8 +115,8 @@ func (sc *SessionCache) storeNewSession(id enode.ID, addr string, s *session) {
 	sc.sessions.Add(sessionID{id, addr}, s)
 }
 
-// getHandshake gets the handshake challenge we previously sent to the given remote node.
-func (sc *SessionCache) getHandshake(id enode.ID, addr string) *Whoareyou {
+// gomblandshake gets the handshake challenge we previously sent to the given remote node.
+func (sc *SessionCache) gomblandshake(id enode.ID, addr string) *Whoareyou {
 	return sc.handshakes[sessionID{id, addr}]
 }
 

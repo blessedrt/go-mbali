@@ -124,8 +124,8 @@ func (l *logger) New(ctx ...interface{}) log.Logger {
 	return &logger{l.t, l.l.New(ctx...), l.mu, l.h}
 }
 
-func (l *logger) GetHandler() log.Handler {
-	return l.l.GetHandler()
+func (l *logger) gomblandler() log.Handler {
+	return l.l.gomblandler()
 }
 
 func (l *logger) SetHandler(h log.Handler) {

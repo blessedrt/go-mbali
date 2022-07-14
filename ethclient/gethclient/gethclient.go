@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package gethclient provides an RPC client for geth-specific APIs.
-package gethclient
+// Package gomblclient provides an RPC client for gombl-specific APIs.
+package gomblclient
 
 import (
 	"context"
@@ -31,7 +31,7 @@ import (
 	"github.com/mbali/go-mbali/rpc"
 )
 
-// Client is a wrapper around rpc.Client that implements geth-specific functionality.
+// Client is a wrapper around rpc.Client that implements gombl-specific functionality.
 //
 // If you want to use the standardized mbali RPC functionality, use ethclient.Client instead.
 type Client struct {
@@ -147,14 +147,14 @@ func (ec *Client) CallContract(ctx context.Context, msg mbali.CallMsg, blockNumb
 	return hex, err
 }
 
-// GCStats retrieves the current garbage collection stats from a geth node.
+// GCStats retrieves the current garbage collection stats from a gombl node.
 func (ec *Client) GCStats(ctx context.Context) (*debug.GCStats, error) {
 	var result debug.GCStats
 	err := ec.c.CallContext(ctx, &result, "debug_gcStats")
 	return &result, err
 }
 
-// MemStats retrieves the current memory stats from a geth node.
+// MemStats retrieves the current memory stats from a gombl node.
 func (ec *Client) MemStats(ctx context.Context) (*runtime.MemStats, error) {
 	var result runtime.MemStats
 	err := ec.c.CallContext(ctx, &result, "debug_memStats")
@@ -168,7 +168,7 @@ func (ec *Client) SetHead(ctx context.Context, number *big.Int) error {
 	return ec.c.CallContext(ctx, nil, "debug_setHead", toBlockNumArg(number))
 }
 
-// GetNodeInfo retrieves the node info of a geth node.
+// GetNodeInfo retrieves the node info of a gombl node.
 func (ec *Client) GetNodeInfo(ctx context.Context) (*p2p.NodeInfo, error) {
 	var result p2p.NodeInfo
 	err := ec.c.CallContext(ctx, &result, "admin_nodeInfo")

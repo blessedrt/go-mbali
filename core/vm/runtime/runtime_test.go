@@ -61,7 +61,7 @@ func TestDefaults(t *testing.T) {
 	if cfg.Value == nil {
 		t.Error("expected time to be non nil")
 	}
-	if cfg.GetHashFn == nil {
+	if cfg.gomblashFn == nil {
 		t.Error("expected time to be non nil")
 	}
 	if cfg.BlockNumber == nil {
@@ -239,15 +239,15 @@ func (d *dummyChain) Engine() consensus.Engine {
 	return nil
 }
 
-// GetHeader returns the hash corresponding to their hash.
-func (d *dummyChain) GetHeader(h common.Hash, n uint64) *types.Header {
+// gombleader returns the hash corresponding to their hash.
+func (d *dummyChain) gombleader(h common.Hash, n uint64) *types.Header {
 	d.counter++
 	parentHash := common.Hash{}
 	s := common.LeftPadBytes(big.NewInt(int64(n-1)).Bytes(), 32)
 	copy(parentHash[:], s)
 
 	//parentHash := common.Hash{byte(n - 1)}
-	//fmt.Printf("GetHeader(%x, %d) => header with parent %x\n", h, n, parentHash)
+	//fmt.Printf("gombleader(%x, %d) => header with parent %x\n", h, n, parentHash)
 	return fakeHeader(n, parentHash)
 }
 
@@ -299,7 +299,7 @@ func TestBlockhash(t *testing.T) {
 	input := common.Hex2Bytes("f8a8fd6d")
 	chain := &dummyChain{}
 	ret, _, err := Execute(data, input, &Config{
-		GetHashFn:   core.GetHashFn(header, chain),
+		gomblashFn:   core.gomblashFn(header, chain),
 		BlockNumber: new(big.Int).Set(header.Number),
 	})
 	if err != nil {

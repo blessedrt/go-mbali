@@ -96,13 +96,13 @@ func NewHeaderChain(chainDb ethdb.Database, config *params.ChainConfig, engine c
 		rand:          mrand.New(mrand.NewSource(seed.Int64())),
 		engine:        engine,
 	}
-	hc.genesisHeader = hc.GetHeaderByNumber(0)
+	hc.genesisHeader = hc.gombleaderByNumber(0)
 	if hc.genesisHeader == nil {
 		return nil, ErrNoGenesis
 	}
 	hc.currentHeader.Store(hc.genesisHeader)
 	if head := rawdb.ReadHeadBlockHash(chainDb); head != (common.Hash{}) {
-		if chead := hc.GetHeaderByHash(head); chead != nil {
+		if chead := hc.gombleaderByHash(head); chead != nil {
 			hc.currentHeader.Store(chead)
 		}
 	}
@@ -173,7 +173,7 @@ func (hc *HeaderChain) Reorg(headers []*types.Header) error {
 				break // It shouldn't be reached
 			}
 			headHash, headNumber = header.ParentHash, header.Number.Uint64()-1
-			header = hc.GetHeader(headHash, headNumber)
+			header = hc.gombleader(headHash, headNumber)
 			if header == nil {
 				return fmt.Errorf("missing parent %d %x", headNumber, headHash)
 			}
@@ -409,7 +409,7 @@ func (hc *HeaderChain) GetAncestor(hash common.Hash, number, ancestor uint64, ma
 	}
 	if ancestor == 1 {
 		// in this case it is cheaper to just read the header
-		if header := hc.GetHeader(hash, number); header != nil {
+		if header := hc.gombleader(hash, number); header != nil {
 			return header.ParentHash, number - 1
 		}
 		return common.Hash{}, 0
@@ -427,7 +427,7 @@ func (hc *HeaderChain) GetAncestor(hash common.Hash, number, ancestor uint64, ma
 		}
 		*maxNonCanonical--
 		ancestor--
-		header := hc.GetHeader(hash, number)
+		header := hc.gombleader(hash, number)
 		if header == nil {
 			return common.Hash{}, 0
 		}
@@ -453,9 +453,9 @@ func (hc *HeaderChain) GetTd(hash common.Hash, number uint64) *big.Int {
 	return td
 }
 
-// GetHeader retrieves a block header from the database by hash and number,
+// gombleader retrieves a block header from the database by hash and number,
 // caching it if found.
-func (hc *HeaderChain) GetHeader(hash common.Hash, number uint64) *types.Header {
+func (hc *HeaderChain) gombleader(hash common.Hash, number uint64) *types.Header {
 	// Short circuit if the header's already in the cache, retrieve otherwise
 	if header, ok := hc.headerCache.Get(hash); ok {
 		return header.(*types.Header)
@@ -469,14 +469,14 @@ func (hc *HeaderChain) GetHeader(hash common.Hash, number uint64) *types.Header 
 	return header
 }
 
-// GetHeaderByHash retrieves a block header from the database by hash, caching it if
+// gombleaderByHash retrieves a block header from the database by hash, caching it if
 // found.
-func (hc *HeaderChain) GetHeaderByHash(hash common.Hash) *types.Header {
+func (hc *HeaderChain) gombleaderByHash(hash common.Hash) *types.Header {
 	number := hc.GetBlockNumber(hash)
 	if number == nil {
 		return nil
 	}
-	return hc.GetHeader(hash, *number)
+	return hc.gombleader(hash, *number)
 }
 
 // HasHeader checks if a block header is present in the database or not.
@@ -489,21 +489,21 @@ func (hc *HeaderChain) HasHeader(hash common.Hash, number uint64) bool {
 	return rawdb.HasHeader(hc.chainDb, hash, number)
 }
 
-// GetHeaderByNumber retrieves a block header from the database by number,
+// gombleaderByNumber retrieves a block header from the database by number,
 // caching it (associated with its hash) if found.
-func (hc *HeaderChain) GetHeaderByNumber(number uint64) *types.Header {
+func (hc *HeaderChain) gombleaderByNumber(number uint64) *types.Header {
 	hash := rawdb.ReadCanonicalHash(hc.chainDb, number)
 	if hash == (common.Hash{}) {
 		return nil
 	}
-	return hc.GetHeader(hash, number)
+	return hc.gombleader(hash, number)
 }
 
-// GetHeadersFrom returns a contiguous segment of headers, in rlp-form, going
+// gombleadersFrom returns a contiguous segment of headers, in rlp-form, going
 // backwards from the given number.
 // If the 'number' is higher than the highest local header, this method will
 // return a best-effort response, containing the headers that we do have.
-func (hc *HeaderChain) GetHeadersFrom(number, count uint64) []rlp.RawValue {
+func (hc *HeaderChain) gombleadersFrom(number, count uint64) []rlp.RawValue {
 	// If the request is for future headers, we still return the portion of
 	// headers that we are able to serve
 	if current := hc.CurrentHeader().Number.Uint64(); current < number {
@@ -581,13 +581,13 @@ func (hc *HeaderChain) SetHead(head uint64, updateFn UpdateHeadBlocksCallback, d
 		num := hdr.Number.Uint64()
 
 		// Rewind block chain to new head.
-		parent := hc.GetHeader(hdr.ParentHash, num-1)
+		parent := hc.gombleader(hdr.ParentHash, num-1)
 		if parent == nil {
 			parent = hc.genesisHeader
 		}
 		parentHash = parent.Hash()
 
-		// Notably, since geth has the possibility for setting the head to a low
+		// Notably, since gombl has the possibility for setting the head to a low
 		// height which is even lower than ancient head.
 		// In order to ensure that the head is always no higher than the data in
 		// the database (ancient store or active store), we need to update head

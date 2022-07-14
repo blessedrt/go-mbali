@@ -3,7 +3,7 @@ ARG COMMIT=""
 ARG VERSION=""
 ARG BUILDNUM=""
 
-# Build Geth in a stock Go builder container
+# Build gombl in a stock Go builder container
 FROM golang:1.18-alpine as builder
 
 RUN apk add --no-cache gcc musl-dev linux-headers git
@@ -14,16 +14,16 @@ COPY go.sum /go-mbali/
 RUN cd /go-mbali && go mod download
 
 ADD . /go-mbali
-RUN cd /go-mbali && go run build/ci.go install ./cmd/geth
+RUN cd /go-mbali && go run build/ci.go install ./cmd/gombl
 
-# Pull Geth into a second stage deploy alpine container
+# Pull gombl into a second stage deploy alpine container
 FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates
-COPY --from=builder /go-mbali/build/bin/geth /usr/local/bin/
+COPY --from=builder /go-mbali/build/bin/gombl /usr/local/bin/
 
 EXPOSE 8545 8546 30303 30303/udp
-ENTRYPOINT ["geth"]
+ENTRYPOINT ["gombl"]
 
 # Add some metadata labels to help programatic image consumption
 ARG COMMIT=""

@@ -96,10 +96,10 @@ func odrAccounts(ctx context.Context, db ethdb.Database, config *params.ChainCon
 	)
 	for _, addr := range acc {
 		if bc != nil {
-			header := bc.GetHeaderByHash(bhash)
+			header := bc.gombleaderByHash(bhash)
 			st, err = state.New(header.Root, state.NewDatabase(db), nil)
 		} else {
-			header := lc.GetHeaderByHash(bhash)
+			header := lc.gombleaderByHash(bhash)
 			st = light.NewState(ctx, header, lc.Odr())
 		}
 		if err == nil {
@@ -128,7 +128,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 	for i := 0; i < 3; i++ {
 		data[35] = byte(i)
 		if bc != nil {
-			header := bc.GetHeaderByHash(bhash)
+			header := bc.gombleaderByHash(bhash)
 			statedb, err := state.New(header.Root, state.NewDatabase(db), nil)
 
 			if err == nil {
@@ -147,7 +147,7 @@ func odrContractCall(ctx context.Context, db ethdb.Database, config *params.Chai
 				res = append(res, result.Return()...)
 			}
 		} else {
-			header := lc.GetHeaderByHash(bhash)
+			header := lc.gombleaderByHash(bhash)
 			state := light.NewState(ctx, header, lc.Odr())
 			state.SetBalance(bankAddr, math.MaxBig256)
 			msg := callmsg{types.NewMessage(bankAddr, &testContractAddr, 0, new(big.Int), 100000, big.NewInt(params.InitialBaseFee), big.NewInt(params.InitialBaseFee), new(big.Int), data, nil, true)}

@@ -34,9 +34,9 @@ import (
 // by the CHT or Bloom trie for verification.
 var errNonCanonicalHash = errors.New("hash is not currently canonical")
 
-// GetHeaderByNumber retrieves the canonical block header corresponding to the
+// gombleaderByNumber retrieves the canonical block header corresponding to the
 // given number. The returned header is proven by local CHT.
-func GetHeaderByNumber(ctx context.Context, odr OdrBackend, number uint64) (*types.Header, error) {
+func gombleaderByNumber(ctx context.Context, odr OdrBackend, number uint64) (*types.Header, error) {
 	// Try to find it in the local database first.
 	db := odr.Database()
 	hash := rawdb.ReadCanonicalHash(db, number)
@@ -72,7 +72,7 @@ func GetCanonicalHash(ctx context.Context, odr OdrBackend, number uint64) (commo
 	if hash != (common.Hash{}) {
 		return hash, nil
 	}
-	header, err := GetHeaderByNumber(ctx, odr, number)
+	header, err := gombleaderByNumber(ctx, odr, number)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -86,7 +86,7 @@ func GetTd(ctx context.Context, odr OdrBackend, hash common.Hash, number uint64)
 	if td != nil {
 		return td, nil
 	}
-	header, err := GetHeaderByNumber(ctx, odr, number)
+	header, err := gombleaderByNumber(ctx, odr, number)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func GetBodyRLP(ctx context.Context, odr OdrBackend, hash common.Hash, number ui
 		return data, nil
 	}
 	// Retrieve the block header first and pass it for verification.
-	header, err := GetHeaderByNumber(ctx, odr, number)
+	header, err := gombleaderByNumber(ctx, odr, number)
 	if err != nil {
 		return nil, errNoHeader
 	}
@@ -135,7 +135,7 @@ func GetBody(ctx context.Context, odr OdrBackend, hash common.Hash, number uint6
 // back from the stored header and body.
 func GetBlock(ctx context.Context, odr OdrBackend, hash common.Hash, number uint64) (*types.Block, error) {
 	// Retrieve the block header and body contents
-	header, err := GetHeaderByNumber(ctx, odr, number)
+	header, err := gombleaderByNumber(ctx, odr, number)
 	if err != nil {
 		return nil, errNoHeader
 	}
@@ -153,7 +153,7 @@ func GetBlockReceipts(ctx context.Context, odr OdrBackend, hash common.Hash, num
 	// Assume receipts are already stored locally and attempt to retrieve.
 	receipts := rawdb.ReadRawReceipts(odr.Database(), hash, number)
 	if receipts == nil {
-		header, err := GetHeaderByNumber(ctx, odr, number)
+		header, err := gombleaderByNumber(ctx, odr, number)
 		if err != nil {
 			return nil, errNoHeader
 		}
@@ -283,7 +283,7 @@ func GetTransaction(ctx context.Context, odr OdrBackend, txHash common.Hash) (*t
 	pos := r.Status[0].Lookup
 	// first ensure that we have the header, otherwise block body retrieval will fail
 	// also verify if this is a canonical block by getting the header by number and checking its hash
-	if header, err := GetHeaderByNumber(ctx, odr, pos.BlockIndex); err != nil || header.Hash() != pos.BlockHash {
+	if header, err := gombleaderByNumber(ctx, odr, pos.BlockIndex); err != nil || header.Hash() != pos.BlockHash {
 		return nil, common.Hash{}, 0, 0, err
 	}
 	body, err := GetBody(ctx, odr, pos.BlockHash, pos.BlockIndex)

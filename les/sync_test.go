@@ -258,7 +258,7 @@ func testSyncFromConfiguredCheckpoint(t *testing.T, protocol int) {
 	defer tearDown()
 
 	// Configure the local checkpoint(the first section)
-	head := server.handler.blockchain.GetHeaderByNumber(config.ChtSize - 1).Hash()
+	head := server.handler.blockchain.gombleaderByNumber(config.ChtSize - 1).Hash()
 	cp := &params.TrustedCheckpoint{
 		SectionIndex: 0,
 		SectionHead:  head,

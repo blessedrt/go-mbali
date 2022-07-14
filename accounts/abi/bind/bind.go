@@ -435,10 +435,10 @@ func bindStructTypeGo(kind abi.Type, structs map[string]*tmplStruct) string {
 	switch kind.T {
 	case abi.TupleTy:
 		// We compose a raw struct name and a canonical parameter expression
-		// together here. The reason is before solidity v0.5.11, kind.TupleRawName
+		// togombler here. The reason is before solidity v0.5.11, kind.TupleRawName
 		// is empty, so we use canonical parameter expression to distinguish
 		// different struct definition. From the consideration of backward
-		// compatibility, we concat these two together so that if kind.TupleRawName
+		// compatibility, we concat these two togombler so that if kind.TupleRawName
 		// is not empty, it can have unique id.
 		id := kind.TupleRawName + kind.String()
 		if s, exist := structs[id]; exist {
@@ -481,10 +481,10 @@ func bindStructTypeJava(kind abi.Type, structs map[string]*tmplStruct) string {
 	switch kind.T {
 	case abi.TupleTy:
 		// We compose a raw struct name and a canonical parameter expression
-		// together here. The reason is before solidity v0.5.11, kind.TupleRawName
+		// togombler here. The reason is before solidity v0.5.11, kind.TupleRawName
 		// is empty, so we use canonical parameter expression to distinguish
 		// different struct definition. From the consideration of backward
-		// compatibility, we concat these two together so that if kind.TupleRawName
+		// compatibility, we concat these two togombler so that if kind.TupleRawName
 		// is not empty, it can have unique id.
 		id := kind.TupleRawName + kind.String()
 		if s, exist := structs[id]; exist {

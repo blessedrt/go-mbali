@@ -63,7 +63,7 @@ var (
 					utils.BloomFilterSizeFlag,
 				}, utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-geth snapshot prune-state <state-root>
+gombl snapshot prune-state <state-root>
 will prune historical state data with the help of the state snapshot.
 All trie nodes and contract codes that do not belong to the specified
 version state will be deleted from the database. After pruning, only
@@ -73,7 +73,7 @@ The default pruning target is the HEAD-127 state.
 
 WARNING: It's necessary to delete the trie clean cache after the pruning.
 If you specify another directory for the trie clean cache via "--cache.trie.journal"
-during the use of Geth, please also specify it here for correct deletion. Otherwise
+during the use of gombl, please also specify it here for correct deletion. Otherwise
 the trie clean cache with default directory will be deleted.
 `,
 			},
@@ -85,7 +85,7 @@ the trie clean cache with default directory will be deleted.
 				Category:  "MISCELLANEOUS COMMANDS",
 				Flags:     utils.GroupFlags(utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-geth snapshot verify-state <state-root>
+gombl snapshot verify-state <state-root>
 will traverse the whole accounts and storages set based on the specified
 snapshot and recalculate the root hash of state for verification.
 In other words, this command does the snapshot to trie conversion.
@@ -99,7 +99,7 @@ In other words, this command does the snapshot to trie conversion.
 				Category:  "MISCELLANEOUS COMMANDS",
 				Flags:     utils.GroupFlags(utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-geth snapshot check-dangling-storage <state-root> traverses the snap storage 
+gombl snapshot check-dangling-storage <state-root> traverses the snap storage 
 data, and verifies that all snapshot storage data has a corresponding account. 
 `,
 			},
@@ -111,7 +111,7 @@ data, and verifies that all snapshot storage data has a corresponding account.
 				Category:  "MISCELLANEOUS COMMANDS",
 				Flags:     utils.GroupFlags(utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-geth snapshot inspect-account <address | hash> checks all snapshot layers and prints out
+gombl snapshot inspect-account <address | hash> checks all snapshot layers and prints out
 information about the specified address. 
 `,
 			},
@@ -123,7 +123,7 @@ information about the specified address.
 				Category:  "MISCELLANEOUS COMMANDS",
 				Flags:     utils.GroupFlags(utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-geth snapshot traverse-state <state-root>
+gombl snapshot traverse-state <state-root>
 will traverse the whole state from the given state root and will abort if any
 referenced trie node or contract code is missing. This command can be used for
 state integrity verification. The default checking target is the HEAD state.
@@ -139,7 +139,7 @@ It's also usable without snapshot enabled.
 				Category:  "MISCELLANEOUS COMMANDS",
 				Flags:     utils.GroupFlags(utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-geth snapshot traverse-rawstate <state-root>
+gombl snapshot traverse-rawstate <state-root>
 will traverse the whole state from the given root and will abort if any referenced
 trie node or contract code is missing. This command can be used for state integrity
 verification. The default checking target is the HEAD state. It's basically identical
@@ -150,7 +150,7 @@ It's also usable without snapshot enabled.
 			},
 			{
 				Name:      "dump",
-				Usage:     "Dump a specific block from storage (same as 'geth dump' but using snapshots)",
+				Usage:     "Dump a specific block from storage (same as 'gombl dump' but using snapshots)",
 				ArgsUsage: "[? <blockHash> | <blockNum>]",
 				Action:    utils.MigrateFlags(dumpState),
 				Category:  "MISCELLANEOUS COMMANDS",
@@ -161,7 +161,7 @@ It's also usable without snapshot enabled.
 					utils.DumpLimitFlag,
 				}, utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
-This command is semantically equivalent to 'geth dump', but uses the snapshots
+This command is semantically equivalent to 'gombl dump', but uses the snapshots
 as the backend data source, making this command a lot faster. 
 
 The argument is interpreted as block number or hash. If none is provided, the latest

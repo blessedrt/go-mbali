@@ -30,7 +30,7 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-// stateReq represents a batch of state fetch requests grouped together into
+// stateReq represents a batch of state fetch requests grouped togombler into
 // a single data retrieval network packet.
 type stateReq struct {
 	nItems    uint16                    // Number of items requested for download (max is 384, so uint16 is sufficient)

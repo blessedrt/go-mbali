@@ -70,15 +70,15 @@ func serviceNonContiguousBlockHeaderQuery(chain *core.BlockChain, query *GetBloc
 		if hashMode {
 			if first {
 				first = false
-				origin = chain.GetHeaderByHash(query.Origin.Hash)
+				origin = chain.gombleaderByHash(query.Origin.Hash)
 				if origin != nil {
 					query.Origin.Number = origin.Number.Uint64()
 				}
 			} else {
-				origin = chain.GetHeader(query.Origin.Hash, query.Origin.Number)
+				origin = chain.gombleader(query.Origin.Hash, query.Origin.Number)
 			}
 		} else {
-			origin = chain.GetHeaderByNumber(query.Origin.Number)
+			origin = chain.gombleaderByNumber(query.Origin.Number)
 		}
 		if origin == nil {
 			break
@@ -111,7 +111,7 @@ func serviceNonContiguousBlockHeaderQuery(chain *core.BlockChain, query *GetBloc
 				peer.Log().Warn("GetBlockHeaders skip overflow attack", "current", current, "skip", query.Skip, "next", next, "attacker", infos)
 				unknown = true
 			} else {
-				if header := chain.GetHeaderByNumber(next); header != nil {
+				if header := chain.gombleaderByNumber(next); header != nil {
 					nextHash := header.Hash()
 					expOldHash, _ := chain.GetAncestor(nextHash, next, query.Skip+1, &maxNonCanonical)
 					if expOldHash == query.Origin.Hash {
@@ -152,7 +152,7 @@ func serviceContiguousBlockHeaderQuery(chain *core.BlockChain, query *GetBlockHe
 		if !query.Reverse {
 			from = from + count - 1
 		}
-		headers := chain.GetHeadersFrom(from, count)
+		headers := chain.gombleadersFrom(from, count)
 		if !query.Reverse {
 			for i, j := 0, len(headers)-1; i < j; i, j = i+1, j-1 {
 				headers[i], headers[j] = headers[j], headers[i]
@@ -164,7 +164,7 @@ func serviceContiguousBlockHeaderQuery(chain *core.BlockChain, query *GetBlockHe
 	var (
 		headers []rlp.RawValue
 		hash    = query.Origin.Hash
-		header  = chain.GetHeaderByHash(hash)
+		header  = chain.gombleaderByHash(hash)
 	)
 	if header != nil {
 		rlpData, _ := rlp.EncodeToBytes(header)
@@ -182,7 +182,7 @@ func serviceContiguousBlockHeaderQuery(chain *core.BlockChain, query *GetBlockHe
 			// Not canon, we can't deliver descendants
 			return headers
 		}
-		descendants := chain.GetHeadersFrom(num+count-1, count-1)
+		descendants := chain.gombleadersFrom(num+count-1, count-1)
 		for i, j := 0, len(descendants)-1; i < j; i, j = i+1, j-1 {
 			descendants[i], descendants[j] = descendants[j], descendants[i]
 		}
@@ -191,7 +191,7 @@ func serviceContiguousBlockHeaderQuery(chain *core.BlockChain, query *GetBlockHe
 	}
 	{ // Last mode: deliver ancestors of H
 		for i := uint64(1); header != nil && i < count; i++ {
-			header = chain.GetHeaderByHash(header.ParentHash)
+			header = chain.gombleaderByHash(header.ParentHash)
 			if header == nil {
 				break
 			}
@@ -296,7 +296,7 @@ func ServiceGetReceiptsQuery(chain *core.BlockChain, query GetReceiptsPacket) []
 		// Retrieve the requested block's receipts
 		results := chain.GetReceiptsByHash(hash)
 		if results == nil {
-			if header := chain.GetHeaderByHash(hash); header == nil || header.ReceiptHash != types.EmptyRootHash {
+			if header := chain.gombleaderByHash(hash); header == nil || header.ReceiptHash != types.EmptyRootHash {
 				continue
 			}
 		}

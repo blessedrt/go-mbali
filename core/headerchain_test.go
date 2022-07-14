@@ -46,7 +46,7 @@ func verifyUnbrokenCanonchain(hc *HeaderChain) error {
 		if h.Number.Uint64() == 0 {
 			break
 		}
-		h = hc.GetHeader(h.ParentHash, h.Number.Uint64()-1)
+		h = hc.gombleader(h.ParentHash, h.Number.Uint64()-1)
 	}
 	return nil
 }

@@ -142,9 +142,9 @@ func TestLightPruner(t *testing.T) {
 		method     func(uint64) bool
 	}{
 		{
-			1, 10, "GetHeaderByNumber",
+			1, 10, "gombleaderByNumber",
 			func(n uint64) bool {
-				_, err := light.GetHeaderByNumber(context.Background(), client.handler.backend.odr, n)
+				_, err := light.gombleaderByNumber(context.Background(), client.handler.backend.odr, n)
 				return err == nil
 			},
 		},
@@ -158,28 +158,28 @@ func TestLightPruner(t *testing.T) {
 		{
 			21, 30, "GetTd",
 			func(n uint64) bool {
-				_, err := light.GetTd(context.Background(), client.handler.backend.odr, server.handler.blockchain.GetHeaderByNumber(n).Hash(), n)
+				_, err := light.GetTd(context.Background(), client.handler.backend.odr, server.handler.blockchain.gombleaderByNumber(n).Hash(), n)
 				return err == nil
 			},
 		},
 		{
 			31, 40, "GetBodyRLP",
 			func(n uint64) bool {
-				_, err := light.GetBodyRLP(context.Background(), client.handler.backend.odr, server.handler.blockchain.GetHeaderByNumber(n).Hash(), n)
+				_, err := light.GetBodyRLP(context.Background(), client.handler.backend.odr, server.handler.blockchain.gombleaderByNumber(n).Hash(), n)
 				return err == nil
 			},
 		},
 		{
 			41, 50, "GetBlock",
 			func(n uint64) bool {
-				_, err := light.GetBlock(context.Background(), client.handler.backend.odr, server.handler.blockchain.GetHeaderByNumber(n).Hash(), n)
+				_, err := light.GetBlock(context.Background(), client.handler.backend.odr, server.handler.blockchain.gombleaderByNumber(n).Hash(), n)
 				return err == nil
 			},
 		},
 		{
 			51, 60, "GetBlockReceipts",
 			func(n uint64) bool {
-				_, err := light.GetBlockReceipts(context.Background(), client.handler.backend.odr, server.handler.blockchain.GetHeaderByNumber(n).Hash(), n)
+				_, err := light.GetBlockReceipts(context.Background(), client.handler.backend.odr, server.handler.blockchain.gombleaderByNumber(n).Hash(), n)
 				return err == nil
 			},
 		},

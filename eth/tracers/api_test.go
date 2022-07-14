@@ -94,14 +94,14 @@ func newTestBackend(t *testing.T, n int, gspec *core.Genesis, generator func(i i
 }
 
 func (b *testBackend) HeaderByHash(ctx context.Context, hash common.Hash) (*types.Header, error) {
-	return b.chain.GetHeaderByHash(hash), nil
+	return b.chain.gombleaderByHash(hash), nil
 }
 
 func (b *testBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Header, error) {
 	if number == rpc.PendingBlockNumber || number == rpc.LatestBlockNumber {
 		return b.chain.CurrentHeader(), nil
 	}
-	return b.chain.GetHeaderByNumber(uint64(number)), nil
+	return b.chain.gombleaderByNumber(uint64(number)), nil
 }
 
 func (b *testBackend) BlockByHash(ctx context.Context, hash common.Hash) (*types.Block, error) {

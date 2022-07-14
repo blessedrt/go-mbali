@@ -17,12 +17,12 @@ Section "Uninstall"
   rmDir "$SMPROGRAMS\${APPNAME}"
 
   # Firewall - remove rules if exists
-  SimpleFC::AdvRemoveRule "Geth incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Geth outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Geth UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "gombl incoming peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "gombl outgoing peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "gombl UDP discovery (UDP:30303)"
 
   # Remove IPC endpoint (https://github.com/mbali/EIPs/issues/147)
-  ${un.EnvVarUpdate} $0 "mbali_SOCKET" "R" "HKLM" "\\.\pipe\geth.ipc"
+  ${un.EnvVarUpdate} $0 "mbali_SOCKET" "R" "HKLM" "\\.\pipe\gombl.ipc"
 
   # Remove install directory from PATH
   Push "$INSTDIR"

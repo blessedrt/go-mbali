@@ -31,8 +31,8 @@ type ChainContext interface {
 	// Engine retrieves the chain's consensus engine.
 	Engine() consensus.Engine
 
-	// GetHeader returns the hash corresponding to their hash.
-	GetHeader(common.Hash, uint64) *types.Header
+	// gombleader returns the hash corresponding to their hash.
+	gombleader(common.Hash, uint64) *types.Header
 }
 
 // NewEVMBlockContext creates a new context for use in the EVM.
@@ -58,7 +58,7 @@ func NewEVMBlockContext(header *types.Header, chain ChainContext, author *common
 	return vm.BlockContext{
 		CanTransfer: CanTransfer,
 		Transfer:    Transfer,
-		GetHash:     GetHashFn(header, chain),
+		gomblash:     gomblashFn(header, chain),
 		Coinbase:    beneficiary,
 		BlockNumber: new(big.Int).Set(header.Number),
 		Time:        new(big.Int).SetUint64(header.Time),
@@ -77,8 +77,8 @@ func NewEVMTxContext(msg Message) vm.TxContext {
 	}
 }
 
-// GetHashFn returns a GetHashFunc which retrieves header hashes by number
-func GetHashFn(ref *types.Header, chain ChainContext) func(n uint64) common.Hash {
+// gomblashFn returns a gomblashFunc which retrieves header hashes by number
+func gomblashFn(ref *types.Header, chain ChainContext) func(n uint64) common.Hash {
 	// Cache will initially contain [refHash.parent],
 	// Then fill up with [refHash.p, refHash.pp, refHash.ppp, ...]
 	var cache []common.Hash
@@ -101,7 +101,7 @@ func GetHashFn(ref *types.Header, chain ChainContext) func(n uint64) common.Hash
 		lastKnownNumber := ref.Number.Uint64() - uint64(len(cache))
 
 		for {
-			header := chain.GetHeader(lastKnownHash, lastKnownNumber)
+			header := chain.gombleader(lastKnownHash, lastKnownNumber)
 			if header == nil {
 				break
 			}

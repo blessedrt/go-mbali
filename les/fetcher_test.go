@@ -87,7 +87,7 @@ func testSequentialAnnouncements(t *testing.T, protocol int) {
 		importCh <- header
 	}
 	for i := uint64(1); i <= s.backend.Blockchain().CurrentHeader().Number.Uint64(); i++ {
-		header := s.backend.Blockchain().GetHeaderByNumber(i)
+		header := s.backend.Blockchain().gombleaderByNumber(i)
 		hash, number := header.Hash(), header.Number.Uint64()
 		td := rawdb.ReadTd(s.db, hash, number)
 
@@ -226,7 +226,7 @@ func testTrustedAnnouncement(t *testing.T, protocol int) {
 	check := func(height []uint64, expected uint64, callback func()) {
 		for i := 0; i < len(height); i++ {
 			for j := 0; j < len(servers); j++ {
-				h := servers[j].backend.Blockchain().GetHeaderByNumber(height[i])
+				h := servers[j].backend.Blockchain().gombleaderByNumber(height[i])
 				hash, number := h.Hash(), h.Number.Uint64()
 				td := rawdb.ReadTd(servers[j].db, hash, number)
 
@@ -272,7 +272,7 @@ func testInvalidAnnounces(t *testing.T, protocol int) {
 	c.handler.fetcher.newHeadHook = func(header *types.Header) { done <- header }
 
 	// Prepare announcement by latest header.
-	headerOne := s.backend.Blockchain().GetHeaderByNumber(1)
+	headerOne := s.backend.Blockchain().gombleaderByNumber(1)
 	hash, number := headerOne.Hash(), headerOne.Number.Uint64()
 	td := big.NewInt(params.GenesisDifficulty.Int64() + 200) // bad td
 

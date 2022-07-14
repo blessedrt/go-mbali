@@ -106,7 +106,7 @@ func (api *API) SubmitHashrate(rate hexutil.Uint64, id common.Hash) bool {
 	return true
 }
 
-// GetHashrate returns the current hashrate for local CPU miner and remote miner.
-func (api *API) GetHashrate() uint64 {
+// gomblashrate returns the current hashrate for local CPU miner and remote miner.
+func (api *API) gomblashrate() uint64 {
 	return uint64(api.ethash.Hashrate())
 }

@@ -284,7 +284,7 @@ func (c *Conn) readAndServe65(chain *Chain, timeout time.Duration) Message {
 			c.Write(&Pong{})
 		case *GetBlockHeaders:
 			req := *msg
-			headers, err := chain.GetHeaders(req)
+			headers, err := chain.gombleaders(req)
 			if err != nil {
 				return errorf("could not get headers for inbound header request: %v", err)
 			}
@@ -311,7 +311,7 @@ func (c *Conn) readAndServe66(chain *Chain, timeout time.Duration) (uint64, Mess
 		case *Ping:
 			c.Write(&Pong{})
 		case GetBlockHeaders:
-			headers, err := chain.GetHeaders(msg)
+			headers, err := chain.gombleaders(msg)
 			if err != nil {
 				return 0, errorf("could not get headers for inbound header request: %v", err)
 			}

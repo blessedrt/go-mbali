@@ -156,8 +156,8 @@ type LightChain interface {
 	// HasHeader verifies a header's presence in the local chain.
 	HasHeader(common.Hash, uint64) bool
 
-	// GetHeaderByHash retrieves a header from the local chain.
-	GetHeaderByHash(common.Hash) *types.Header
+	// gombleaderByHash retrieves a header from the local chain.
+	gombleaderByHash(common.Hash) *types.Header
 
 	// CurrentHeader retrieves the head header from the local chain.
 	CurrentHeader() *types.Header
@@ -365,7 +365,7 @@ func (d *Downloader) synchronise(id string, hash common.Hash, td *big.Int, mode 
 		log.Info("Block synchronisation started")
 	}
 	// If snap sync was requested, create the snap scheduler and switch to fast
-	// sync mode. Long term we could drop fast sync or merge the two together,
+	// sync mode. Long term we could drop fast sync or merge the two togombler,
 	// but until snap becomes prevalent, we should support both. TODO(karalabe).
 	if mode == SnapSync {
 		if !d.snapSync {
@@ -785,7 +785,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 				if floor >= int64(d.genesis)-1 {
 					break
 				}
-				header = d.lightchain.GetHeaderByHash(header.ParentHash)
+				header = d.lightchain.gombleaderByHash(header.ParentHash)
 			}
 		}
 		// We already know the "genesis" block number, cap floor to that
@@ -953,7 +953,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 					end = check
 					break
 				}
-				header := d.lightchain.GetHeaderByHash(h) // Independent of sync mode, header surely exists
+				header := d.lightchain.gombleaderByHash(h) // Independent of sync mode, header surely exists
 				if header.Number.Uint64() != check {
 					p.log.Warn("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
 					return 0, fmt.Errorf("%w: non-requested header (%d)", errBadPeer, header.Number)
@@ -1001,7 +1001,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 	defer timeout.Stop()
 
 	var ttl time.Duration
-	getHeaders := func(from uint64) {
+	gombleaders := func(from uint64) {
 		request = time.Now()
 
 		ttl = d.peers.rates.TargetTimeout()
@@ -1031,7 +1031,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 	}
 	// Start pulling the header chain skeleton until all is done
 	ancestor := from
-	getHeaders(from)
+	gombleaders(from)
 
 	mode := d.getMode()
 	for {
@@ -1083,13 +1083,13 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 					rawdb.WriteLastPivotNumber(d.stateDB, pivot)
 				}
 				pivoting = false
-				getHeaders(from)
+				gombleaders(from)
 				continue
 			}
 			// If the skeleton's finished, pull any remaining head headers directly from the origin
 			if skeleton && packet.Items() == 0 {
 				skeleton = false
-				getHeaders(from)
+				gombleaders(from)
 				continue
 			}
 			// If no more headers are inbound, notify the content fetchers and return
@@ -1099,7 +1099,7 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 					p.log.Debug("No headers, waiting for pivot commit")
 					select {
 					case <-time.After(fsHeaderContCheck):
-						getHeaders(from)
+						gombleaders(from)
 						continue
 					case <-d.cancelCh:
 						return errCanceled
@@ -1171,14 +1171,14 @@ func (d *Downloader) fetchHeaders(p *peerConnection, from uint64) error {
 				if skeleton && pivot > 0 {
 					getNextPivot()
 				} else {
-					getHeaders(from)
+					gombleaders(from)
 				}
 			} else {
 				// No headers delivered, or all of them being delayed, sleep a bit and retry
 				p.log.Trace("All headers delayed, waiting")
 				select {
 				case <-time.After(fsHeaderContCheck):
-					getHeaders(from)
+					gombleaders(from)
 					continue
 				case <-d.cancelCh:
 					return errCanceled
@@ -1717,7 +1717,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 		} else {
 			// The InsertChain method in blockchain.go will sometimes return an out-of-bounds index,
 			// when it needs to preprocess blocks to import a sidechain.
-			// The importer will put together a new list of blocks to import, which is a superset
+			// The importer will put togombler a new list of blocks to import, which is a superset
 			// of the blocks delivered from the downloader, and the indexing will be off.
 			log.Debug("Downloaded item processing failed on sidechain import", "index", index, "err", err)
 		}

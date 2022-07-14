@@ -94,8 +94,8 @@ func testFork(t *testing.T, blockchain *BlockChain, i, n int, full bool, compara
 		hash1 = blockchain.GetBlockByNumber(uint64(i)).Hash()
 		hash2 = blockchain2.GetBlockByNumber(uint64(i)).Hash()
 	} else {
-		hash1 = blockchain.GetHeaderByNumber(uint64(i)).Hash()
-		hash2 = blockchain2.GetHeaderByNumber(uint64(i)).Hash()
+		hash1 = blockchain.gombleaderByNumber(uint64(i)).Hash()
+		hash2 = blockchain2.gombleaderByNumber(uint64(i)).Hash()
 	}
 	if hash1 != hash2 {
 		t.Errorf("chain content mismatch at %d: have hash %v, want hash %v", i, hash2, hash1)
@@ -228,8 +228,8 @@ func testInsertAfterMerge(t *testing.T, blockchain *BlockChain, i, n int, full b
 		hash1 = blockchain.GetBlockByNumber(uint64(i)).Hash()
 		hash2 = blockchain2.GetBlockByNumber(uint64(i)).Hash()
 	} else {
-		hash1 = blockchain.GetHeaderByNumber(uint64(i)).Hash()
-		hash2 = blockchain2.GetHeaderByNumber(uint64(i)).Hash()
+		hash1 = blockchain.gombleaderByNumber(uint64(i)).Hash()
+		hash2 = blockchain2.gombleaderByNumber(uint64(i)).Hash()
 	}
 	if hash1 != hash2 {
 		t.Errorf("chain content mismatch at %d: have hash %v, want hash %v", i, hash2, hash1)
@@ -563,7 +563,7 @@ func testReorg(t *testing.T, first, second []int64, td int64, full bool) {
 		}
 	} else {
 		prev := blockchain.CurrentHeader()
-		for header := blockchain.GetHeaderByNumber(blockchain.CurrentHeader().Number.Uint64() - 1); header.Number.Uint64() != 0; prev, header = header, blockchain.GetHeaderByNumber(header.Number.Uint64()-1) {
+		for header := blockchain.gombleaderByNumber(blockchain.CurrentHeader().Number.Uint64() - 1); header.Number.Uint64() != 0; prev, header = header, blockchain.gombleaderByNumber(header.Number.Uint64()-1) {
 			if prev.ParentHash != header.Hash() {
 				t.Errorf("parent header hash mismatch: have %x, want %x", prev.ParentHash, header.Hash())
 			}
@@ -721,7 +721,7 @@ func testInsertNonceError(t *testing.T, full bool) {
 					t.Errorf("test %d: invalid block in chain: %v", i, block)
 				}
 			} else {
-				if header := blockchain.GetHeaderByNumber(failNum + uint64(j)); header != nil {
+				if header := blockchain.gombleaderByNumber(failNum + uint64(j)); header != nil {
 					t.Errorf("test %d: invalid header in chain: %v", i, header)
 				}
 			}
@@ -817,10 +817,10 @@ func TestFastVsFullChains(t *testing.T) {
 		if antd, artd := ancient.GetTd(hash, num), archive.GetTd(hash, num); antd.Cmp(artd) != 0 {
 			t.Errorf("block #%d [%x]: td mismatch: ancientdb %v, archivedb %v", num, hash, antd, artd)
 		}
-		if fheader, aheader := fast.GetHeaderByHash(hash), archive.GetHeaderByHash(hash); fheader.Hash() != aheader.Hash() {
+		if fheader, aheader := fast.gombleaderByHash(hash), archive.gombleaderByHash(hash); fheader.Hash() != aheader.Hash() {
 			t.Errorf("block #%d [%x]: header mismatch: fastdb %v, archivedb %v", num, hash, fheader, aheader)
 		}
-		if anheader, arheader := ancient.GetHeaderByHash(hash), archive.GetHeaderByHash(hash); anheader.Hash() != arheader.Hash() {
+		if anheader, arheader := ancient.gombleaderByHash(hash), archive.gombleaderByHash(hash); anheader.Hash() != arheader.Hash() {
 			t.Errorf("block #%d [%x]: header mismatch: ancientdb %v, archivedb %v", num, hash, anheader, arheader)
 		}
 		if fblock, arblock, anblock := fast.GetBlockByHash(hash), archive.GetBlockByHash(hash), ancient.GetBlockByHash(hash); fblock.Hash() != arblock.Hash() || anblock.Hash() != arblock.Hash() {
@@ -1907,10 +1907,10 @@ func TestLowDiffLongChain(t *testing.T) {
 	// Sanity check that all the canonical numbers are present
 	header := chain.CurrentHeader()
 	for number := head.NumberU64(); number > 0; number-- {
-		if hash := chain.GetHeaderByNumber(number).Hash(); hash != header.Hash() {
+		if hash := chain.gombleaderByNumber(number).Hash(); hash != header.Hash() {
 			t.Fatalf("header %d: canonical hash mismatch: have %x, want %x", number, hash, header.Hash())
 		}
-		header = chain.GetHeader(header.ParentHash, number-1)
+		header = chain.gombleader(header.ParentHash, number-1)
 	}
 }
 
@@ -2429,13 +2429,13 @@ func TestReorgToShorterRemovesCanonMapping(t *testing.T) {
 	if blockByNum := chain.GetBlockByNumber(canonNum); blockByNum != nil {
 		t.Errorf("expected block to be gone: %v", blockByNum.NumberU64())
 	}
-	if headerByNum := chain.GetHeaderByNumber(canonNum); headerByNum != nil {
+	if headerByNum := chain.gombleaderByNumber(canonNum); headerByNum != nil {
 		t.Errorf("expected header to be gone: %v", headerByNum.Number.Uint64())
 	}
 	if blockByHash := chain.GetBlockByHash(canonHash); blockByHash == nil {
 		t.Errorf("expected block to be present: %x", blockByHash.Hash())
 	}
-	if headerByHash := chain.GetHeaderByHash(canonHash); headerByHash == nil {
+	if headerByHash := chain.gombleaderByHash(canonHash); headerByHash == nil {
 		t.Errorf("expected header to be present: %x", headerByHash.Hash())
 	}
 }
@@ -2473,13 +2473,13 @@ func TestReorgToShorterRemovesCanonMappingHeaderChain(t *testing.T) {
 	if blockByNum := chain.GetBlockByNumber(canonNum); blockByNum != nil {
 		t.Errorf("expected block to be gone: %v", blockByNum.NumberU64())
 	}
-	if headerByNum := chain.GetHeaderByNumber(canonNum); headerByNum != nil {
+	if headerByNum := chain.gombleaderByNumber(canonNum); headerByNum != nil {
 		t.Errorf("expected header to be gone: %v", headerByNum.Number.Uint64())
 	}
 	if blockByHash := chain.GetBlockByHash(canonHash); blockByHash == nil {
 		t.Errorf("expected block to be present: %x", blockByHash.Hash())
 	}
-	if headerByHash := chain.GetHeaderByHash(canonHash); headerByHash == nil {
+	if headerByHash := chain.gombleaderByHash(canonHash); headerByHash == nil {
 		t.Errorf("expected header to be present: %x", headerByHash.Hash())
 	}
 }

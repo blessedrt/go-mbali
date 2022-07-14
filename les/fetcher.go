@@ -179,7 +179,7 @@ func newLightFetcher(chain *light.LightChain, engine consensus.Engine, peers *se
 		chaindb:     chaindb,
 		chain:       chain,
 		reqDist:     reqDist,
-		fetcher:     fetcher.NewBlockFetcher(true, chain.GetHeaderByHash, nil, validator, nil, heighter, inserter, nil, dropper),
+		fetcher:     fetcher.NewBlockFetcher(true, chain.gombleaderByHash, nil, validator, nil, heighter, inserter, nil, dropper),
 		peers:       make(map[enode.ID]*fetcherPeer),
 		synchronise: syncFn,
 		announceCh:  make(chan *announce),
@@ -411,7 +411,7 @@ func (f *lightFetcher) mainloop() {
 			f.forEachPeer(func(id enode.ID, p *fetcherPeer) bool {
 				removed := p.forwardAnno(localTd)
 				for _, anno := range removed {
-					if header := f.chain.GetHeaderByHash(anno.data.Hash); header != nil {
+					if header := f.chain.gombleaderByHash(anno.data.Hash); header != nil {
 						if header.Number.Uint64() != anno.data.Number {
 							droplist = append(droplist, id)
 							break
@@ -456,7 +456,7 @@ func (f *lightFetcher) mainloop() {
 						break
 					}
 					untrusted = append(untrusted, hash)
-					head = f.chain.GetHeader(head.ParentHash, number-1)
+					head = f.chain.gombleader(head.ParentHash, number-1)
 					if head == nil {
 						break // all the synced headers will be dropped
 					}

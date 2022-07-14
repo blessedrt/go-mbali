@@ -243,7 +243,7 @@ func (f *fuzzer) AddTxsSync() bool {
 	return false
 }
 
-func (f *fuzzer) GetHelperTrie(typ uint, index uint64) *trie.Trie {
+func (f *fuzzer) gomblelperTrie(typ uint, index uint64) *trie.Trie {
 	if typ == 0 {
 		return f.chtTrie
 	} else if typ == 1 {
@@ -346,7 +346,7 @@ func Fuzz(input []byte) int {
 			f.doFuzz(l.GetProofsV2Msg, req)
 
 		case 5:
-			req := &l.GetHelperTrieProofsPacket{Reqs: make([]l.HelperTrieReq, f.randomInt(l.MaxHelperTrieProofsFetch+1))}
+			req := &l.gomblelperTrieProofsPacket{Reqs: make([]l.HelperTrieReq, f.randomInt(l.MaxHelperTrieProofsFetch+1))}
 			for i := range req.Reqs {
 				switch f.randomInt(3) {
 				case 0:
@@ -378,7 +378,7 @@ func Fuzz(input []byte) int {
 					}
 				}
 			}
-			f.doFuzz(l.GetHelperTrieProofsMsg, req)
+			f.doFuzz(l.gomblelperTrieProofsMsg, req)
 
 		case 6:
 			req := &l.SendTxPacket{Txs: make([]*types.Transaction, f.randomInt(l.MaxTxSend+1))}

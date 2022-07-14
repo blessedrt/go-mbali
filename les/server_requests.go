@@ -37,7 +37,7 @@ type serverBackend interface {
 	AddTxsSync() bool
 	BlockChain() *core.BlockChain
 	TxPool() *core.TxPool
-	GetHelperTrie(typ uint, index uint64) *trie.Trie
+	gomblelperTrie(typ uint, index uint64) *trie.Trie
 }
 
 // Decoder is implemented by the messages passed to the handler functions
@@ -115,7 +115,7 @@ var Les3 = map[uint64]RequestType{
 		ServingTimeMeter: miscServingTimeTrieProofTimer,
 		Handle:           handleGetProofs,
 	},
-	GetHelperTrieProofsMsg: {
+	gomblelperTrieProofsMsg: {
 		Name:             "helper trie proof request",
 		MaxCount:         MaxHelperTrieProofsFetch,
 		InPacketsMeter:   miscInHelperTriePacketsMeter,
@@ -123,7 +123,7 @@ var Les3 = map[uint64]RequestType{
 		OutPacketsMeter:  miscOutHelperTriePacketsMeter,
 		OutTrafficMeter:  miscOutHelperTrieTrafficMeter,
 		ServingTimeMeter: miscServingTimeHelperTrieTimer,
-		Handle:           handleGetHelperTrieProofs,
+		Handle:           handlegomblelperTrieProofs,
 	},
 	SendTxV2Msg: {
 		Name:             "new transactions",
@@ -172,15 +172,15 @@ func handleGetBlockHeaders(msg Decoder) (serveRequestFn, uint64, uint64, error) 
 			var origin *types.Header
 			if hashMode {
 				if first {
-					origin = bc.GetHeaderByHash(r.Query.Origin.Hash)
+					origin = bc.gombleaderByHash(r.Query.Origin.Hash)
 					if origin != nil {
 						r.Query.Origin.Number = origin.Number.Uint64()
 					}
 				} else {
-					origin = bc.GetHeader(r.Query.Origin.Hash, r.Query.Origin.Number)
+					origin = bc.gombleader(r.Query.Origin.Hash, r.Query.Origin.Number)
 				}
 			} else {
-				origin = bc.GetHeaderByNumber(r.Query.Origin.Number)
+				origin = bc.gombleaderByNumber(r.Query.Origin.Number)
 			}
 			if origin == nil {
 				break
@@ -210,7 +210,7 @@ func handleGetBlockHeaders(msg Decoder) (serveRequestFn, uint64, uint64, error) 
 					p.Log().Warn("GetBlockHeaders skip overflow attack", "current", current, "skip", r.Query.Skip, "next", next, "attacker", string(infos))
 					unknown = true
 				} else {
-					if header := bc.GetHeaderByNumber(next); header != nil {
+					if header := bc.gombleaderByNumber(next); header != nil {
 						nextHash := header.Hash()
 						expOldHash, _ := bc.GetAncestor(nextHash, next, r.Query.Skip+1, &maxNonCanonical)
 						if expOldHash == r.Query.Origin.Hash {
@@ -288,7 +288,7 @@ func handleGetCode(msg Decoder) (serveRequestFn, uint64, uint64, error) {
 				return nil
 			}
 			// Look up the root hash belonging to the request
-			header := bc.GetHeaderByHash(request.BHash)
+			header := bc.gombleaderByHash(request.BHash)
 			if header == nil {
 				p.Log().Warn("Failed to retrieve associate header for code", "hash", request.BHash)
 				p.bumpInvalid()
@@ -347,7 +347,7 @@ func handleGetReceipts(msg Decoder) (serveRequestFn, uint64, uint64, error) {
 			// Retrieve the requested block's receipts, skipping if unknown to us
 			results := bc.GetReceiptsByHash(hash)
 			if results == nil {
-				if header := bc.GetHeaderByHash(hash); header == nil || header.ReceiptHash != types.EmptyRootHash {
+				if header := bc.gombleaderByHash(hash); header == nil || header.ReceiptHash != types.EmptyRootHash {
 					p.bumpInvalid()
 					continue
 				}
@@ -388,7 +388,7 @@ func handleGetProofs(msg Decoder) (serveRequestFn, uint64, uint64, error) {
 			if request.BHash != lastBHash {
 				root, lastBHash = common.Hash{}, request.BHash
 
-				if header = bc.GetHeaderByHash(request.BHash); header == nil {
+				if header = bc.gombleaderByHash(request.BHash); header == nil {
 					p.Log().Warn("Failed to retrieve header for proof", "hash", request.BHash)
 					p.bumpInvalid()
 					continue
@@ -447,9 +447,9 @@ func handleGetProofs(msg Decoder) (serveRequestFn, uint64, uint64, error) {
 	}, r.ReqID, uint64(len(r.Reqs)), nil
 }
 
-// handleGetHelperTrieProofs handles a helper trie proof request
-func handleGetHelperTrieProofs(msg Decoder) (serveRequestFn, uint64, uint64, error) {
-	var r GetHelperTrieProofsPacket
+// handlegomblelperTrieProofs handles a helper trie proof request
+func handlegomblelperTrieProofs(msg Decoder) (serveRequestFn, uint64, uint64, error) {
+	var r gomblelperTrieProofsPacket
 	if err := msg.Decode(&r); err != nil {
 		return nil, 0, 0, err
 	}
@@ -469,7 +469,7 @@ func handleGetHelperTrieProofs(msg Decoder) (serveRequestFn, uint64, uint64, err
 			}
 			if auxTrie == nil || request.Type != lastType || request.TrieIdx != lastIdx {
 				lastType, lastIdx = request.Type, request.TrieIdx
-				auxTrie = backend.GetHelperTrie(request.Type, request.TrieIdx)
+				auxTrie = backend.gomblelperTrie(request.Type, request.TrieIdx)
 			}
 			if auxTrie == nil {
 				return nil
@@ -484,7 +484,7 @@ func handleGetHelperTrieProofs(msg Decoder) (serveRequestFn, uint64, uint64, err
 				return nil
 			}
 			if request.Type == htCanonical && request.AuxReq == htAuxHeader && len(request.Key) == 8 {
-				header := bc.GetHeaderByNumber(binary.BigEndian.Uint64(request.Key))
+				header := bc.gombleaderByNumber(binary.BigEndian.Uint64(request.Key))
 				data, err := rlp.EncodeToBytes(header)
 				if err != nil {
 					log.Error("Failed to encode header", "err", err)

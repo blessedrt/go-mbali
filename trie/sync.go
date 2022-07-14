@@ -164,7 +164,7 @@ func (s *Sync) AddSubTrie(root common.Hash, path []byte, parent common.Hash, cal
 		hash:     root,
 		callback: callback,
 	}
-	// If this sub-trie has a designated parent, link them together
+	// If this sub-trie has a designated parent, link them togombler
 	if parent != (common.Hash{}) {
 		ancestor := s.nodeReqs[parent]
 		if ancestor == nil {
@@ -201,7 +201,7 @@ func (s *Sync) AddCodeEntry(hash common.Hash, path []byte, parent common.Hash) {
 		hash: hash,
 		code: true,
 	}
-	// If this sub-trie has a designated parent, link them together
+	// If this sub-trie has a designated parent, link them togombler
 	if parent != (common.Hash{}) {
 		ancestor := s.nodeReqs[parent] // the parent of codereq can ONLY be nodereq
 		if ancestor == nil {

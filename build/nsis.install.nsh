@@ -1,4 +1,4 @@
-Name "geth ${MAJORVERSION}.${MINORVERSION}.${BUILDVERSION}" # VERSION variables set through command line arguments
+Name "gombl ${MAJORVERSION}.${MINORVERSION}.${BUILDVERSION}" # VERSION variables set through command line arguments
 InstallDir "$InstDir"
 OutFile "${OUTPUTFILE}" # set through command line arguments
 
@@ -12,30 +12,30 @@ PageEx license
   LicenseData {{.License}}
 PageExEnd
 
-# Install geth binary
-Section "Geth" GETH_IDX
+# Install gombl binary
+Section "gombl" gombl_IDX
   SetOutPath $INSTDIR
-  file {{.Geth}}
+  file {{.gombl}}
 
   # Create start menu launcher
   createDirectory "$SMPROGRAMS\${APPNAME}"
-  createShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\geth.exe"
-  createShortCut "$SMPROGRAMS\${APPNAME}\Attach.lnk" "$INSTDIR\geth.exe" "attach"
+  createShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\gombl.exe"
+  createShortCut "$SMPROGRAMS\${APPNAME}\Attach.lnk" "$INSTDIR\gombl.exe" "attach"
   createShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
   # Firewall - remove rules (if exists)
-  SimpleFC::AdvRemoveRule "Geth incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Geth outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Geth UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "gombl incoming peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "gombl outgoing peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "gombl UDP discovery (UDP:30303)"
 
   # Firewall - add rules
-  SimpleFC::AdvAddRule "Geth incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "mbali" 30303 "" "" ""
-  SimpleFC::AdvAddRule "Geth outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "mbali" "" 30303 "" ""
-  SimpleFC::AdvAddRule "Geth UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "mbali" "" 30303 "" ""
+  SimpleFC::AdvAddRule "gombl incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\gombl.exe" "" "" "mbali" 30303 "" "" ""
+  SimpleFC::AdvAddRule "gombl outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\gombl.exe" "" "" "mbali" "" 30303 "" ""
+  SimpleFC::AdvAddRule "gombl UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\gombl.exe" "" "" "mbali" "" 30303 "" ""
 
   # Set default IPC endpoint (https://github.com/mbali/EIPs/issues/147)
-  ${EnvVarUpdate} $0 "mbali_SOCKET" "R" "HKLM" "\\.\pipe\geth.ipc"
-  ${EnvVarUpdate} $0 "mbali_SOCKET" "A" "HKLM" "\\.\pipe\geth.ipc"
+  ${EnvVarUpdate} $0 "mbali_SOCKET" "R" "HKLM" "\\.\pipe\gombl.ipc"
+  ${EnvVarUpdate} $0 "mbali_SOCKET" "A" "HKLM" "\\.\pipe\gombl.ipc"
 
   # Add instdir to PATH
   Push "$INSTDIR"
@@ -54,8 +54,8 @@ Var GetInstalledSize.total
 Function GetInstalledSize
   StrCpy $GetInstalledSize.total 0
 
-  ${if} ${SectionIsSelected} ${GETH_IDX}
-    SectionGetSize ${GETH_IDX} $0
+  ${if} ${SectionIsSelected} ${gombl_IDX}
+    SectionGetSize ${gombl_IDX} $0
     IntOp $GetInstalledSize.total $GetInstalledSize.total + $0
   ${endif}
 

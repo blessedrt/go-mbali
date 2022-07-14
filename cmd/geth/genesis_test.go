@@ -67,7 +67,7 @@ var customGenesisTests = []struct {
 	},
 }
 
-// Tests that initializing Geth with a custom genesis block and chain definitions
+// Tests that initializing gombl with a custom genesis block and chain definitions
 // work properly.
 func TestCustomGenesis(t *testing.T) {
 	for i, tt := range customGenesisTests {
@@ -79,14 +79,14 @@ func TestCustomGenesis(t *testing.T) {
 		if err := os.WriteFile(json, []byte(tt.genesis), 0600); err != nil {
 			t.Fatalf("test %d: failed to write genesis file: %v", i, err)
 		}
-		runGeth(t, "--datadir", datadir, "init", json).WaitExit()
+		rungombl(t, "--datadir", datadir, "init", json).WaitExit()
 
 		// Query the custom genesis block
-		geth := runGeth(t, "--networkid", "1337", "--syncmode=full", "--cache", "16",
+		gombl := rungombl(t, "--networkid", "1337", "--syncmode=full", "--cache", "16",
 			"--datadir", datadir, "--maxpeers", "0", "--port", "0",
 			"--nodiscover", "--nat", "none", "--ipcdisable",
 			"--exec", tt.query, "console")
-		geth.ExpectRegexp(tt.result)
-		geth.ExpectExit()
+		gombl.ExpectRegexp(tt.result)
+		gombl.ExpectExit()
 	}
 }

@@ -17,7 +17,7 @@
 // Contains all the wrappers from the node package to support client side node
 // management on mobile platforms.
 
-package geth
+package gombl
 
 import (
 	"encoding/json"
@@ -37,7 +37,7 @@ import (
 	"github.com/mbali/go-mbali/params"
 )
 
-// NodeConfig represents the collection of configuration values to fine tune the Geth
+// NodeConfig represents the collection of configuration values to fine tune the gombl
 // node embedded into a mobile process. The available values are a subset of the
 // entire API provided by go-mbali to reduce the maintenance surface and dev
 // complexity.
@@ -106,12 +106,12 @@ func (conf *NodeConfig) String() string {
 	return encodeOrError(conf)
 }
 
-// Node represents a Geth mbali node instance.
+// Node represents a gombl mbali node instance.
 type Node struct {
 	node *node.Node
 }
 
-// NewNode creates and configures a new Geth node.
+// NewNode creates and configures a new gombl node.
 func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	// If no or partial configurations were specified, use defaults
 	if config == nil {

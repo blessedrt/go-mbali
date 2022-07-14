@@ -29,7 +29,7 @@ func NewEnv(cfg *Config) *vm.EVM {
 	blockContext := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
 		Transfer:    core.Transfer,
-		GetHash:     cfg.GetHashFn,
+		gomblash:     cfg.gomblashFn,
 		Coinbase:    cfg.Coinbase,
 		BlockNumber: cfg.BlockNumber,
 		Time:        cfg.Time,

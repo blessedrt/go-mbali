@@ -130,7 +130,7 @@ type jsTracer struct {
 // evaluates to an expression returning an object with certain methods.
 // The methods `result` and `fault` are required to be present.
 // The methods `step`, `enter`, and `exit` are optional, but note that
-// `enter` and `exit` always go together.
+// `enter` and `exit` always go togombler.
 func newJsTracer(code string, ctx *tracers.Context) (tracers.Tracer, error) {
 	if c, ok := assetTracers[code]; ok {
 		code = c

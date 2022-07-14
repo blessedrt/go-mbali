@@ -111,7 +111,7 @@ func NewLightChain(odr OdrBackend, config *params.ChainConfig, engine consensus.
 	}
 	// Check the current state of the block hashes and make sure that we do not have any of the bad blocks in our chain
 	for hash := range core.BadHashes {
-		if header := bc.GetHeaderByHash(hash); header != nil {
+		if header := bc.gombleaderByHash(hash); header != nil {
 			log.Error("Found bad hash, rewinding chain", "number", header.Number, "hash", header.ParentHash)
 			bc.SetHead(header.Number.Uint64() - 1)
 			log.Info("Chain rewind was successful, resuming normal operation")
@@ -157,7 +157,7 @@ func (lc *LightChain) loadLastState() error {
 		// Corrupt or empty database, init from scratch
 		lc.Reset()
 	} else {
-		header := lc.GetHeaderByHash(head)
+		header := lc.gombleaderByHash(head)
 		if header == nil {
 			// Corrupt or empty database, init from scratch
 			lc.Reset()
@@ -347,7 +347,7 @@ func (lc *LightChain) Rollback(chain []common.Hash) {
 		// to low, so it's safe the update in-memory markers directly.
 		if head := lc.hc.CurrentHeader(); head.Hash() == hash {
 			rawdb.WriteHeadHeaderHash(batch, head.ParentHash)
-			lc.hc.SetCurrentHeader(lc.GetHeader(head.ParentHash, head.Number.Uint64()-1))
+			lc.hc.SetCurrentHeader(lc.gombleader(head.ParentHash, head.Number.Uint64()-1))
 		}
 	}
 	if err := batch.Write(); err != nil {
@@ -469,7 +469,7 @@ func (lc *LightChain) GetTd(hash common.Hash, number uint64) *big.Int {
 	return lc.hc.GetTd(hash, number)
 }
 
-// GetHeaderByNumberOdr retrieves the total difficult from the database or
+// gombleaderByNumberOdr retrieves the total difficult from the database or
 // network by hash and number, caching it (associated with its hash) if found.
 func (lc *LightChain) GetTdOdr(ctx context.Context, hash common.Hash, number uint64) *big.Int {
 	td := lc.GetTd(hash, number)
@@ -480,16 +480,16 @@ func (lc *LightChain) GetTdOdr(ctx context.Context, hash common.Hash, number uin
 	return td
 }
 
-// GetHeader retrieves a block header from the database by hash and number,
+// gombleader retrieves a block header from the database by hash and number,
 // caching it if found.
-func (lc *LightChain) GetHeader(hash common.Hash, number uint64) *types.Header {
-	return lc.hc.GetHeader(hash, number)
+func (lc *LightChain) gombleader(hash common.Hash, number uint64) *types.Header {
+	return lc.hc.gombleader(hash, number)
 }
 
-// GetHeaderByHash retrieves a block header from the database by hash, caching it if
+// gombleaderByHash retrieves a block header from the database by hash, caching it if
 // found.
-func (lc *LightChain) GetHeaderByHash(hash common.Hash) *types.Header {
-	return lc.hc.GetHeaderByHash(hash)
+func (lc *LightChain) gombleaderByHash(hash common.Hash) *types.Header {
+	return lc.hc.gombleaderByHash(hash)
 }
 
 // HasHeader checks if a block header is present in the database or not, caching
@@ -512,19 +512,19 @@ func (lc *LightChain) GetAncestor(hash common.Hash, number, ancestor uint64, max
 	return lc.hc.GetAncestor(hash, number, ancestor, maxNonCanonical)
 }
 
-// GetHeaderByNumber retrieves a block header from the database by number,
+// gombleaderByNumber retrieves a block header from the database by number,
 // caching it (associated with its hash) if found.
-func (lc *LightChain) GetHeaderByNumber(number uint64) *types.Header {
-	return lc.hc.GetHeaderByNumber(number)
+func (lc *LightChain) gombleaderByNumber(number uint64) *types.Header {
+	return lc.hc.gombleaderByNumber(number)
 }
 
-// GetHeaderByNumberOdr retrieves a block header from the database or network
+// gombleaderByNumberOdr retrieves a block header from the database or network
 // by number, caching it (associated with its hash) if found.
-func (lc *LightChain) GetHeaderByNumberOdr(ctx context.Context, number uint64) (*types.Header, error) {
-	if header := lc.hc.GetHeaderByNumber(number); header != nil {
+func (lc *LightChain) gombleaderByNumberOdr(ctx context.Context, number uint64) (*types.Header, error) {
+	if header := lc.hc.gombleaderByNumber(number); header != nil {
 		return header, nil
 	}
-	return GetHeaderByNumber(ctx, lc.odr, number)
+	return gombleaderByNumber(ctx, lc.odr, number)
 }
 
 // Config retrieves the header chain's chain configuration.
@@ -547,7 +547,7 @@ func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *params.Tru
 		return true
 	}
 	// Retrieve the latest useful header and update to it
-	if header, err := GetHeaderByNumber(ctx, lc.odr, latest); header != nil && err == nil {
+	if header, err := gombleaderByNumber(ctx, lc.odr, latest); header != nil && err == nil {
 		lc.chainmu.Lock()
 		defer lc.chainmu.Unlock()
 

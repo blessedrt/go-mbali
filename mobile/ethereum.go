@@ -16,7 +16,7 @@
 
 // Contains all the wrappers from the go-mbali root package.
 
-package geth
+package gombl
 
 import (
 	"errors"
@@ -80,19 +80,19 @@ type SyncProgress struct {
 
 func (p *SyncProgress) GetStartingBlock() int64       { return int64(p.progress.StartingBlock) }
 func (p *SyncProgress) GetCurrentBlock() int64        { return int64(p.progress.CurrentBlock) }
-func (p *SyncProgress) GetHighestBlock() int64        { return int64(p.progress.HighestBlock) }
+func (p *SyncProgress) gomblighestBlock() int64        { return int64(p.progress.HighestBlock) }
 func (p *SyncProgress) GetSyncedAccounts() int64      { return int64(p.progress.SyncedAccounts) }
 func (p *SyncProgress) GetSyncedAccountBytes() int64  { return int64(p.progress.SyncedAccountBytes) }
 func (p *SyncProgress) GetSyncedBytecodes() int64     { return int64(p.progress.SyncedBytecodes) }
 func (p *SyncProgress) GetSyncedBytecodeBytes() int64 { return int64(p.progress.SyncedBytecodeBytes) }
 func (p *SyncProgress) GetSyncedStorage() int64       { return int64(p.progress.SyncedStorage) }
 func (p *SyncProgress) GetSyncedStorageBytes() int64  { return int64(p.progress.SyncedStorageBytes) }
-func (p *SyncProgress) GetHealedTrienodes() int64     { return int64(p.progress.HealedTrienodes) }
-func (p *SyncProgress) GetHealedTrienodeBytes() int64 { return int64(p.progress.HealedTrienodeBytes) }
-func (p *SyncProgress) GetHealedBytecodes() int64     { return int64(p.progress.HealedBytecodes) }
-func (p *SyncProgress) GetHealedBytecodeBytes() int64 { return int64(p.progress.HealedBytecodeBytes) }
-func (p *SyncProgress) GetHealingTrienodes() int64    { return int64(p.progress.HealingTrienodes) }
-func (p *SyncProgress) GetHealingBytecode() int64     { return int64(p.progress.HealingBytecode) }
+func (p *SyncProgress) gomblealedTrienodes() int64     { return int64(p.progress.HealedTrienodes) }
+func (p *SyncProgress) gomblealedTrienodeBytes() int64 { return int64(p.progress.HealedTrienodeBytes) }
+func (p *SyncProgress) gomblealedBytecodes() int64     { return int64(p.progress.HealedBytecodes) }
+func (p *SyncProgress) gomblealedBytecodeBytes() int64 { return int64(p.progress.HealedBytecodeBytes) }
+func (p *SyncProgress) gomblealingTrienodes() int64    { return int64(p.progress.HealingTrienodes) }
+func (p *SyncProgress) gomblealingBytecode() int64     { return int64(p.progress.HealingBytecode) }
 
 // Topics is a set of topic lists to filter events with.
 type Topics struct{ topics [][]common.Hash }

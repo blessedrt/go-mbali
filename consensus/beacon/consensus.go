@@ -83,7 +83,7 @@ func (beacon *Beacon) VerifyHeader(chain consensus.ChainHeaderReader, header *ty
 		return beacon.ethone.VerifyHeader(chain, header, seal)
 	}
 	// Short circuit if the parent is not known
-	parent := chain.GetHeader(header.ParentHash, header.Number.Uint64()-1)
+	parent := chain.gombleader(header.ParentHash, header.Number.Uint64()-1)
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
@@ -224,7 +224,7 @@ func (beacon *Beacon) verifyHeaders(chain consensus.ChainHeaderReader, headers [
 				if ancestor != nil {
 					parent = ancestor
 				} else {
-					parent = chain.GetHeader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
+					parent = chain.gombleader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
 				}
 			} else if headers[i-1].Hash() == headers[i].ParentHash {
 				parent = headers[i-1]

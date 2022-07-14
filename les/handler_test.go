@@ -171,7 +171,7 @@ func testGetBlockHeaders(t *testing.T, protocol int) {
 		// Collect the headers to expect in the response
 		var headers []*types.Header
 		for _, hash := range tt.expect {
-			headers = append(headers, bc.GetHeaderByHash(hash))
+			headers = append(headers, bc.gombleaderByHash(hash))
 		}
 		// Send the hash request and verify the response
 		reqID++
@@ -292,7 +292,7 @@ func testGetCode(t *testing.T, protocol int) {
 	var codereqs []*CodeReq
 	var codes [][]byte
 	for i := uint64(0); i <= bc.CurrentBlock().NumberU64(); i++ {
-		header := bc.GetHeaderByNumber(i)
+		header := bc.gombleaderByNumber(i)
 		req := &CodeReq{
 			BHash:  header.Hash(),
 			AccKey: crypto.Keccak256(testContractAddr[:]),
@@ -330,7 +330,7 @@ func testGetStaleCode(t *testing.T, protocol int) {
 
 	check := func(number uint64, expected [][]byte) {
 		req := &CodeReq{
-			BHash:  bc.GetHeaderByNumber(number).Hash(),
+			BHash:  bc.gombleaderByNumber(number).Hash(),
 			AccKey: crypto.Keccak256(testContractAddr[:]),
 		}
 		sendRequest(rawPeer.app, GetCodeMsg, 42, []*CodeReq{req})
@@ -404,7 +404,7 @@ func testGetProofs(t *testing.T, protocol int) {
 
 	accounts := []common.Address{bankAddr, userAddr1, userAddr2, signerAddr, {}}
 	for i := uint64(0); i <= bc.CurrentBlock().NumberU64(); i++ {
-		header := bc.GetHeaderByNumber(i)
+		header := bc.gombleaderByNumber(i)
 		trie, _ := trie.New(common.Hash{}, header.Root, trie.NewDatabase(server.db))
 
 		for _, acc := range accounts {
@@ -444,7 +444,7 @@ func testGetStaleProof(t *testing.T, protocol int) {
 
 	check := func(number uint64, wantOK bool) {
 		var (
-			header  = bc.GetHeaderByNumber(number)
+			header  = bc.gombleaderByNumber(number)
 			account = crypto.Keccak256(userAddr1.Bytes())
 		)
 		req := &ProofReq{
@@ -502,7 +502,7 @@ func testGetCHTProofs(t *testing.T, protocol int) {
 	bc := server.handler.blockchain
 
 	// Assemble the proofs from the different protocols
-	header := bc.GetHeaderByNumber(config.ChtSize - 1)
+	header := bc.gombleaderByNumber(config.ChtSize - 1)
 	rlp, _ := rlp.EncodeToBytes(header)
 
 	key := make([]byte, 8)
@@ -511,7 +511,7 @@ func testGetCHTProofs(t *testing.T, protocol int) {
 	proofsV2 := HelperTrieResps{
 		AuxData: [][]byte{rlp},
 	}
-	root := light.GetChtRoot(server.db, 0, bc.GetHeaderByNumber(config.ChtSize-1).Hash())
+	root := light.GetChtRoot(server.db, 0, bc.gombleaderByNumber(config.ChtSize-1).Hash())
 	trie, _ := trie.New(common.Hash{}, root, trie.NewDatabase(rawdb.NewTable(server.db, light.ChtTablePrefix)))
 	trie.Prove(key, 0, &proofsV2.Proofs)
 	// Assemble the requests for the different protocols
@@ -522,7 +522,7 @@ func testGetCHTProofs(t *testing.T, protocol int) {
 		AuxReq:  htAuxHeader,
 	}}
 	// Send the proof request and verify the response
-	sendRequest(rawPeer.app, GetHelperTrieProofsMsg, 42, requestsV2)
+	sendRequest(rawPeer.app, gomblelperTrieProofsMsg, 42, requestsV2)
 	if err := expectResponse(rawPeer.app, HelperTrieProofsMsg, 42, testBufLimit, proofsV2); err != nil {
 		t.Errorf("proofs mismatch: %v", err)
 	}
@@ -576,12 +576,12 @@ func testGetBloombitsProofs(t *testing.T, protocol int) {
 		}}
 		var proofs HelperTrieResps
 
-		root := light.GetBloomTrieRoot(server.db, 0, bc.GetHeaderByNumber(config.BloomTrieSize-1).Hash())
+		root := light.GetBloomTrieRoot(server.db, 0, bc.gombleaderByNumber(config.BloomTrieSize-1).Hash())
 		trie, _ := trie.New(common.Hash{}, root, trie.NewDatabase(rawdb.NewTable(server.db, light.BloomTrieTablePrefix)))
 		trie.Prove(key, 0, &proofs.Proofs)
 
 		// Send the proof request and verify the response
-		sendRequest(rawPeer.app, GetHelperTrieProofsMsg, 42, requests)
+		sendRequest(rawPeer.app, gomblelperTrieProofsMsg, 42, requests)
 		if err := expectResponse(rawPeer.app, HelperTrieProofsMsg, 42, testBufLimit, proofs); err != nil {
 			t.Errorf("bit %d: proofs mismatch: %v", bit, err)
 		}

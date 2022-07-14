@@ -65,19 +65,19 @@ import (
 )
 
 var (
-	// Files that end up in the geth*.zip archive.
-	gethArchiveFiles = []string{
+	// Files that end up in the gombl*.zip archive.
+	gomblArchiveFiles = []string{
 		"COPYING",
-		executablePath("geth"),
+		executablePath("gombl"),
 	}
 
-	// Files that end up in the geth-alltools*.zip archive.
+	// Files that end up in the gombl-alltools*.zip archive.
 	allToolsArchiveFiles = []string{
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
 		executablePath("evm"),
-		executablePath("geth"),
+		executablePath("gombl"),
 		executablePath("puppeth"),
 		executablePath("rlpdump"),
 		executablePath("clef"),
@@ -98,7 +98,7 @@ var (
 			Description: "Developer utility version of the EVM (mbali Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
 		},
 		{
-			BinaryName:  "geth",
+			BinaryName:  "gombl",
 			Description: "mbali CLI client.",
 		},
 		{
@@ -364,7 +364,7 @@ func doArchive(cmdline []string) {
 		atype   = flag.String("type", "zip", "Type of archive to write (zip|tar)")
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. LINUX_SIGNING_KEY)`)
 		signify = flag.String("signify", "", `Environment variable holding the signify key (e.g. LINUX_SIGNIFY_KEY)`)
-		upload  = flag.String("upload", "", `Destination to upload the archives (usually "gethstore/builds")`)
+		upload  = flag.String("upload", "", `Destination to upload the archives (usually "gomblstore/builds")`)
 		ext     string
 	)
 	flag.CommandLine.Parse(cmdline)
@@ -379,18 +379,18 @@ func doArchive(cmdline []string) {
 
 	var (
 		env      = build.Env()
-		basegeth = archiveBasename(*arch, params.ArchiveVersion(env.Commit))
-		geth     = "geth-" + basegeth + ext
-		alltools = "geth-alltools-" + basegeth + ext
+		basegombl = archiveBasename(*arch, params.ArchiveVersion(env.Commit))
+		gombl     = "gombl-" + basegombl + ext
+		alltools = "gombl-alltools-" + basegombl + ext
 	)
 	maybeSkipArchive(env)
-	if err := build.WriteArchive(geth, gethArchiveFiles); err != nil {
+	if err := build.WriteArchive(gombl, gomblArchiveFiles); err != nil {
 		log.Fatal(err)
 	}
 	if err := build.WriteArchive(alltools, allToolsArchiveFiles); err != nil {
 		log.Fatal(err)
 	}
-	for _, archive := range []string{geth, alltools} {
+	for _, archive := range []string{gombl, alltools} {
 		if err := archiveUpload(archive, *upload, *signer, *signify); err != nil {
 			log.Fatal(err)
 		}
@@ -421,7 +421,7 @@ func archiveUpload(archive string, blobstore string, signer string, signifyVar s
 	}
 	if signifyVar != "" {
 		key := os.Getenv(signifyVar)
-		untrustedComment := "verify with geth-release.pub"
+		untrustedComment := "verify with gombl-release.pub"
 		trustedComment := fmt.Sprintf("%s (%s)", archive, time.Now().UTC().Format(time.RFC1123))
 		if err := signify.SignFile(archive, archive+".sig", key, untrustedComment, trustedComment); err != nil {
 			return err
@@ -490,14 +490,14 @@ func doDocker(cmdline []string) {
 		build.MustRun(auther)
 	}
 	// Retrieve the version infos to build and push to the following paths:
-	//  - mbali/client-go:latest                            - Pushes to the master branch, Geth only
-	//  - mbali/client-go:stable                            - Version tag publish on GitHub, Geth only
-	//  - mbali/client-go:alltools-latest                   - Pushes to the master branch, Geth & tools
-	//  - mbali/client-go:alltools-stable                   - Version tag publish on GitHub, Geth & tools
-	//  - mbali/client-go:release-<major>.<minor>           - Version tag publish on GitHub, Geth only
-	//  - mbali/client-go:alltools-release-<major>.<minor>  - Version tag publish on GitHub, Geth & tools
-	//  - mbali/client-go:v<major>.<minor>.<patch>          - Version tag publish on GitHub, Geth only
-	//  - mbali/client-go:alltools-v<major>.<minor>.<patch> - Version tag publish on GitHub, Geth & tools
+	//  - mbali/client-go:latest                            - Pushes to the master branch, gombl only
+	//  - mbali/client-go:stable                            - Version tag publish on GitHub, gombl only
+	//  - mbali/client-go:alltools-latest                   - Pushes to the master branch, gombl & tools
+	//  - mbali/client-go:alltools-stable                   - Version tag publish on GitHub, gombl & tools
+	//  - mbali/client-go:release-<major>.<minor>           - Version tag publish on GitHub, gombl only
+	//  - mbali/client-go:alltools-release-<major>.<minor>  - Version tag publish on GitHub, gombl & tools
+	//  - mbali/client-go:v<major>.<minor>.<patch>          - Version tag publish on GitHub, gombl only
+	//  - mbali/client-go:alltools-v<major>.<minor>.<patch> - Version tag publish on GitHub, gombl & tools
 	var tags []string
 
 	switch {
@@ -513,7 +513,7 @@ func doDocker(cmdline []string) {
 
 		// Tag and upload the images to Docker Hub
 		for _, tag := range tags {
-			gethImage := fmt.Sprintf("%s:%s-%s", *upload, tag, runtime.GOARCH)
+			gomblImage := fmt.Sprintf("%s:%s-%s", *upload, tag, runtime.GOARCH)
 			toolImage := fmt.Sprintf("%s:alltools-%s-%s", *upload, tag, runtime.GOARCH)
 
 			// If the image already exists (non version tag), check the build
@@ -521,7 +521,7 @@ func doDocker(cmdline []string) {
 			// are running. This is still a tiny bit racey if two published are
 			// done at the same time, but that's extremely unlikely even on the
 			// master branch.
-			for _, img := range []string{gethImage, toolImage} {
+			for _, img := range []string{gomblImage, toolImage} {
 				if exec.Command("docker", "pull", img).Run() != nil {
 					continue // Generally the only failure is a missing image, which is good
 				}
@@ -547,9 +547,9 @@ func doDocker(cmdline []string) {
 					}
 				}
 			}
-			build.MustRunCommand("docker", "image", "tag", fmt.Sprintf("%s:TAG", *upload), gethImage)
+			build.MustRunCommand("docker", "image", "tag", fmt.Sprintf("%s:TAG", *upload), gomblImage)
 			build.MustRunCommand("docker", "image", "tag", fmt.Sprintf("%s:alltools-TAG", *upload), toolImage)
-			build.MustRunCommand("docker", "push", gethImage)
+			build.MustRunCommand("docker", "push", gomblImage)
 			build.MustRunCommand("docker", "push", toolImage)
 		}
 	}
@@ -563,10 +563,10 @@ func doDocker(cmdline []string) {
 
 			for _, tag := range tags {
 				for _, arch := range strings.Split(*manifest, ",") {
-					gethImage := fmt.Sprintf("%s:%s-%s", *upload, tag, arch)
+					gomblImage := fmt.Sprintf("%s:%s-%s", *upload, tag, arch)
 					toolImage := fmt.Sprintf("%s:alltools-%s-%s", *upload, tag, arch)
 
-					for _, img := range []string{gethImage, toolImage} {
+					for _, img := range []string{gomblImage, toolImage} {
 						if out, err := exec.Command("docker", "pull", img).CombinedOutput(); err != nil {
 							log.Printf("Required image %s unavailable: %v\nOutput: %s", img, err, out)
 							mismatch = true
@@ -608,16 +608,16 @@ func doDocker(cmdline []string) {
 			log.Println("Relinquishing publish to other builder")
 			return
 		}
-		// Assemble and push the Geth manifest image
+		// Assemble and push the gombl manifest image
 		for _, tag := range tags {
-			gethImage := fmt.Sprintf("%s:%s", *upload, tag)
+			gomblImage := fmt.Sprintf("%s:%s", *upload, tag)
 
-			var gethSubImages []string
+			var gomblSubImages []string
 			for _, arch := range strings.Split(*manifest, ",") {
-				gethSubImages = append(gethSubImages, gethImage+"-"+arch)
+				gomblSubImages = append(gomblSubImages, gomblImage+"-"+arch)
 			}
-			build.MustRunCommand("docker", append([]string{"manifest", "create", gethImage}, gethSubImages...)...)
-			build.MustRunCommand("docker", "manifest", "push", gethImage)
+			build.MustRunCommand("docker", append([]string{"manifest", "create", gomblImage}, gomblSubImages...)...)
+			build.MustRunCommand("docker", "manifest", "push", gomblImage)
 		}
 		// Assemble and push the alltools manifest image
 		for _, tag := range tags {
@@ -639,7 +639,7 @@ func doDebianSource(cmdline []string) {
 		cachedir = flag.String("cachedir", "./build/cache", `Filesystem path to cache the downloaded Go bundles at`)
 		signer   = flag.String("signer", "", `Signing key name, also used as package author`)
 		upload   = flag.String("upload", "", `Where to upload the source package (usually "mbali/mbali")`)
-		sshUser  = flag.String("sftp-user", "", `Username for SFTP upload (usually "geth-ci")`)
+		sshUser  = flag.String("sftp-user", "", `Username for SFTP upload (usually "gombl-ci")`)
 		workdir  = flag.String("workdir", "", `Output directory for packages (uses temp dir if unset)`)
 		now      = time.Now()
 	)
@@ -758,7 +758,7 @@ func makeWorkdir(wdflag string) string {
 	if wdflag != "" {
 		err = os.MkdirAll(wdflag, 0744)
 	} else {
-		wdflag, err = os.MkdirTemp("", "geth-build-")
+		wdflag, err = os.MkdirTemp("", "gombl-build-")
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -917,7 +917,7 @@ func doWindowsInstaller(cmdline []string) {
 		arch    = flag.String("arch", runtime.GOARCH, "Architecture for cross build packaging")
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. WINDOWS_SIGNING_KEY)`)
 		signify = flag.String("signify key", "", `Environment variable holding the signify signing key (e.g. WINDOWS_SIGNIFY_KEY)`)
-		upload  = flag.String("upload", "", `Destination to upload the archives (usually "gethstore/builds")`)
+		upload  = flag.String("upload", "", `Destination to upload the archives (usually "gomblstore/builds")`)
 		workdir = flag.String("workdir", "", `Output directory for packages (uses temp dir if unset)`)
 	)
 	flag.CommandLine.Parse(cmdline)
@@ -929,28 +929,28 @@ func doWindowsInstaller(cmdline []string) {
 	var (
 		devTools []string
 		allTools []string
-		gethTool string
+		gomblTool string
 	)
 	for _, file := range allToolsArchiveFiles {
 		if file == "COPYING" { // license, copied later
 			continue
 		}
 		allTools = append(allTools, filepath.Base(file))
-		if filepath.Base(file) == "geth.exe" {
-			gethTool = file
+		if filepath.Base(file) == "gombl.exe" {
+			gomblTool = file
 		} else {
 			devTools = append(devTools, file)
 		}
 	}
 
 	// Render NSIS scripts: Installer NSIS contains two installer sections,
-	// first section contains the geth binary, second section holds the dev tools.
+	// first section contains the gombl binary, second section holds the dev tools.
 	templateData := map[string]interface{}{
 		"License":  "COPYING",
-		"Geth":     gethTool,
+		"gombl":     gomblTool,
 		"DevTools": devTools,
 	}
-	build.Render("build/nsis.geth.nsi", filepath.Join(*workdir, "geth.nsi"), 0644, nil)
+	build.Render("build/nsis.gombl.nsi", filepath.Join(*workdir, "gombl.nsi"), 0644, nil)
 	build.Render("build/nsis.install.nsh", filepath.Join(*workdir, "install.nsh"), 0644, templateData)
 	build.Render("build/nsis.uninstall.nsh", filepath.Join(*workdir, "uninstall.nsh"), 0644, allTools)
 	build.Render("build/nsis.pathupdate.nsh", filepath.Join(*workdir, "PathUpdate.nsh"), 0644, nil)
@@ -968,14 +968,14 @@ func doWindowsInstaller(cmdline []string) {
 	if env.Commit != "" {
 		version[2] += "-" + env.Commit[:8]
 	}
-	installer, _ := filepath.Abs("geth-" + archiveBasename(*arch, params.ArchiveVersion(env.Commit)) + ".exe")
+	installer, _ := filepath.Abs("gombl-" + archiveBasename(*arch, params.ArchiveVersion(env.Commit)) + ".exe")
 	build.MustRunCommand("makensis.exe",
 		"/DOUTPUTFILE="+installer,
 		"/DMAJORVERSION="+version[0],
 		"/DMINORVERSION="+version[1],
 		"/DBUILDVERSION="+version[2],
 		"/DARCH="+*arch,
-		filepath.Join(*workdir, "geth.nsi"),
+		filepath.Join(*workdir, "gombl.nsi"),
 	)
 	// Sign and publish installer.
 	if err := archiveUpload(installer, *upload, *signer, *signify); err != nil {
@@ -991,7 +991,7 @@ func doAndroidArchive(cmdline []string) {
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. ANDROID_SIGNING_KEY)`)
 		signify = flag.String("signify", "", `Environment variable holding the signify signing key (e.g. ANDROID_SIGNIFY_KEY)`)
 		deploy  = flag.String("deploy", "", `Destination to deploy the archive (usually "https://oss.sonatype.org")`)
-		upload  = flag.String("upload", "", `Destination to upload the archive (usually "gethstore/builds")`)
+		upload  = flag.String("upload", "", `Destination to upload the archive (usually "gomblstore/builds")`)
 	)
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
@@ -1016,8 +1016,8 @@ func doAndroidArchive(cmdline []string) {
 
 	if *local {
 		// If we're building locally, copy bundle to build dir and skip Maven
-		os.Rename("geth.aar", filepath.Join(GOBIN, "geth.aar"))
-		os.Rename("geth-sources.jar", filepath.Join(GOBIN, "geth-sources.jar"))
+		os.Rename("gombl.aar", filepath.Join(GOBIN, "gombl.aar"))
+		os.Rename("gombl-sources.jar", filepath.Join(GOBIN, "gombl-sources.jar"))
 		return
 	}
 	meta := newMavenMetadata(env)
@@ -1027,8 +1027,8 @@ func doAndroidArchive(cmdline []string) {
 	maybeSkipArchive(env)
 
 	// Sign and upload the archive to Azure
-	archive := "geth-" + archiveBasename("android", params.ArchiveVersion(env.Commit)) + ".aar"
-	os.Rename("geth.aar", archive)
+	archive := "gombl-" + archiveBasename("android", params.ArchiveVersion(env.Commit)) + ".aar"
+	os.Rename("gombl.aar", archive)
 
 	if err := archiveUpload(archive, *upload, *signer, *signify); err != nil {
 		log.Fatal(err)
@@ -1113,7 +1113,7 @@ func newMavenMetadata(env build.Environment) mavenMetadata {
 	}
 	return mavenMetadata{
 		Version:      version,
-		Package:      "geth-" + version,
+		Package:      "gombl-" + version,
 		Develop:      isUnstableBuild(env),
 		Contributors: contribs,
 	}
@@ -1127,7 +1127,7 @@ func doXCodeFramework(cmdline []string) {
 		signer  = flag.String("signer", "", `Environment variable holding the signing key (e.g. IOS_SIGNING_KEY)`)
 		signify = flag.String("signify", "", `Environment variable holding the signify signing key (e.g. IOS_SIGNIFY_KEY)`)
 		deploy  = flag.String("deploy", "", `Destination to deploy the archive (usually "trunk")`)
-		upload  = flag.String("upload", "", `Destination to upload the archives (usually "gethstore/builds")`)
+		upload  = flag.String("upload", "", `Destination to upload the archives (usually "gomblstore/builds")`)
 	)
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
@@ -1148,7 +1148,7 @@ func doXCodeFramework(cmdline []string) {
 
 	// Create the archive.
 	maybeSkipArchive(env)
-	archive := "geth-" + archiveBasename("ios", params.ArchiveVersion(env.Commit))
+	archive := "gombl-" + archiveBasename("ios", params.ArchiveVersion(env.Commit))
 	if err := os.MkdirAll(archive, 0755); err != nil {
 		log.Fatal(err)
 	}
@@ -1163,8 +1163,8 @@ func doXCodeFramework(cmdline []string) {
 	// Prepare and upload a PodSpec to CocoaPods
 	if *deploy != "" {
 		meta := newPodMetadata(env, archive)
-		build.Render("build/pod.podspec", "Geth.podspec", 0755, meta)
-		build.MustRunCommand("pod", *deploy, "push", "Geth.podspec", "--allow-warnings")
+		build.Render("build/pod.podspec", "gombl.podspec", 0755, meta)
+		build.MustRunCommand("pod", *deploy, "push", "gombl.podspec", "--allow-warnings")
 	}
 }
 
@@ -1217,7 +1217,7 @@ func newPodMetadata(env build.Environment, archive string) podMetadata {
 
 func doPurge(cmdline []string) {
 	var (
-		store = flag.String("store", "", `Destination from where to purge archives (usually "gethstore/builds")`)
+		store = flag.String("store", "", `Destination from where to purge archives (usually "gomblstore/builds")`)
 		limit = flag.Int("days", 30, `Age threshold above which to delete unstable archives`)
 	)
 	flag.CommandLine.Parse(cmdline)

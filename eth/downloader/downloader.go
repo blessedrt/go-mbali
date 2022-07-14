@@ -156,8 +156,8 @@ type LightChain interface {
 	// HasHeader verifies a header's presence in the local chain.
 	HasHeader(common.Hash, uint64) bool
 
-	// GetHeaderByHash retrieves a header from the local chain.
-	GetHeaderByHash(common.Hash) *types.Header
+	// gombleaderByHash retrieves a header from the local chain.
+	gombleaderByHash(common.Hash) *types.Header
 
 	// CurrentHeader retrieves the head header from the local chain.
 	CurrentHeader() *types.Header
@@ -829,7 +829,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 				if floor >= int64(d.genesis)-1 {
 					break
 				}
-				header = d.lightchain.GetHeaderByHash(header.ParentHash)
+				header = d.lightchain.gombleaderByHash(header.ParentHash)
 			}
 		}
 		// We already know the "genesis" block number, cap floor to that
@@ -957,7 +957,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 			end = check
 			continue
 		}
-		header := d.lightchain.GetHeaderByHash(h) // Independent of sync mode, header surely exists
+		header := d.lightchain.gombleaderByHash(h) // Independent of sync mode, header surely exists
 		if header.Number.Uint64() != check {
 			p.log.Warn("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
 			return 0, fmt.Errorf("%w: non-requested header (%d)", errBadPeer, header.Number)
@@ -1548,7 +1548,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 		} else {
 			// The InsertChain method in blockchain.go will sometimes return an out-of-bounds index,
 			// when it needs to preprocess blocks to import a sidechain.
-			// The importer will put together a new list of blocks to import, which is a superset
+			// The importer will put togombler a new list of blocks to import, which is a superset
 			// of the blocks delivered from the downloader, and the indexing will be off.
 			log.Debug("Downloaded item processing failed on sidechain import", "index", index, "err", err)
 		}
@@ -1787,7 +1787,7 @@ func (d *Downloader) readHeaderRange(last *types.Header, count int) []*types.Hea
 		headers []*types.Header
 	)
 	for {
-		parent := d.lightchain.GetHeaderByHash(current.ParentHash)
+		parent := d.lightchain.gombleaderByHash(current.ParentHash)
 		if parent == nil {
 			break // The chain is not continuous, or the chain is exhausted
 		}

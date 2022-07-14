@@ -96,7 +96,7 @@ func (c *Chain) Head() *types.Block {
 	return c.blocks[c.Len()-1]
 }
 
-func (c *Chain) GetHeaders(req GetBlockHeaders) (BlockHeaders, error) {
+func (c *Chain) gombleaders(req GetBlockHeaders) (BlockHeaders, error) {
 	if req.Amount < 1 {
 		return nil, fmt.Errorf("no block headers requested")
 	}

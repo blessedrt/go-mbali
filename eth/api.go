@@ -601,7 +601,7 @@ func (api *PrivateDebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64
 		if i < int64(pivot) {
 			continue
 		}
-		h := api.eth.BlockChain().GetHeaderByNumber(uint64(i))
+		h := api.eth.BlockChain().gombleaderByNumber(uint64(i))
 		if h == nil {
 			return 0, fmt.Errorf("missing header %d", i)
 		}

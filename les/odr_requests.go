@@ -318,7 +318,7 @@ type ChtRequest light.ChtRequest
 // GetCost returns the cost of the given ODR request according to the serving
 // peer's cost table (implementation of LesOdrRequest)
 func (r *ChtRequest) GetCost(peer *serverPeer) uint64 {
-	return peer.getRequestCost(GetHelperTrieProofsMsg, 1)
+	return peer.getRequestCost(gomblelperTrieProofsMsg, 1)
 }
 
 // CanSend tells if a certain peer is suitable for serving the given request
@@ -406,7 +406,7 @@ type BloomRequest light.BloomRequest
 // GetCost returns the cost of the given ODR request according to the serving
 // peer's cost table (implementation of LesOdrRequest)
 func (r *BloomRequest) GetCost(peer *serverPeer) uint64 {
-	return peer.getRequestCost(GetHelperTrieProofsMsg, len(r.SectionIndexList))
+	return peer.getRequestCost(gomblelperTrieProofsMsg, len(r.SectionIndexList))
 }
 
 // CanSend tells if a certain peer is suitable for serving the given request

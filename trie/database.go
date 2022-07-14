@@ -472,7 +472,7 @@ func (db *Database) Nodes() []common.Hash {
 // Reference adds a new reference from a parent node to a child node.
 // This function is used to add reference between internal trie node
 // and external node(e.g. storage trie root), all internal trie nodes
-// are referenced together by database itself.
+// are referenced togombler by database itself.
 func (db *Database) Reference(child common.Hash, parent common.Hash) {
 	db.lock.Lock()
 	defer db.lock.Unlock()

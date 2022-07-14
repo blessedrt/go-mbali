@@ -35,13 +35,13 @@ var (
 )
 
 func TestEthSuite(t *testing.T) {
-	geth, err := runGeth()
+	gombl, err := rungombl()
 	if err != nil {
-		t.Fatalf("could not run geth: %v", err)
+		t.Fatalf("could not run gombl: %v", err)
 	}
-	defer geth.Close()
+	defer gombl.Close()
 
-	suite, err := NewSuite(geth.Server().Self(), fullchainFile, genesisFile)
+	suite, err := NewSuite(gombl.Server().Self(), fullchainFile, genesisFile)
 	if err != nil {
 		t.Fatalf("could not create new test suite: %v", err)
 	}
@@ -56,13 +56,13 @@ func TestEthSuite(t *testing.T) {
 }
 
 func TestSnapSuite(t *testing.T) {
-	geth, err := runGeth()
+	gombl, err := rungombl()
 	if err != nil {
-		t.Fatalf("could not run geth: %v", err)
+		t.Fatalf("could not run gombl: %v", err)
 	}
-	defer geth.Close()
+	defer gombl.Close()
 
-	suite, err := NewSuite(geth.Server().Self(), fullchainFile, genesisFile)
+	suite, err := NewSuite(gombl.Server().Self(), fullchainFile, genesisFile)
 	if err != nil {
 		t.Fatalf("could not create new test suite: %v", err)
 	}
@@ -76,8 +76,8 @@ func TestSnapSuite(t *testing.T) {
 	}
 }
 
-// runGeth creates and starts a geth node
-func runGeth() (*node.Node, error) {
+// rungombl creates and starts a gombl node
+func rungombl() (*node.Node, error) {
 	stack, err := node.New(&node.Config{
 		P2P: p2p.Config{
 			ListenAddr:  "127.0.0.1:0",
@@ -90,7 +90,7 @@ func runGeth() (*node.Node, error) {
 		return nil, err
 	}
 
-	err = setupGeth(stack)
+	err = setupgombl(stack)
 	if err != nil {
 		stack.Close()
 		return nil, err
@@ -102,7 +102,7 @@ func runGeth() (*node.Node, error) {
 	return stack, nil
 }
 
-func setupGeth(stack *node.Node) error {
+func setupgombl(stack *node.Node) error {
 	chain, err := loadChain(halfchainFile, genesisFile)
 	if err != nil {
 		return err

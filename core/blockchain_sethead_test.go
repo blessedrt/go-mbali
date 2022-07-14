@@ -2058,7 +2058,7 @@ func verifyNoGaps(t *testing.T, chain *BlockChain, canonical bool, inserted type
 
 	var end uint64
 	for i := uint64(0); i <= uint64(len(inserted)); i++ {
-		header := chain.GetHeaderByNumber(i)
+		header := chain.gombleaderByNumber(i)
 		if header == nil && end == 0 {
 			end = i
 		}
@@ -2110,7 +2110,7 @@ func verifyCutoff(t *testing.T, chain *BlockChain, canonical bool, inserted type
 
 	for i := 1; i <= len(inserted); i++ {
 		if i <= head {
-			if header := chain.GetHeader(inserted[i-1].Hash(), uint64(i)); header == nil {
+			if header := chain.gombleader(inserted[i-1].Hash(), uint64(i)); header == nil {
 				if canonical {
 					t.Errorf("Canonical header   #%2d [%x...] missing before cap %d", inserted[i-1].Number(), inserted[i-1].Hash().Bytes()[:3], head)
 				} else {
@@ -2132,7 +2132,7 @@ func verifyCutoff(t *testing.T, chain *BlockChain, canonical bool, inserted type
 				}
 			}
 		} else {
-			if header := chain.GetHeader(inserted[i-1].Hash(), uint64(i)); header != nil {
+			if header := chain.gombleader(inserted[i-1].Hash(), uint64(i)); header != nil {
 				if canonical {
 					t.Errorf("Canonical header   #%2d [%x...] present after cap %d", inserted[i-1].Number(), inserted[i-1].Hash().Bytes()[:3], head)
 				} else {

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-package gethclient
+package gomblclient
 
 import (
 	"bytes"
@@ -90,7 +90,7 @@ func generateTestChain() (*core.Genesis, []*types.Block) {
 	return genesis, blocks
 }
 
-func TestGethClient(t *testing.T) {
+func TestgomblClient(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, err := backend.Attach()
 	if err != nil {

@@ -100,7 +100,7 @@ func (context *chainContext) Engine() consensus.Engine {
 	return context.api.backend.Engine()
 }
 
-func (context *chainContext) GetHeader(hash common.Hash, number uint64) *types.Header {
+func (context *chainContext) gombleader(hash common.Hash, number uint64) *types.Header {
 	header, err := context.api.backend.HeaderByNumber(context.ctx, rpc.BlockNumber(number))
 	if err != nil {
 		return nil

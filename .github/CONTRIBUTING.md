@@ -30,11 +30,11 @@ Please make sure your contributions adhere to our coding guidelines:
 Before you submit a feature request, please check and make sure that it isn't 
 possible through some other means. The JavaScript-enabled console is a powerful 
 feature in the right hands. Please check our 
-[Geth documentation page](https://geth.mbali.org/docs/) for more info
+[gombl documentation page](https://gombl.mbali.org/docs/) for more info
 and help.
 
 ## Configuration, dependencies, and tests
 
-Please see the [Developers' Guide](https://geth.mbali.org/docs/developers/devguide)
+Please see the [Developers' Guide](https://gombl.mbali.org/docs/developers/devguide)
 for more details on configuring your environment, managing project dependencies
 and testing procedures.

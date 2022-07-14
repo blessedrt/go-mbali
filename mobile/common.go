@@ -16,7 +16,7 @@
 
 // Contains all the wrappers from the common package.
 
-package geth
+package gombl
 
 import (
 	"encoding/hex"
@@ -82,14 +82,14 @@ func (h *Hash) SetHex(hash string) error {
 	return nil
 }
 
-// GetHex retrieves the hex string representation of the hash.
-func (h *Hash) GetHex() string {
+// gomblex retrieves the hex string representation of the hash.
+func (h *Hash) gomblex() string {
 	return h.hash.Hex()
 }
 
 // String implements Stringer interface for printable representation of the hash.
 func (h *Hash) String() string {
-	return h.GetHex()
+	return h.gomblex()
 }
 
 // Hashes represents a slice of hashes.
@@ -188,14 +188,14 @@ func (a *Address) SetHex(address string) error {
 	return nil
 }
 
-// GetHex retrieves the hex string representation of the address.
-func (a *Address) GetHex() string {
+// gomblex retrieves the hex string representation of the address.
+func (a *Address) gomblex() string {
 	return a.address.Hex()
 }
 
 // String returns a printable representation of the address.
 func (a *Address) String() string {
-	return a.GetHex()
+	return a.gomblex()
 }
 
 // Addresses represents a slice of addresses.

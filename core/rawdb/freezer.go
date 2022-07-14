@@ -60,7 +60,7 @@ const freezerTableSize = 2 * 1000 * 1000 * 1000
 // - The append-only nature ensures that disk writes are minimized.
 // - The memory mapping ensures we can max out system memory for caching without
 //   reserving it for go-mbali. This would also reduce the memory requirements
-//   of Geth, and thus also GC overhead.
+//   of gombl, and thus also GC overhead.
 type Freezer struct {
 	// WARNING: The `frozen` and `tail` fields are accessed atomically. On 32 bit platforms, only
 	// 64-bit aligned fields can be atomic. The struct is guaranteed to be so aligned,

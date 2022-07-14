@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.mbali</groupId>
-  <artifactId>geth</artifactId>
+  <artifactId>gombl</artifactId>
   <version>{{.Version}}</version>
   <packaging>aar</packaging>
 

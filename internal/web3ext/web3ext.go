@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-mbali library. If not, see <http://www.gnu.org/licenses/>.
 
-// package web3ext contains geth specific web3.js extensions.
+// package web3ext contains gombl specific web3.js extensions.
 package web3ext
 
 var Modules = map[string]string{
@@ -99,8 +99,8 @@ web3._extend({
 			params: 0
 		}),
 		new web3._extend.Method({
-			name: 'getHashrate',
-			call: 'ethash_getHashrate',
+			name: 'gomblashrate',
+			call: 'ethash_gomblashrate',
 			params: 0
 		}),
 		new web3._extend.Method({
@@ -224,8 +224,8 @@ web3._extend({
 			outputFormatter: console.log
 		}),
 		new web3._extend.Method({
-			name: 'getHeaderRlp',
-			call: 'debug_getHeaderRlp',
+			name: 'gombleaderRlp',
+			call: 'debug_gombleaderRlp',
 			params: 1
 		}),
 		new web3._extend.Method({
@@ -537,14 +537,14 @@ web3._extend({
 			inputFormatter: [web3._extend.formatters.inputTransactionFormatter]
 		}),
 		new web3._extend.Method({
-			name: 'getHeaderByNumber',
-			call: 'eth_getHeaderByNumber',
+			name: 'gombleaderByNumber',
+			call: 'eth_gombleaderByNumber',
 			params: 1,
 			inputFormatter: [web3._extend.formatters.inputBlockNumberFormatter]
 		}),
 		new web3._extend.Method({
-			name: 'getHeaderByHash',
-			call: 'eth_getHeaderByHash',
+			name: 'gombleaderByHash',
+			call: 'eth_gombleaderByHash',
 			params: 1
 		}),
 		new web3._extend.Method({
@@ -661,8 +661,8 @@ web3._extend({
 			params: 1,
 		}),
 		new web3._extend.Method({
-			name: 'getHashrate',
-			call: 'miner_getHashrate'
+			name: 'gomblashrate',
+			call: 'miner_gomblashrate'
 		}),
 	],
 	properties: []

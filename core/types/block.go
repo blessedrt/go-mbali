@@ -156,7 +156,7 @@ func (h *Header) EmptyReceipts() bool {
 }
 
 // Body is a simple (mutable, non-safe) data container for storing and moving
-// a block's data contents (transactions and uncles) together.
+// a block's data contents (transactions and uncles) togombler.
 type Body struct {
 	Transactions []*Transaction
 	Uncles       []*Header

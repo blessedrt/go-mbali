@@ -121,9 +121,9 @@ func TestEthProtocolNegotiation(t *testing.T) {
 	}
 }
 
-// TestChain_GetHeaders tests whether the test suite can correctly
+// TestChain_gombleaders tests whether the test suite can correctly
 // respond to a GetBlockHeaders request from a node.
-func TestChain_GetHeaders(t *testing.T) {
+func TestChain_gombleaders(t *testing.T) {
 	chainFile, err := filepath.Abs("./testdata/chain.rlp")
 	if err != nil {
 		t.Fatal(err)
@@ -191,7 +191,7 @@ func TestChain_GetHeaders(t *testing.T) {
 
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			headers, err := chain.GetHeaders(tt.req)
+			headers, err := chain.gombleaders(tt.req)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -154,7 +154,7 @@ func makeMiner(genesis *core.Genesis) (*node.Node, *eth.mbali, error) {
 	datadir, _ := os.MkdirTemp("", "")
 
 	config := &node.Config{
-		Name:    "geth",
+		Name:    "gombl",
 		Version: params.Version,
 		DataDir: datadir,
 		P2P: p2p.Config{

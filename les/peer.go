@@ -472,7 +472,7 @@ func (p *serverPeer) requestProofs(reqID uint64, reqs []ProofReq) error {
 // requestHelperTrieProofs fetches a batch of HelperTrie merkle proofs from a remote node.
 func (p *serverPeer) requestHelperTrieProofs(reqID uint64, reqs []HelperTrieReq) error {
 	p.Log().Debug("Fetching batch of HelperTrie proofs", "count", len(reqs))
-	return p.sendRequest(GetHelperTrieProofsMsg, reqID, reqs, len(reqs))
+	return p.sendRequest(gomblelperTrieProofsMsg, reqID, reqs, len(reqs))
 }
 
 // requestTxStatus fetches a batch of transaction status records from a remote node.

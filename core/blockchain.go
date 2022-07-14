@@ -126,7 +126,7 @@ type CacheConfig struct {
 	TrieCleanRejournal  time.Duration // Time interval to dump clean cache to disk periodically
 	TrieCleanNoPrefetch bool          // Whether to disable heuristic state prefetching for followup blocks
 	TrieDirtyLimit      int           // Memory limit (MB) at which to start flushing dirty trie nodes to disk
-	TrieDirtyDisabled   bool          // Whether to disable trie write caching and GC altogether (archive node)
+	TrieDirtyDisabled   bool          // Whether to disable trie write caching and GC altogombler (archive node)
 	TrieTimeLimit       time.Duration // Time limit after which to flush the current in-memory trie to disk
 	SnapshotLimit       int           // Memory allowance (MB) to use for caching snapshot entries in memory
 	Preimages           bool          // Whether to store preimage of trie key to the disk
@@ -351,9 +351,9 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig *par
 
 	// Check the current state of the block hashes and make sure that we do not have any of the bad blocks in our chain
 	for hash := range BadHashes {
-		if header := bc.GetHeaderByHash(hash); header != nil {
+		if header := bc.gombleaderByHash(hash); header != nil {
 			// get the canonical block corresponding to the offending header's number
-			headerByNumber := bc.GetHeaderByNumber(header.Number.Uint64())
+			headerByNumber := bc.gombleaderByNumber(header.Number.Uint64())
 			// make sure the headerByNumber (if present) is in our current canonical chain
 			if headerByNumber != nil && headerByNumber.Hash() == header.Hash() {
 				log.Error("Found bad hash, rewinding chain", "number", header.Number, "hash", header.ParentHash)
@@ -447,7 +447,7 @@ func (bc *BlockChain) loadLastState() error {
 	// Restore the last known head header
 	currentHeader := currentBlock.Header()
 	if head := rawdb.ReadHeadHeaderHash(bc.db); head != (common.Hash{}) {
-		if header := bc.GetHeaderByHash(head); header != nil {
+		if header := bc.gombleaderByHash(head); header != nil {
 			currentHeader = header
 		}
 	}
@@ -644,7 +644,7 @@ func (bc *BlockChain) setHeadBeyondRoot(head uint64, root common.Hash, repair bo
 		// Todo(rjl493456442) txlookup, bloombits, etc
 	}
 	// If SetHead was only called as a chain reparation method, try to skip
-	// touching the header chain altogether, unless the freezer is broken
+	// touching the header chain altogombler, unless the freezer is broken
 	if repair {
 		if target, force := updateFn(bc.db, bc.CurrentBlock().Header()); force {
 			bc.hc.SetHead(target, updateFn, delFn)
@@ -1010,7 +1010,7 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 		// * If block number is large enough to be regarded as a recent block
 		// It means blocks below the ancientLimit-txlookupLimit won't be indexed.
 		//
-		// But if the `TxIndexTail` is not nil, e.g. Geth is initialized with
+		// But if the `TxIndexTail` is not nil, e.g. gombl is initialized with
 		// an external ancient database, during the setup, blockchain will start
 		// a background routine to re-indexed all indices in [ancients - txlookupLimit, ancients)
 		// range. In this case, all tx indices of newly imported blocks should be
@@ -1261,7 +1261,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 			if bc.gcproc > bc.cacheConfig.TrieTimeLimit {
 				// If the header is missing (canonical chain behind), we're reorging a low
 				// diff sidechain. Suspend committing until this operation is completed.
-				header := bc.GetHeaderByNumber(chosen)
+				header := bc.gombleaderByNumber(chosen)
 				if header == nil {
 					log.Warn("Reorg in progress, trie commit postponed", "number", chosen)
 				} else {
@@ -1353,7 +1353,7 @@ func (bc *BlockChain) writeBlockAndSetHead(block *types.Block, receipts []*types
 // ahead and was not added.
 //
 // TODO after the transition, the future block shouldn't be kept. Because
-// it's not checked in the Geth side anymore.
+// it's not checked in the gombl side anymore.
 func (bc *BlockChain) addFutureBlock(block *types.Block) error {
 	max := uint64(time.Now().Unix() + maxTimeFutureBlocks)
 	if block.Time() > max {
@@ -1598,7 +1598,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		start := time.Now()
 		parent := it.previous()
 		if parent == nil {
-			parent = bc.GetHeader(block.ParentHash(), block.NumberU64()-1)
+			parent = bc.gombleader(block.ParentHash(), block.NumberU64()-1)
 		}
 		statedb, err := state.New(parent.Root, bc.stateCache, bc.snaps)
 		if err != nil {
@@ -1830,7 +1830,7 @@ func (bc *BlockChain) insertSideChain(block *types.Block, it *insertIterator) (i
 		hashes = append(hashes, parent.Hash())
 		numbers = append(numbers, parent.Number.Uint64())
 
-		parent = bc.GetHeader(parent.ParentHash, parent.Number.Uint64()-1)
+		parent = bc.gombleader(parent.ParentHash, parent.Number.Uint64()-1)
 	}
 	if parent == nil {
 		return it.index, errors.New("missing parent")
@@ -2219,7 +2219,7 @@ func (bc *BlockChain) skipBlock(err error, it *insertIterator) bool {
 	// Resolve parent block
 	if parent := it.previous(); parent != nil {
 		parentRoot = parent.Root
-	} else if parent = bc.GetHeaderByHash(header.ParentHash); parent != nil {
+	} else if parent = bc.gombleaderByHash(header.ParentHash); parent != nil {
 		parentRoot = parent.Root
 	}
 	if parentRoot == (common.Hash{}) {
@@ -2240,13 +2240,13 @@ func (bc *BlockChain) skipBlock(err error, it *insertIterator) bool {
 // all tx indices will be reserved.
 //
 // The user can adjust the txlookuplimit value for each launch after fast
-// sync, Geth will automatically construct the missing indices and delete
+// sync, gombl will automatically construct the missing indices and delete
 // the extra indices.
 func (bc *BlockChain) maintainTxIndex(ancients uint64) {
 	defer bc.wg.Done()
 
 	// Before starting the actual maintenance, we need to handle a special case,
-	// where user might init Geth with an external ancient database. If so, we
+	// where user might init gombl with an external ancient database. If so, we
 	// need to reindex all necessary transactions before starting to process any
 	// pruning requests.
 	if ancients > 0 {
@@ -2261,7 +2261,7 @@ func (bc *BlockChain) maintainTxIndex(ancients uint64) {
 	indexBlocks := func(tail *uint64, head uint64, done chan struct{}) {
 		defer func() { done <- struct{}{} }()
 
-		// If the user just upgraded Geth to a new version which supports transaction
+		// If the user just upgraded gombl to a new version which supports transaction
 		// index pruning, write the new tail and remove anything older.
 		if tail == nil {
 			if bc.txLookupLimit == 0 || head < bc.txLookupLimit {

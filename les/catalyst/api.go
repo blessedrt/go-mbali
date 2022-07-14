@@ -73,7 +73,7 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(heads beacon.ForkchoiceStateV1, pay
 		return beacon.STATUS_INVALID, nil // TODO(karalabe): Why does someone send us this?
 	}
 	if err := api.checkTerminalTotalDifficulty(heads.HeadBlockHash); err != nil {
-		if header := api.les.BlockChain().GetHeaderByHash(heads.HeadBlockHash); header == nil {
+		if header := api.les.BlockChain().gombleaderByHash(heads.HeadBlockHash); header == nil {
 			// TODO (MariusVanDerWijden) trigger sync
 			return beacon.STATUS_SYNCING, nil
 		}
@@ -81,7 +81,7 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(heads beacon.ForkchoiceStateV1, pay
 	}
 	// If the finalized block is set, check if it is in our blockchain
 	if heads.FinalizedBlockHash != (common.Hash{}) {
-		if header := api.les.BlockChain().GetHeaderByHash(heads.FinalizedBlockHash); header == nil {
+		if header := api.les.BlockChain().gombleaderByHash(heads.FinalizedBlockHash); header == nil {
 			// TODO (MariusVanDerWijden) trigger sync
 			return beacon.STATUS_SYNCING, nil
 		}
@@ -117,7 +117,7 @@ func (api *ConsensusAPI) ExecutePayloadV1(params beacon.ExecutableDataV1) (beaco
 		// TODO (MariusVanDerWijden) we should return nil here not empty hash
 		return beacon.PayloadStatusV1{Status: beacon.SYNCING, LatestValidHash: nil}, nil
 	}
-	parent := api.les.BlockChain().GetHeaderByHash(params.ParentHash)
+	parent := api.les.BlockChain().gombleaderByHash(params.ParentHash)
 	if parent == nil {
 		return api.invalid(), fmt.Errorf("could not find parent %x", params.ParentHash)
 	}
@@ -155,7 +155,7 @@ func (api *ConsensusAPI) checkTerminalTotalDifficulty(head common.Hash) error {
 		return nil
 	}
 	// make sure the parent has enough terminal total difficulty
-	header := api.les.BlockChain().GetHeaderByHash(head)
+	header := api.les.BlockChain().gombleaderByHash(head)
 	if header == nil {
 		return errors.New("unknown header")
 	}
@@ -174,7 +174,7 @@ func (api *ConsensusAPI) setCanonical(newHead common.Hash) error {
 	if headHeader.Hash() == newHead {
 		return nil
 	}
-	newHeadHeader := api.les.BlockChain().GetHeaderByHash(newHead)
+	newHeadHeader := api.les.BlockChain().gombleaderByHash(newHead)
 	if newHeadHeader == nil {
 		return errors.New("unknown header")
 	}

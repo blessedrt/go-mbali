@@ -55,7 +55,7 @@ func (b *testBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumber
 			return nil, nil
 		}
 	}
-	return b.chain.GetHeaderByNumber(uint64(number)), nil
+	return b.chain.gombleaderByNumber(uint64(number)), nil
 }
 
 func (b *testBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Block, error) {

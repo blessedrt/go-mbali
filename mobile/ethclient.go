@@ -16,7 +16,7 @@
 
 // Contains a wrapper for the mbali client.
 
-package geth
+package gombl
 
 import (
 	"math/big"
@@ -53,15 +53,15 @@ func (ec *mbaliClient) GetBlockByNumber(ctx *Context, number int64) (block *Bloc
 	return &Block{rawBlock}, err
 }
 
-// GetHeaderByHash returns the block header with the given hash.
-func (ec *mbaliClient) GetHeaderByHash(ctx *Context, hash *Hash) (header *Header, _ error) {
+// gombleaderByHash returns the block header with the given hash.
+func (ec *mbaliClient) gombleaderByHash(ctx *Context, hash *Hash) (header *Header, _ error) {
 	rawHeader, err := ec.client.HeaderByHash(ctx.context, hash.hash)
 	return &Header{rawHeader}, err
 }
 
-// GetHeaderByNumber returns a block header from the current canonical chain. If number is <0,
+// gombleaderByNumber returns a block header from the current canonical chain. If number is <0,
 // the latest known header is returned.
-func (ec *mbaliClient) GetHeaderByNumber(ctx *Context, number int64) (header *Header, _ error) {
+func (ec *mbaliClient) gombleaderByNumber(ctx *Context, number int64) (header *Header, _ error) {
 	if number < 0 {
 		rawHeader, err := ec.client.HeaderByNumber(ctx.context, nil)
 		return &Header{rawHeader}, err

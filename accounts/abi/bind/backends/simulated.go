@@ -311,7 +311,7 @@ func (b *SimulatedBackend) HeaderByHash(ctx context.Context, hash common.Hash) (
 		return b.pendingBlock.Header(), nil
 	}
 
-	header := b.blockchain.GetHeaderByHash(hash)
+	header := b.blockchain.gombleaderByHash(hash)
 	if header == nil {
 		return nil, errBlockDoesNotExist
 	}
@@ -329,7 +329,7 @@ func (b *SimulatedBackend) HeaderByNumber(ctx context.Context, block *big.Int) (
 		return b.blockchain.CurrentHeader(), nil
 	}
 
-	return b.blockchain.GetHeaderByNumber(uint64(block.Int64())), nil
+	return b.blockchain.gombleaderByNumber(uint64(block.Int64())), nil
 }
 
 // TransactionCount returns the number of transactions in a given block.
@@ -830,11 +830,11 @@ func (fb *filterBackend) HeaderByNumber(ctx context.Context, block rpc.BlockNumb
 	if block == rpc.LatestBlockNumber {
 		return fb.bc.CurrentHeader(), nil
 	}
-	return fb.bc.GetHeaderByNumber(uint64(block.Int64())), nil
+	return fb.bc.gombleaderByNumber(uint64(block.Int64())), nil
 }
 
 func (fb *filterBackend) HeaderByHash(ctx context.Context, hash common.Hash) (*types.Header, error) {
-	return fb.bc.GetHeaderByHash(hash), nil
+	return fb.bc.gombleaderByHash(hash), nil
 }
 
 func (fb *filterBackend) PendingBlockAndReceipts() (*types.Block, types.Receipts) {

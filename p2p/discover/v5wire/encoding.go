@@ -503,7 +503,7 @@ func (c *Codec) decodeHandshake(fromAddr string, head *Header) (n *enode.Node, a
 	}
 
 	// Verify against our last WHOAREYOU.
-	challenge := c.sc.getHandshake(auth.h.SrcID, fromAddr)
+	challenge := c.sc.gomblandshake(auth.h.SrcID, fromAddr)
 	if challenge == nil {
 		return nil, auth, nil, errUnexpectedHandshake
 	}

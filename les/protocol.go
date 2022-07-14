@@ -74,7 +74,7 @@ const (
 	// Protocol messages introduced in LPV2
 	GetProofsV2Msg         = 0x0f
 	ProofsV2Msg            = 0x10
-	GetHelperTrieProofsMsg = 0x11
+	gomblelperTrieProofsMsg = 0x11
 	HelperTrieProofsMsg    = 0x12
 	SendTxV2Msg            = 0x13
 	GetTxStatusMsg         = 0x14
@@ -122,8 +122,8 @@ type GetProofsPacket struct {
 	Reqs  []ProofReq
 }
 
-// GetHelperTrieProofsPacket represents a helper trie proof request
-type GetHelperTrieProofsPacket struct {
+// gomblelperTrieProofsPacket represents a helper trie proof request
+type gomblelperTrieProofsPacket struct {
 	ReqID uint64
 	Reqs  []HelperTrieReq
 }
@@ -163,7 +163,7 @@ var (
 		GetReceiptsMsg:         {"GetReceipts", MaxReceiptFetch, 1, 0},
 		GetCodeMsg:             {"GetCode", MaxCodeFetch, 1, 0},
 		GetProofsV2Msg:         {"GetProofsV2", MaxProofsFetch, 10, 0},
-		GetHelperTrieProofsMsg: {"GetHelperTrieProofs", MaxHelperTrieProofsFetch, 10, 100},
+		gomblelperTrieProofsMsg: {"gomblelperTrieProofs", MaxHelperTrieProofsFetch, 10, 100},
 		SendTxV2Msg:            {"SendTxV2", MaxTxSend, 1, 0},
 		GetTxStatusMsg:         {"GetTxStatus", MaxTxStatus, 10, 0},
 	}

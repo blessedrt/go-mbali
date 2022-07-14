@@ -46,7 +46,7 @@ type Config struct {
 	BaseFee     *big.Int
 
 	State     *state.StateDB
-	GetHashFn func(n uint64) common.Hash
+	gomblashFn func(n uint64) common.Hash
 }
 
 // sets defaults on the config
@@ -89,8 +89,8 @@ func setDefaults(cfg *Config) {
 	if cfg.BlockNumber == nil {
 		cfg.BlockNumber = new(big.Int)
 	}
-	if cfg.GetHashFn == nil {
-		cfg.GetHashFn = func(n uint64) common.Hash {
+	if cfg.gomblashFn == nil {
+		cfg.gomblashFn = func(n uint64) common.Hash {
 			return common.BytesToHash(crypto.Keccak256([]byte(new(big.Int).SetUint64(n).String())))
 		}
 	}

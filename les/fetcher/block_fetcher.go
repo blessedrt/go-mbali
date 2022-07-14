@@ -182,7 +182,7 @@ type BlockFetcher struct {
 	queued map[common.Hash]*blockOrHeaderInject // Set of already queued blocks (to dedup imports)
 
 	// Callbacks
-	getHeader      HeaderRetrievalFn  // Retrieves a header from the local chain
+	gombleader      HeaderRetrievalFn  // Retrieves a header from the local chain
 	getBlock       blockRetrievalFn   // Retrieves a block from the local chain
 	verifyHeader   headerVerifierFn   // Checks if a block's headers have a valid proof of work
 	broadcastBlock blockBroadcasterFn // Broadcasts a block to connected peers
@@ -200,7 +200,7 @@ type BlockFetcher struct {
 }
 
 // NewBlockFetcher creates a block fetcher to retrieve blocks based on hash announcements.
-func NewBlockFetcher(light bool, getHeader HeaderRetrievalFn, getBlock blockRetrievalFn, verifyHeader headerVerifierFn, broadcastBlock blockBroadcasterFn, chainHeight chainHeightFn, insertHeaders headersInsertFn, insertChain chainInsertFn, dropPeer peerDropFn) *BlockFetcher {
+func NewBlockFetcher(light bool, gombleader HeaderRetrievalFn, getBlock blockRetrievalFn, verifyHeader headerVerifierFn, broadcastBlock blockBroadcasterFn, chainHeight chainHeightFn, insertHeaders headersInsertFn, insertChain chainInsertFn, dropPeer peerDropFn) *BlockFetcher {
 	return &BlockFetcher{
 		light:          light,
 		notify:         make(chan *blockAnnounce),
@@ -217,7 +217,7 @@ func NewBlockFetcher(light bool, getHeader HeaderRetrievalFn, getBlock blockRetr
 		queue:          prque.New(nil),
 		queues:         make(map[string]int),
 		queued:         make(map[common.Hash]*blockOrHeaderInject),
-		getHeader:      getHeader,
+		gombleader:      gombleader,
 		getBlock:       getBlock,
 		verifyHeader:   verifyHeader,
 		broadcastBlock: broadcastBlock,
@@ -347,7 +347,7 @@ func (f *BlockFetcher) loop() {
 		// Clean up any expired block fetches
 		for hash, announce := range f.fetching {
 			if time.Since(announce.time) > fetchTimeout {
-				f.forgetHash(hash)
+				f.forgomblash(hash)
 			}
 		}
 		// Import any queued blocks that could potentially fit
@@ -368,7 +368,7 @@ func (f *BlockFetcher) loop() {
 				break
 			}
 			// Otherwise if fresh and still unknown, try and import
-			if (number+maxUncleDist < height) || (f.light && f.getHeader(hash) != nil) || (!f.light && f.getBlock(hash) != nil) {
+			if (number+maxUncleDist < height) || (f.light && f.gombleader(hash) != nil) || (!f.light && f.getBlock(hash) != nil) {
 				f.forgetBlock(hash)
 				continue
 			}
@@ -431,7 +431,7 @@ func (f *BlockFetcher) loop() {
 
 		case hash := <-f.done:
 			// A pending import finished, remove all traces of the notification
-			f.forgetHash(hash)
+			f.forgomblash(hash)
 			f.forgetBlock(hash)
 
 		case <-fetchTimer.C:
@@ -448,10 +448,10 @@ func (f *BlockFetcher) loop() {
 				if time.Since(announces[0].time) > timeout {
 					// Pick a random peer to retrieve from, reset all others
 					announce := announces[rand.Intn(len(announces))]
-					f.forgetHash(hash)
+					f.forgomblash(hash)
 
 					// If the block still didn't arrive, queue for fetching
-					if (f.light && f.getHeader(hash) == nil) || (!f.light && f.getBlock(hash) == nil) {
+					if (f.light && f.gombleader(hash) == nil) || (!f.light && f.getBlock(hash) == nil) {
 						request[announce.origin] = append(request[announce.origin], hash)
 						f.fetching[hash] = announce
 					}
@@ -483,7 +483,7 @@ func (f *BlockFetcher) loop() {
 			for hash, announces := range f.fetched {
 				// Pick a random peer to retrieve from, reset all others
 				announce := announces[rand.Intn(len(announces))]
-				f.forgetHash(hash)
+				f.forgomblash(hash)
 
 				// If the block still didn't arrive, queue for completion
 				if f.getBlock(hash) == nil {
@@ -529,17 +529,17 @@ func (f *BlockFetcher) loop() {
 					if header.Number.Uint64() != announce.number {
 						log.Trace("Invalid block number fetched", "peer", announce.origin, "hash", header.Hash(), "announced", announce.number, "provided", header.Number)
 						f.dropPeer(announce.origin)
-						f.forgetHash(hash)
+						f.forgomblash(hash)
 						continue
 					}
 					// Collect all headers only if we are running in light
 					// mode and the headers are not imported by other means.
 					if f.light {
-						if f.getHeader(hash) == nil {
+						if f.gombleader(hash) == nil {
 							announce.header = header
 							lightHeaders = append(lightHeaders, announce)
 						}
-						f.forgetHash(hash)
+						f.forgomblash(hash)
 						continue
 					}
 					// Only keep if not imported by other means
@@ -562,7 +562,7 @@ func (f *BlockFetcher) loop() {
 						incomplete = append(incomplete, announce)
 					} else {
 						log.Trace("Block already imported, discarding header", "peer", announce.origin, "number", header.Number, "hash", header.Hash())
-						f.forgetHash(hash)
+						f.forgomblash(hash)
 					}
 				} else {
 					// BlockFetcher doesn't know about it, add to the return list
@@ -639,7 +639,7 @@ func (f *BlockFetcher) loop() {
 							block.ReceivedAt = task.time
 							blocks = append(blocks, block)
 						} else {
-							f.forgetHash(hash)
+							f.forgomblash(hash)
 						}
 
 					}
@@ -722,14 +722,14 @@ func (f *BlockFetcher) enqueue(peer string, header *types.Header, block *types.B
 	if count > blockLimit {
 		log.Debug("Discarded delivered header or block, exceeded allowance", "peer", peer, "number", number, "hash", hash, "limit", blockLimit)
 		blockBroadcastDOSMeter.Mark(1)
-		f.forgetHash(hash)
+		f.forgomblash(hash)
 		return
 	}
 	// Discard any past or too distant blocks
 	if dist := int64(number) - int64(f.chainHeight()); dist < -maxUncleDist || dist > maxQueueDist {
 		log.Debug("Discarded delivered header or block, too far away", "peer", peer, "number", number, "hash", hash, "distance", dist)
 		blockBroadcastDropMeter.Mark(1)
-		f.forgetHash(hash)
+		f.forgomblash(hash)
 		return
 	}
 	// Schedule the block for future importing
@@ -760,7 +760,7 @@ func (f *BlockFetcher) importHeaders(peer string, header *types.Header) {
 	go func() {
 		defer func() { f.done <- hash }()
 		// If the parent's unknown, abort insertion
-		parent := f.getHeader(header.ParentHash)
+		parent := f.gombleader(header.ParentHash)
 		if parent == nil {
 			log.Debug("Unknown parent of propagated header", "peer", peer, "number", header.Number, "hash", hash, "parent", header.ParentHash)
 			return
@@ -832,9 +832,9 @@ func (f *BlockFetcher) importBlocks(peer string, block *types.Block) {
 	}()
 }
 
-// forgetHash removes all traces of a block announcement from the fetcher's
+// forgomblash removes all traces of a block announcement from the fetcher's
 // internal state.
-func (f *BlockFetcher) forgetHash(hash common.Hash) {
+func (f *BlockFetcher) forgomblash(hash common.Hash) {
 	// Remove all pending announces and decrement DOS counters
 	if announceMap, ok := f.announced[hash]; ok {
 		for _, announce := range announceMap {

@@ -42,7 +42,7 @@ func (api *API) GetSnapshot(number *rpc.BlockNumber) (*Snapshot, error) {
 	if number == nil || *number == rpc.LatestBlockNumber {
 		header = api.chain.CurrentHeader()
 	} else {
-		header = api.chain.GetHeaderByNumber(uint64(number.Int64()))
+		header = api.chain.gombleaderByNumber(uint64(number.Int64()))
 	}
 	// Ensure we have an actually valid block and return its snapshot
 	if header == nil {
@@ -53,7 +53,7 @@ func (api *API) GetSnapshot(number *rpc.BlockNumber) (*Snapshot, error) {
 
 // GetSnapshotAtHash retrieves the state snapshot at a given block.
 func (api *API) GetSnapshotAtHash(hash common.Hash) (*Snapshot, error) {
-	header := api.chain.GetHeaderByHash(hash)
+	header := api.chain.gombleaderByHash(hash)
 	if header == nil {
 		return nil, errUnknownBlock
 	}
@@ -67,7 +67,7 @@ func (api *API) GetSigners(number *rpc.BlockNumber) ([]common.Address, error) {
 	if number == nil || *number == rpc.LatestBlockNumber {
 		header = api.chain.CurrentHeader()
 	} else {
-		header = api.chain.GetHeaderByNumber(uint64(number.Int64()))
+		header = api.chain.gombleaderByNumber(uint64(number.Int64()))
 	}
 	// Ensure we have an actually valid block and return the signers from its snapshot
 	if header == nil {
@@ -82,7 +82,7 @@ func (api *API) GetSigners(number *rpc.BlockNumber) ([]common.Address, error) {
 
 // GetSignersAtHash retrieves the list of authorized signers at the specified block.
 func (api *API) GetSignersAtHash(hash common.Hash) ([]common.Address, error) {
-	header := api.chain.GetHeaderByHash(hash)
+	header := api.chain.gombleaderByHash(hash)
 	if header == nil {
 		return nil, errUnknownBlock
 	}
@@ -158,7 +158,7 @@ func (api *API) Status() (*status, error) {
 		signStatus[s] = 0
 	}
 	for n := start; n < end; n++ {
-		h := api.chain.GetHeaderByNumber(n)
+		h := api.chain.gombleaderByNumber(n)
 		if h == nil {
 			return nil, fmt.Errorf("missing block %d", n)
 		}
@@ -214,9 +214,9 @@ func (api *API) GetSigner(rlpOrBlockNr *blockNumberOrHashOrRLP) (common.Address,
 		if blockNrOrHash == nil {
 			header = api.chain.CurrentHeader()
 		} else if hash, ok := blockNrOrHash.Hash(); ok {
-			header = api.chain.GetHeaderByHash(hash)
+			header = api.chain.gombleaderByHash(hash)
 		} else if number, ok := blockNrOrHash.Number(); ok {
-			header = api.chain.GetHeaderByNumber(uint64(number.Int64()))
+			header = api.chain.gombleaderByNumber(uint64(number.Int64()))
 		}
 		if header == nil {
 			return common.Address{}, fmt.Errorf("missing block %v", blockNrOrHash.String())

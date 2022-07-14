@@ -218,7 +218,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	// Prepare the EVM.
 	txContext := core.NewEVMTxContext(msg)
 	context := core.NewEVMBlockContext(block.Header(), nil, &t.json.Env.Coinbase)
-	context.GetHash = vmTestBlockHash
+	context.gomblash = vmTestBlockHash
 	context.BaseFee = baseFee
 	if t.json.Env.Random != nil {
 		rnd := common.BigToHash(t.json.Env.Random)

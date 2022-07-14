@@ -85,14 +85,14 @@ type ethstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
-type gethConfig struct {
+type gomblConfig struct {
 	Eth      ethconfig.Config
 	Node     node.Config
 	Ethstats ethstatsConfig
 	Metrics  metrics.Config
 }
 
-func loadConfig(file string, cfg *gethConfig) error {
+func loadConfig(file string, cfg *gomblConfig) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -113,14 +113,14 @@ func defaultNodeConfig() node.Config {
 	cfg.Version = params.VersionWithCommit(gitCommit, gitDate)
 	cfg.HTTPModules = append(cfg.HTTPModules, "eth")
 	cfg.WSModules = append(cfg.WSModules, "eth")
-	cfg.IPCPath = "geth.ipc"
+	cfg.IPCPath = "gombl.ipc"
 	return cfg
 }
 
-// makeConfigNode loads geth configuration and creates a blank node instance.
-func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
+// makeConfigNode loads gombl configuration and creates a blank node instance.
+func makeConfigNode(ctx *cli.Context) (*node.Node, gomblConfig) {
 	// Load defaults.
-	cfg := gethConfig{
+	cfg := gomblConfig{
 		Eth:     ethconfig.Defaults,
 		Node:    defaultNodeConfig(),
 		Metrics: metrics.DefaultConfig,
@@ -153,7 +153,7 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
 	return stack, cfg
 }
 
-// makeFullNode loads geth configuration and creates the mbali backend.
+// makeFullNode loads gombl configuration and creates the mbali backend.
 func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	stack, cfg := makeConfigNode(ctx)
 	if ctx.GlobalIsSet(utils.OverrideArrowGlacierFlag.Name) {
@@ -177,7 +177,7 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			log.Error("Failed to check db for legacy receipts", "err", err)
 		} else if isLegacy {
 			stack.Close()
-			utils.Fatalf("Database has receipts with a legacy format. Please run `geth db freezer-migrate`.")
+			utils.Fatalf("Database has receipts with a legacy format. Please run `gombl db freezer-migrate`.")
 		}
 	}
 
@@ -221,7 +221,7 @@ func dumpConfig(ctx *cli.Context) error {
 	return nil
 }
 
-func applyMetricConfig(ctx *cli.Context, cfg *gethConfig) {
+func applyMetricConfig(ctx *cli.Context, cfg *gomblConfig) {
 	if ctx.GlobalIsSet(utils.MetricsEnabledFlag.Name) {
 		cfg.Metrics.Enabled = ctx.GlobalBool(utils.MetricsEnabledFlag.Name)
 	}

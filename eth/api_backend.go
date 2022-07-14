@@ -76,7 +76,7 @@ func (b *EthAPIBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumb
 	if number == rpc.FinalizedBlockNumber {
 		return b.eth.blockchain.CurrentFinalizedBlock().Header(), nil
 	}
-	return b.eth.blockchain.GetHeaderByNumber(uint64(number)), nil
+	return b.eth.blockchain.gombleaderByNumber(uint64(number)), nil
 }
 
 func (b *EthAPIBackend) HeaderByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) (*types.Header, error) {
@@ -84,7 +84,7 @@ func (b *EthAPIBackend) HeaderByNumberOrHash(ctx context.Context, blockNrOrHash 
 		return b.HeaderByNumber(ctx, blockNr)
 	}
 	if hash, ok := blockNrOrHash.Hash(); ok {
-		header := b.eth.blockchain.GetHeaderByHash(hash)
+		header := b.eth.blockchain.gombleaderByHash(hash)
 		if header == nil {
 			return nil, errors.New("header for hash not found")
 		}
@@ -97,7 +97,7 @@ func (b *EthAPIBackend) HeaderByNumberOrHash(ctx context.Context, blockNrOrHash 
 }
 
 func (b *EthAPIBackend) HeaderByHash(ctx context.Context, hash common.Hash) (*types.Header, error) {
-	return b.eth.blockchain.GetHeaderByHash(hash), nil
+	return b.eth.blockchain.gombleaderByHash(hash), nil
 }
 
 func (b *EthAPIBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Block, error) {
@@ -125,7 +125,7 @@ func (b *EthAPIBackend) BlockByNumberOrHash(ctx context.Context, blockNrOrHash r
 		return b.BlockByNumber(ctx, blockNr)
 	}
 	if hash, ok := blockNrOrHash.Hash(); ok {
-		header := b.eth.blockchain.GetHeaderByHash(hash)
+		header := b.eth.blockchain.gombleaderByHash(hash)
 		if header == nil {
 			return nil, errors.New("header for hash not found")
 		}
@@ -202,7 +202,7 @@ func (b *EthAPIBackend) GetLogs(ctx context.Context, hash common.Hash) ([][]*typ
 }
 
 func (b *EthAPIBackend) GetTd(ctx context.Context, hash common.Hash) *big.Int {
-	if header := b.eth.blockchain.GetHeaderByHash(hash); header != nil {
+	if header := b.eth.blockchain.gombleaderByHash(hash); header != nil {
 		return b.eth.blockchain.GetTd(hash, header.Number.Uint64())
 	}
 	return nil

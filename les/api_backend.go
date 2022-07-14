@@ -70,7 +70,7 @@ func (b *LesApiBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumb
 	if number == rpc.LatestBlockNumber {
 		return b.eth.blockchain.CurrentHeader(), nil
 	}
-	return b.eth.blockchain.GetHeaderByNumberOdr(ctx, uint64(number))
+	return b.eth.blockchain.gombleaderByNumberOdr(ctx, uint64(number))
 }
 
 func (b *LesApiBackend) HeaderByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) (*types.Header, error) {
@@ -94,7 +94,7 @@ func (b *LesApiBackend) HeaderByNumberOrHash(ctx context.Context, blockNrOrHash 
 }
 
 func (b *LesApiBackend) HeaderByHash(ctx context.Context, hash common.Hash) (*types.Header, error) {
-	return b.eth.blockchain.GetHeaderByHash(hash), nil
+	return b.eth.blockchain.gombleaderByHash(hash), nil
 }
 
 func (b *LesApiBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Block, error) {
@@ -149,7 +149,7 @@ func (b *LesApiBackend) StateAndHeaderByNumberOrHash(ctx context.Context, blockN
 		return b.StateAndHeaderByNumber(ctx, blockNr)
 	}
 	if hash, ok := blockNrOrHash.Hash(); ok {
-		header := b.eth.blockchain.GetHeaderByHash(hash)
+		header := b.eth.blockchain.gombleaderByHash(hash)
 		if header == nil {
 			return nil, nil, errors.New("header for hash not found")
 		}

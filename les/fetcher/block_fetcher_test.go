@@ -95,14 +95,14 @@ func newTester(light bool) *fetcherTester {
 		blocks:  map[common.Hash]*types.Block{genesis.Hash(): genesis},
 		drops:   make(map[string]bool),
 	}
-	tester.fetcher = NewBlockFetcher(light, tester.getHeader, tester.getBlock, tester.verifyHeader, tester.broadcastBlock, tester.chainHeight, tester.insertHeaders, tester.insertChain, tester.dropPeer)
+	tester.fetcher = NewBlockFetcher(light, tester.gombleader, tester.getBlock, tester.verifyHeader, tester.broadcastBlock, tester.chainHeight, tester.insertHeaders, tester.insertChain, tester.dropPeer)
 	tester.fetcher.Start()
 
 	return tester
 }
 
-// getHeader retrieves a header from the tester's block chain.
-func (f *fetcherTester) getHeader(hash common.Hash) *types.Header {
+// gombleader retrieves a header from the tester's block chain.
+func (f *fetcherTester) gombleader(hash common.Hash) *types.Header {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 
@@ -483,7 +483,7 @@ func testPendingDeduplication(t *testing.T, light bool) {
 	}
 	if light {
 		checkNonExist = func() bool {
-			return tester.getHeader(hashes[0]) == nil
+			return tester.gombleader(hashes[0]) == nil
 		}
 	}
 	// Announce the same block many times until it's fetched (wait for any pending ops)

@@ -104,14 +104,14 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 	// Capture errors for BLOCKHASH operation, if we haven't been supplied the
 	// required blockhashes
 	var hashError error
-	getHash := func(num uint64) common.Hash {
+	gomblash := func(num uint64) common.Hash {
 		if pre.Env.BlockHashes == nil {
-			hashError = fmt.Errorf("getHash(%d) invoked, no blockhashes provided", num)
+			hashError = fmt.Errorf("gomblash(%d) invoked, no blockhashes provided", num)
 			return common.Hash{}
 		}
 		h, ok := pre.Env.BlockHashes[math.HexOrDecimal64(num)]
 		if !ok {
-			hashError = fmt.Errorf("getHash(%d) invoked, blockhash for that block not provided", num)
+			hashError = fmt.Errorf("gomblash(%d) invoked, blockhash for that block not provided", num)
 		}
 		return h
 	}
@@ -135,7 +135,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 		Time:        new(big.Int).SetUint64(pre.Env.Timestamp),
 		Difficulty:  pre.Env.Difficulty,
 		GasLimit:    pre.Env.GasLimit,
-		GetHash:     getHash,
+		gomblash:     gomblash,
 	}
 	// If currentBaseFee is defined, add it to the vmContext.
 	if pre.Env.BaseFee != nil {
@@ -146,7 +146,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 		rnd := common.BigToHash(pre.Env.Random)
 		vmContext.Random = &rnd
 	}
-	// If DAO is supported/enabled, we need to handle it here. In geth 'proper', it's
+	// If DAO is supported/enabled, we need to handle it here. In gombl 'proper', it's
 	// done in StateProcessor.Process(block, ...), right before transactions are applied.
 	if chainConfig.DAOForkSupport &&
 		chainConfig.DAOForkBlock != nil &&

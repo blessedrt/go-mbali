@@ -104,10 +104,10 @@ func (ethash *Ethash) VerifyHeader(chain consensus.ChainHeaderReader, header *ty
 	}
 	// Short circuit if the header is known, or its parent not
 	number := header.Number.Uint64()
-	if chain.GetHeader(header.Hash(), number) != nil {
+	if chain.gombleader(header.Hash(), number) != nil {
 		return nil
 	}
-	parent := chain.GetHeader(header.ParentHash, number-1)
+	parent := chain.gombleader(header.ParentHash, number-1)
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
@@ -184,7 +184,7 @@ func (ethash *Ethash) VerifyHeaders(chain consensus.ChainHeaderReader, headers [
 func (ethash *Ethash) verifyHeaderWorker(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool, index int, unixNow int64) error {
 	var parent *types.Header
 	if index == 0 {
-		parent = chain.GetHeader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
+		parent = chain.gombleader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
 	} else if headers[index-1].Hash() == headers[index].ParentHash {
 		parent = headers[index-1]
 	}
@@ -213,7 +213,7 @@ func (ethash *Ethash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 
 	number, parent := block.NumberU64()-1, block.ParentHash()
 	for i := 0; i < 7; i++ {
-		ancestorHeader := chain.GetHeader(parent, number)
+		ancestorHeader := chain.gombleader(parent, number)
 		if ancestorHeader == nil {
 			break
 		}
@@ -580,7 +580,7 @@ func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *type
 // Prepare implements consensus.Engine, initializing the difficulty field of a
 // header to conform to the ethash protocol. The changes are done inline.
 func (ethash *Ethash) Prepare(chain consensus.ChainHeaderReader, header *types.Header) error {
-	parent := chain.GetHeader(header.ParentHash, header.Number.Uint64()-1)
+	parent := chain.gombleader(header.ParentHash, header.Number.Uint64()-1)
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
