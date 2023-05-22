@@ -36,7 +36,7 @@ import (
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/p2p"
 	"github.com/mbali/go-mbali/rpc"
-	"github.com/prommbleus/tsdb/fileutil"
+	"github.com/prometheus/tsdb/fileutil"
 )
 
 // Node is a container on which services can be registered.

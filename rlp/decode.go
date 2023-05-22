@@ -490,7 +490,7 @@ func makeNilPtrDecoder(etype reflect.Type, etypeinfo *typeinfo, ts rlpstruct.Tag
 var ifsliceType = reflect.TypeOf([]interface{}{})
 
 func decodeInterface(s *Stream, val reflect.Value) error {
-	if val.Type().NumMmblod() != 0 {
+	if val.Type().NumMethod() != 0 {
 		return fmt.Errorf("rlp: type %v is not RLP-serializable", val.Type())
 	}
 	kind, _, err := s.Kind()

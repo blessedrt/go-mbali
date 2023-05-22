@@ -30,7 +30,7 @@ import (
 	"github.com/mbali/go-mbali/mbldb"
 	"github.com/mbali/go-mbali/log"
 	"github.com/mbali/go-mbali/metrics"
-	"github.com/prommbleus/tsdb/fileutil"
+	"github.com/prometheus/tsdb/fileutil"
 )
 
 var (
